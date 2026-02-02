@@ -24,34 +24,42 @@ There are two main ways to handle button input.
 
 The API lets you check the state of each button — whether it has been `pressed`, `released`, `held`, or `changed` during the current frame.
 
+> Note: Click on the emulator to allow it to capture input. Use the arrow keys and space on your keyboard to try the example out!
+
 ```python
-from badgeware import io
+last_event = None
 
 def update():
+  global last_event
+
   # true only when button A is newly pressed this frame
   if io.BUTTON_A in io.pressed:
-    ...
+    last_event = "BUTTON A PRESSED!"
 
   # true continuously while button B is being held
   if io.BUTTON_B in io.held:
-    ...
+    last_event = "BUTTON B HELD!"
 
   # true only if button C has been released this frame
   if io.BUTTON_C in io.released:
-    ...
+    last_event = "BUTTON C RELEASED!"
 
   # true only if button UP has changed state this frame
   if io.BUTTON_UP in io.changed:
-    ...
+    last_event = "BUTTON UP CHANGED!"
+
+  if last_event:
+    screen.pen = color.white
+    screen.text(last_event, 10, 10)
 ```
 
 `io.pressed`\
-A list of buttons that were just pressed during the current frame — that is, buttons that were not pressed in the previous frame.
+A list of buttons that were just pressed during the current frame — that is, buttons that switched from not pressed last frame to pressed this frame.
 
 To check which buttons are currently being held down, use `io.held` instead.
 
 `io.released`\
-A list of buttons that were just released during the current frame — that is, buttons that were pressed in the previous frame.
+A list of buttons that were just released during the current frame — that is, buttons that switched from pressed last frame to not pressed this frame.
 
 To check which buttons are currently being held down, use `io.held` instead.
 
@@ -59,7 +67,7 @@ To check which buttons are currently being held down, use `io.held` instead.
 A list of all buttons that are currently held down.
 
 `io.changed`\
-A list of all buttons whose state changed during the previous frame.
+A list of all buttons whose state changed between the last frame and the current frame.
 
 ## Backlight LEDs
 
