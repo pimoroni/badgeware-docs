@@ -9,6 +9,7 @@ There are a few things it's worth getting familiar with before trying to code yo
 - [Coding for the different badges](introduction/badge-differences.md)
 - [Badge modes](introduction/editing-on-device.md)
 - [The hardware](introduction/hardware.md)
+- [Tutorial 1: Absolute Beginners](introduction/tutorial_1.md)
 
 ## Guides
 Once you have the basics down check out our guides to each of the different features of Badgeware!
