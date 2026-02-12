@@ -89,7 +89,7 @@ To learn more about shapes [click here for full documentation of the `shapes` mo
 # Transforming vector shapes
 
 
-Shapes can also be given a transformation matrix to adjust their scale, rotation, and skew - this is very useful for creating smooth animations. [Click here for full documentation of the `Matrix` class](api/types/Matrix.md).
+Shapes can also be given a transformation matrix to adjust their scale, rotation, and skew - this is very useful for creating smooth animations. [Click here for full documentation of the `Matrix` class](api/mat3.md).
 
 ```python {len=3}
 import math

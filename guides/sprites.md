@@ -61,7 +61,7 @@ def update():
 
 # Animating sprites
 
-The `Image` class can load images from files on the filesystem which can then be blitted onto the screen. [Click here for full documentation of the `Image` class](api/types/Image.md).
+The `Image` class can load images from files on the filesystem which can then be blitted onto the screen. [Click here for full documentation of the `Image` class](api/image.md).
 
 ```python
 # example of loading a sprite and blitting it to the screen
