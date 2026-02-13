@@ -9,214 +9,143 @@ Represents a rectangular region defined by its top-left position (`x`, `y`) and 
 
 Although `x`, `y`, `w`, and `h` are stored as floating-point values, they represent pixel coordinates. This allows rectangles to be positioned with subpixel precision. For most basic drawing operations, these values are typically cast to integers before rendering.
 
+# Constructor
+
+## rect()
+Returns a `rect` with the specified dimensions and position.
+
+### Usage
+- `rect_name = rect(x, y, w, h)`
+    - `x, y`: Pixel coordinates of the top left corner of the `rect`.
+    - `w, h`: Width and height of the `rect`.
+
 # Properties
 
 ## x
-The x-coordinate of the top-left corner of the rectangle. This property is a float value.
-
-```python
-r = rect()
-r.x = 50
-```
+The x-coordinate of the top-left corner of the rectangle.
 
 ## y
-The y-coordinate of the top-left corner of the rectangle. This property is a float value.
-
-```python
-r = rect()
-r.y = 50
-```
+The y-coordinate of the top-left corner of the rectangle.
 
 ## w
-The width of the rectangle. This property is a float value.
-
-```python
-r = rect()
-r.w = 100
-```
+The width of the rectangle.
 
 ## h
-The height of the rectangle. This property is a float value.
-
-```python
-r = rect()
-r.h = 80
-```
+The height of the rectangle.
 
 ## l
-The x-cordinate of the top-left corner of the rectangle. This property is a float value.
-
-```python
-r = rect()
-r.l = 50
-```
+The x-cordinate of the top-left corner of the rectangle.
 
 ## r
-The x-coordinate of the bottom-right corner of the rectangle. This property is a float value.
-
-```python
-r = rect()
-r.r = 50
-```
+The x-coordinate of the bottom-right corner of the rectangle.
 
 ## t
-The y-cordinate of the top-left corner of the rectangle. This property is a float value.
-
-```python
-r = rect()
-r.w = 100
-```
+The y-cordinate of the top-left corner of the rectangle.
 
 ## b
-The y-coordinate of the bottom-right corner of the rectangle. This property is a float value.
-
-```python
-r = rect()
-r.h = 80
-```
+The y-coordinate of the bottom-right corner of the rectangle.
 
 # Methods
 
-## offset
+## offset()
 Returns a new rectangle offset by the specified amount.
 
-**Parameters**
+### Usage
+- `rect_name.offset(x, y)`
+    - `x, y`: Amount to offset the rectangle by.
 
-- `offset(x, y)`
-    - `x, y`: Amount to offset the rectangle by
+### Returns
+A `rect` representing the offset rectangle.
 
-**Returns**
-
-- A new `rect` representing the offset rectangle
-
-**Example code**
-
-```python
-r = rect(20, 20, 80, 80)
-r1 = r.offset(10, 10)
-```
-
-## deflate
+## deflate()
 Returns a new rectangle with its area reduced in size.
 
-**Parameters**
+### Usage
+- `rect_name.deflate(a)`
+    - `a`: Amount to deflate each edge by.
+- `rect_name.deflate(t, r, b, l)`
+    - `t, r, b, l`: Amounts to deflate the top, right, bottom, and left edges.
 
-- `deflate(a)`
-    - `a`: Amount to deflate each edge by
+### Returns
+A `rect` representing the smaller rectangle.
 
-- `deflate(t, r, b, l)`
-    - `t, r, b, l`: Amounts to deflate the top, right, bottom, and left edges
-
-**Returns**
-
-- A new `rect` representing the deflated rectangle
-
-**Example code**
-
-```python
-r = rect(20, 20, 80, 80)
-r1 = r.deflate(10)
-r2 = r.deflate(10, 20, 10, 20)
-```
-
-## inflate
+## inflate()
 Returns a new rectangle with its area increased in size.
 
-**Parameters**
+### Usage
+- `rect_name.inflate(a)`
+    - `a`: Amount to inflate each edge by.
+- `rect_name.inflate(t, r, b, l)`
+    - `t, r, b, l`: Amounts to inflate the top, right, bottom, and left edges.
 
-- `inflate(a)`
-    - `a`: Amount to inflate each edge by
+### Returns
+A `rect` representing the larger rectangle.
 
-- `inflate(t, r, b, l)`
-    - `t, r, b, l`: Amounts to inflate the top, right, bottom, and left edges
-
-**Returns**
-
-- A new `rect` representing the inflate rectangle
-
-**Example code**
-
-```python
-r = rect(20, 20, 40, 40)
-r1 = r.inflate(10)
-r2 = r.inflate(10, 20, 10, 20)
-```
-
-## intersection
+## intersection()
 Returns a new rectangle representing the overlapping area between this rectangle and another.
-
 If the rectangles do not overlap, `None` is returned.
 
-**Parameters**
+### Usage
+- `rect_name.intersection(other)`
+    - `other`: The rectangle to intersect with.
 
-- `intersection(other)`
-    - `other`: The rectangle to intersect with
+### Returns
+A `rect` representing the intersection of the two operands.
 
-**Returns**
-
-- A new `rect` representing the intersection of the two rectangles, or `None` if there is no overlap
-
-**Example code**
-
-```python
-r1 = rect(20, 20, 40, 40)
-r2 = rect(30, 30, 40, 40)
-r3 = r1.intersection(r2)
-```
-
-## intersects
+## intersects()
 Returns `True` if this rectangle overlaps with another rectangle, otherwise `False`.
 
-**Parameters**
+### Usage
+- `rect_name.intersects(other)`
+    - `other`: The rectangle to test for intersection with.
 
-- `intersects(other)`
-    - `other`: The rectangle to test for intersection with
+### Returns
+`bool`
 
-**Returns**
-
-- `True` if the rectangles overlap, otherwise `False`
-
-**Example code**
-
-```python
-r1 = rect(20, 20, 40, 40)
-r2 = rect(30, 30, 40, 40)
-if r1.intersects(r2):
-  print("overlap!")
-```
-
-## contains
+## contains()
 Returns `True` if this rectangle fully contains another rectangle, otherwise `False`.
 
-**Parameters**
+### Usage
+- `rect_name.contains(other)`
+    - `other`: The rectangle to test for containment.
 
-- `contains(other)`
-    - `other`: The rectangle to test for containment
+### Returns
+`bool`
 
-**Returns**
+## empty()
+Returns `True` if this rectangle has a width or height of zero, otherwise `False`.
 
-- `True` if the rectangle is fully contained, otherwise `False`
+### Returns
+`bool`
 
-**Example code**
+# Reference
 
-```python
-r1 = rect(20, 20, 40, 40)
-r2 = rect(30, 30, 5, 5)
-if r1.contains(r2):
-  print("r2 is inside r1!")
+## Constructor
+```python-raw
+rect(x: int|float, y: int|float, w: int|float, h: int|float) -> rect
 ```
 
-## empty
-Returns `True` if this rectangle has a width and height of zero, otherwise `False`.
+## Properties
+```python-raw
+rect.x -> float
+rect.y -> float
+rect.w -> float
+rect.h -> float
+rect.l -> float
+rect.r -> float
+rect.t -> float
+rect.b -> float
+```
 
-**Returns**
-
-- `True` if the rectangle is empty, otherwise `False`
-
-**Example code**
-
-```python
-r = rect(20, 20, 40, 40)
-r.deflate(10)
-r.empty() # returns True
+## Methods
+```python-raw
+rect.contains(other: rect) -> bool
+rect.deflate(a: int|float) -> rect
+rect.deflate(t: int|float, r: int|float, b: int|float, l: int|float) -> rect
+rect.empty() -> bool
+rect.inflate(a: int|float) -> rect
+rect.inflate(t: int| float, r: int| float, b: int| float, l: int|float) -> rect
+rect.intersection(other: rect) -> rect | None
+rect.intersects(other: rect) -> bool
+rect.offset(x: int|float, y: int|float) -> rect
 ```
