@@ -35,6 +35,8 @@ def update():
   screen.pen = color.taupe
   circle = shape.circle(80, 60, 40)
   screen.shape(circle)
+
+run(update)
 ```
 
 ## rectangle()
@@ -54,6 +56,8 @@ def update():
   screen.pen = color.blue
   rectangle = shape.rectangle(30, 30, 100, 60)
   screen.shape(rectangle)
+
+run(update)
 ```
 
 ## regular_polygon()
@@ -79,6 +83,8 @@ def update():
 
   screen.pen = color.white
   screen.text(f"{sides} sides", 5, 5)
+
+run(update)
 ```
 
 ## rounded_rectangle()
@@ -109,6 +115,8 @@ def update():
   screen.pen = color.navy
   rounded_rectangle = shape.rounded_rectangle(85, 50, 60, 60, 0, 20, 0, 20)
   screen.shape(rounded_rectangle)
+
+run(update)
 ```
 
 ## squircle
@@ -133,6 +141,8 @@ def update():
   screen.pen = color.orange
   squircle = shape.squircle(80, 60, 40)
   screen.shape(squircle)
+
+run(update)
 ```
 
 ## arc
@@ -158,6 +168,8 @@ def update():
   arc = shape.arc(80, 60, 30, 40, angle + 30, angle + 150)
   screen.pen = color.cyan
   screen.shape(arc)
+
+run(update)
 ```
 
 ## pie
@@ -182,6 +194,8 @@ def update():
   p = shape.pie(80, 60, 40, a + 30, a + 150)
   screen.pen = color.green
   screen.shape(p)
+
+run(update)
 ```
 
 ## star
@@ -203,6 +217,8 @@ def update():
   star = shape.star(80, 60, 7, 25, 40)
   screen.pen = color.latte
   screen.shape(star)
+
+run(update)
 ```
 
 ## line
@@ -223,6 +239,8 @@ def update():
   line = shape.line(30, 30, 120, 80, 10)
   screen.pen = color.smoke
   screen.shape(line)
+
+run(update)
 ```
 
 # Properties

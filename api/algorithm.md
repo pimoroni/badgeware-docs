@@ -83,4 +83,6 @@ def update():
   for intersection in intersections:
     point, square, edge, offset, distance = intersection
     screen.circle(grid_to_screen(point), 2)
+
+run(update)
 ```

@@ -34,6 +34,8 @@ def update():
     bounds = rect(10, 10, 140, 110)
     message = "Well hello there, world! This is a nice long message that's designed to split over several lines, so I'm just going to ramble on for a little while."
     text.draw(screen, message, bounds)
+
+run(update)
 ```
 
 ## tokenise()
@@ -61,6 +63,8 @@ def update():
     message = "Well hello there, world!"
     tokens = text.tokenise(screen, message)
     text.draw(screen, tokens, bounds)
+
+run(update)
 ```
 
 # Glyph renderers
@@ -108,6 +112,8 @@ def update():
     message = "I'm written in blue... [pen:255,0,0]or am I?"
     tokens = text.tokenise(screen, message, glyph_renderers)
     text.draw(screen, tokens, bounds)
+
+run(update)
 ```
 So, `pen_glyph_renderer()` is called by placing `[pen:r, g, b]` in the middle of the text, as its key in the `glyph_renderers` dictionary is `pen`.
 
@@ -137,6 +143,8 @@ def update():
     message = "Come on, man, don't be a [square] all your life..."
     tokens = text.tokenise(screen, message, glyph_renderers)
     text.draw(screen, tokens, bounds)
+
+run(update)
 ```
 Here you can see that this draws a 12px x 12px square in the current pen colour. This time round, `parameters` isn't used. `cursor` gives us the position we're 'at' in the text - we're using that as the coordinates of the top left of the square. If `measure` is true, we should return the width of what we're drawing, which in this case is 12.
 
@@ -184,4 +192,6 @@ update():
 
     # And then we'll show that number.
     screen.text(my_scroll, 10, 10)
+
+run(update)
 ```

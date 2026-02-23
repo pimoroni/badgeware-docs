@@ -12,6 +12,8 @@ First off, you'll need to create an app folder with an `__init__.py`, an `assets
 ```python
 def update():
     pass
+
+run(update)
 ```
 And just like the first time - yay, a blank screen!
 
@@ -45,10 +47,12 @@ radius_inner = radius_outer * 0.6
 
 def update():
     pass
+
+run(update)
 ```
 We're still not seeing anything on the screen, but that's okay - getting these dimensions together before we start is going to make things a lot easier down the road.
 
-From here on, we're going to also make a unit of our own, which we'll call `du` for dimension unit. That way we can just use that for future dimensions and positions. It's going to be 1% of the screen width, and we'll add that in after our existing dimensions with
+From here on, we're going to also make a unit of our own, which we'll call `du` for dimension unit, which just like the ones above is a fraction of the screen resolution. That way we can just use multiples of `du` for future dimensions and positions, and they'll scale properly with the screen resolution. It's going to be 1% of the screen width, and we'll add that in after our existing dimensions with
 ```python-raw
 du = screen.width / 100
 ```
@@ -56,7 +60,7 @@ du = screen.width / 100
 ## Drawing a circle
 The first thing we're going to draw is a circle for the background of each pie chart. For this and all the following drawing we're going to be using Badgeware's vector shapes. These display beautifully with antialiasing, and can be easily rotated, scaled and translated using matrix transformations to get wonderfully smooth animation.
 
-First, let's define our vector shapes using `shape.circle()`.
+First, let's define our vector shapes using `shape.circle()`. Additionally, you'll see we're using `screen.antialias = image.X4` to set the antialiasing to its highest level. This gives nice smooth edges to our curves.
 ```python
 screen.antialias = image.X4
 
@@ -71,6 +75,8 @@ du = screen.width / 100
 def update():
     left_pie_background = shape.circle(left_centre_x, centre_y, radius_outer)
     right_pie_background = shape.circle(right_centre_x, centre_y, radius_outer)
+
+run(update)
 ```
 You can see these two shapes have the same vertical coordinate and radius, but different horizontal coordinates. But we're still not seeing anything on the screen! That's because we've defined these shapes, but we haven't drawn them yet. Let's finally add in some drawing commands to set the background, set the pen for each shape and finally draw them.
 
@@ -103,8 +109,10 @@ def update():
     screen.pen = med_grey
     screen.shape(left_pie_background)
     screen.shape(right_pie_background)
+
+run(update)
 ```
-Finally we're seeing something. You'll notice we added a few extra bits in there - we defined some colours to use now and later on, and we set `screen.antialias` to `X4` to get the highest image quality. You can experiment with `NONE`, `X2` and `X4` to see how this reduces the jaggedness in your vector shapes.
+Finally we're seeing something. You'll notice we added a few extra bits in there - we defined some colours to use now and later on, and as mentioned earlier we set `screen.antialias` to `X4` to get the highest image quality. You can experiment with `NONE`, `X2` and `X4` to see how this reduces the jaggedness in your vector shapes.
 
 ## Getting the data
 If we're wanting to display fascinating stats about our badge, then we need to ask it what those stats are. The information we need can be found in the `badge` class and the `rtc` class, and we can ask them for an update every, well, every update. Once we've got it, we can start looking at how to display it.
@@ -160,7 +168,9 @@ def make_chart(x, y, inner, outer, percentage):
     seg_2_end = 359.999
 ```
 
-And now we've got all the information to make the shapes and return them. The new lines take the values we worked out or passed in, and feed them into an `arc()` method to generate the shapes.
+Of course, eagle eyed viewers might notice we don't actually need them to match up exactly - we could just always make the unfilled section a full ring and draw the filled section over the top of it. But we're making them fit together like jigsaw pieces here for the sake of the tutorial, and because it lets you do potentially interesting things with the shapes once you've done the tutorial and want to tweak it a bit.
+
+Anyway, now we've got all the information to make the shapes and return them. The new lines take the values we worked out or passed in, and feed them into an `arc()` method to generate the shapes.
 ```python-raw
 def make_chart(x, y, inner, outer, percentage):
     seg_1_start = 0
@@ -237,6 +247,8 @@ def update():
     screen.shape(right_pie_filled)
     screen.pen = dark_blue
     screen.shape(right_pie_unfilled)
+
+run(update)
 ```
 Not bad. You might find that the battery level is just showing a solid ring if you're at 100% battery of course.
 
@@ -259,7 +271,7 @@ You can alter that value until you get it just the distance you want. Now, let's
 
 Instead, we're going to do some more drawing after we've worked out the shapes of the graphs, but before we draw them. We want to use the shapes we've already made, but have them shifted down and to the right by `shadow_distance` pixels. For this we'll use a `mat3` to transform the shape.
 
-`mat3` is a transformation matrix. It combines any of translation (movement), rotation and scaling into one set of numbers that get applied to the points of a shape. We're going to make a simple `mat3` which we can reuse for other elements, which represents moving down and to the right by `shadow_distance` pixels. Then we can apply that matrix to any shape by setting the shape's `transform` property to the matrix.
+`mat3` is a transformation matrix. It combines any combination of translation (movement), rotation and scaling into one set of numbers that get applied to the points of a shape. We're going to make a simple `mat3` which we can reuse for other elements, which represents moving down and to the right by `shadow_distance` pixels. Then we can apply that matrix to any shape by setting the shape's `transform` property to be the matrix we've made.
 
 ```python-raw
 shadow_matrix = mat3().translate(shadow_distance, shadow_distance)
@@ -281,7 +293,7 @@ Let's go through this line by line. First, we're remembering whtever colour the 
 
 This is a pretty simple method, and there are a couple of things which you could customise to improve it. For example, this would currently only work on something that didn't already have a transformation applied to it. It also always draws to `screen` - both of these things are fixable, but they're not necessary for what we're doing here so let's move on.
 
-Now we've made our method, we just need to call it. We have to call it after making the shapes, because we need to use them, but also before drawing the charts, because then the shadow would appear over the top of them. That leaves one place we can do it:
+Now we've made our method, we just need to call it. We have to call it after making the shapes, because we need to use them, but also before drawing the charts, because if we didn't then the shadow would appear over the top of the charts. That leaves one place we can do it:
 
 ```python
 screen.antialias = image.X4
@@ -353,6 +365,8 @@ def update():
     screen.shape(right_pie_filled)
     screen.pen = dark_blue
     screen.shape(right_pie_unfilled)
+
+run(update)
 ```
 
 There we go, looking good.
@@ -365,7 +379,7 @@ First, we'll load the font in at the very top of the file with the following lin
 monasans = font.load("/system/assets/fonts/MonaSans-Medium.af")
 ```
 
-Then we need to calculate a size for it. We'll create three variables we can choose from, and they're once again going to be based on one of our existing dimensions - that way everything still scales along with the screen size. You can test this out at any time by putting the line `badge.mode(HIRES)` at the very beginning of your python file to put the badge into high resolution mode. You'll see things are sharper, but nothing should move about or change size on the screen. To go back to low resolution mode, just remove that line. You can use whichever mode you want during the tutorial, it should work just the same with either.
+Then we need to calculate a size for it. We'll create three variables we can choose from, and they're once again going to be based on our standard dimension unit - that way everything still scales along with the screen size. You can test this out at any time by putting the line `badge.mode(HIRES)` (on Tufty only) at the very beginning of your python file to put the badge into high resolution mode. You'll see things are sharper, but nothing should move about or change size on the screen. To go back to low resolution mode, just remove that line. You can use whichever mode you want during the tutorial, it should work just the same with either.
 
 Right after our existing dimensions, let's put:
 ```python-raw
@@ -385,7 +399,7 @@ def centred_text(text, x, y, size):
     new_y = y - height
     screen.text(text, new_x, new_y, size)
 ```
-Going through this line by line, we can see that `screen.measure_text()` gives us the dimensions of the specified text at the specified font size. Then we're taking the centre point we passed into the method, and we're subtracting half of the width from x, and all of the height from y, so that the baseline of the text will be at the point we specified, with the text centred horizontally. Finally we're drawing the text to the screen at the specified size, using these new x and y coordinates.
+Going through this line by line, we can see that `screen.measure_text()` gives us the dimensions of the specified text at the specified font size. Then we're taking the centre point we passed into the method, and we're subtracting half of the width from x, and all of the height from y, so that the baseline of the text will be at the point we specified vertically, with the text centred horizontally. Finally we're drawing the text to the screen at the specified size, using these new x and y coordinates.
 
 Let's try using this to write the battery percentage as a number in the middle of its chart. We'll convert it into a string and add a percent sign, then pass it into our new method, specifying the centre point of that left pie chart:
 
@@ -477,10 +491,12 @@ def update():
 
     battery_text = str(battery_percent) + "%"
     centred_text(battery_text, left_centre_x, centre_y, text_size_l)
+
+run(update)
 ```
 That's not bad, but we can probably tweak it. Now we've got it there, we can move its position around by adding or subtracting multiples of `du` to its position coordinates.
 
-We'll add various other bits of text to the dashboard - they will all work in the same way, and all use variables we've already made:
+We'll add various other bits of text to the dashboard - they will all work in the same way, and all use variables we've already made. These are positions we think look good, but play around with the layout yourself and see what looks good to you:
 ```python
 screen.antialias = image.X4
 
@@ -609,6 +625,8 @@ def update():
     centred_text(time_text, centre_x, time_y, text_size_l)
 
     centred_text("BADGEWARE DASHBOARD", centre_x, (7 * du), text_size_m)
+
+run(update)
 ```
 
 You'll notice we created a new dimension - `centre_x` - to centre the date and time on the screen, and we also moved `centre_y` so that it's 42% of the way down the screen, not the exact centre. Because all of our graphs and their text are positioned relative to `centre_y`, they all move up together. The positions we've arrived at are based on trying different distances and sizes out until we find something that looks good.
@@ -632,12 +650,13 @@ The y coordinate and height are going to be trickier. The height returned by `me
 time_box_y = time_y - time_height + (2 * du)
 time_box_h = time_height + (0 * du)
 ```
+> Note: The dimension we worked out for the height happens to be just the measured text height with nothing added. You could leave out the `+ (0 * du)`  and it wouldn't change anything, since `0 * du` is of course 0, but we've left it in as a reminder of how we calculated these values in case we want to come back and change them later.
 
 Finally we can create the shape:
 ```python-raw
 time_box = shape.rounded_rectangle(time_box_x, time_box_y, time_box_w, time_box_h, (3 * du))
 ```
-We're using a `rounded_rectangle`, which takes in x, y, width and height just like a rectangle, but also takes in one or more values for the radius of the corners. We're making all the corners the same radius and setting it to 3 du.
+We're using a `rounded_rectangle`, which takes in x, y, width and height just like a rectangle, but also takes in one or more values for the radius of the corners. If you supply four radius values they'll apply to each corner individually, but we're making all the corners the same radius, so we can just pass it a single value and it'll use it for all four. We're setting it to 3 du.
 
 Now we've got that, we can draw a shadow with it, just like we did for the pie charts:
 ```python-raw
@@ -786,6 +805,8 @@ def update():
 
     screen.pen = color.black
     centred_text("BADGEWARE DASHBOARD", centre_x, (7 * du), text_size_m)
+
+run(update)
 ```
 
 That looks great, but we're not done yet. Let's add some interactivity and give the user some control over the rear lighting.
@@ -800,7 +821,7 @@ def toggle_caselights():
     else:
         badge.caselights(255)
 ```
-Going through this line by line, first we're getting the current brightness values of the LEDs. `badge.caselights()` returns four values, one for each LED, but since we're doing the same thing with all of the LEDs, they should all be the same so we can just take the value of the first one and discard the other three. The next lines just check the existing brightness and set the LEDs accordingly - if they're at anything above zero (which should most likely be 255, the maximum), set them to zero. And if they're at zero, set them to 255.
+Going through this line by line, first we're getting the current brightness values of the LEDs. `badge.caselights()` returns four values, one for each LED, but since we're doing the same thing with all of the LEDs, they should all be the same. That means we can just take the value of the first one and discard the other three. The next lines just check the existing brightness and set the LEDs accordingly - if they're at anything above zero (which should be 255, the maximum), set them to zero. And if they're at zero, set them to 255.
 
 All we need to get this working is to hook it up to a button. That's very easy on Badgeware - all we need to do is ask if Button A was pressed between the last update and this one. We do this like so - this line goes at the very end of the program, inside `update()`:
 ```python-raw
@@ -828,18 +849,19 @@ We're going to copy these lines:
     battery_voltage = badge.battery_voltage()
     total_flash, used_flash, _ = badge.disk_free("/system")
 ```
-They'll be going outside `update()`, after our colours and before our `make_chart()` method. Since we're defining these variables up there now and reusing them for each cycle of `update()`, we'll need to tell `update()` to use these ones. Add the following line at the very top of `update()`:
+They'll be going outside `update()`, after our colours and before our `make_chart()` method. Since we're defining these variables up there now and reusing them for each cycle of `update()`, we'll need to tell `update()` not to make variables of its own, but to use the ones created when the program started. Add the following line at the very top of `update()`:
 ```python-raw
     global battery_percent, battery_voltage, total_flash, used_flash
 ```
+This will allow `update()` to write to those variables instead of creating new ones each time round.
 
 Now we have to modify `update()` so that it's only refreshing those values every couple of seconds. To start we need to make another global variable, in the same place we copied the other variables to:
 ```python-raw
 last_refresh = badge.ticks
 ```
-And add `last_refresh` to the list in the line we just wrote beginning with `global`.
+And add `last_refresh` to the line we just wrote, where we defined the battery and flash variables as `global`.
 
-`last_refresh` is for our timing. It's set up using `badge.ticks`, which is the number of milliseconds since the badge was powered on. We're going to check `badge.ticks` every time we go round `update()` and see if it's been more than 2000 ticks since `last_refresh` - if it has, then that means two seconds have passed. In that case we'll refresh the battery and memory values, and set `last_refresh` to the current `badge.ticks`. That way, the whole cycle will repeat again every two seconds.
+`last_refresh` is for our timing. It's set up using `badge.ticks`, which is the number of milliseconds between the badge being powered on and the beginning of the current `update()` loop. We're going to check `badge.ticks` every time we go round `update()` and see if it's greater than `last_refresh` by 2000 or more - if it is, then that means at least two seconds have passed since the time we stored in `last_refresh`. In that case we'll refresh the battery and memory values, and set `last_refresh` to the current `badge.ticks`. That way, the whole cycle will repeat again every two seconds.
 
 In practice, that means modifying the beginning of our `update()` to look like this:
 ```python-raw
@@ -1028,10 +1050,12 @@ def update():
 
     if badge.pressed(BUTTON_A):
         toggle_caselights()
+
+run(update)
 ```
 This should work exactly the same, but now all of the battery stuff is separated out into one place. You'll notice we've also duplicated the line where we're setting the font and text colour.
 
-Now, we can just toggle whether or not we draw any of the battery info based on an `if` statement. But what's the statement checking? Well, Badgeware has a built in function called `badge.usb_connected()` which is perfect for our needs - it simply returns True if the USB is connected, and False if not. Let's apply that to the code:
+Now, we can just toggle whether or not we draw any of the battery info based on an `if` statement. But what condition is the `if` statement checking? Well, Badgeware has a built in function called `badge.usb_connected()` which is perfect for our needs - it simply returns True if the USB is connected, and False if not. Let's apply that to the code:
 ```python
 screen.antialias = image.X4
 
@@ -1203,6 +1227,8 @@ def update():
 
     if badge.pressed(BUTTON_A):
         toggle_caselights()
+
+run(update)
 ```
 Well, that's certainly done something, but it's the wrong way round - the graph is displaying when the cable is connected, and that's when we want it to disappear. We could of course just change it to `if not badge.usb_connected():`, but we want to display something else when it is connected so instead let's make this `if` into an `if...else` and put our graph drawing code into the `else` bit:
 ```python-raw
@@ -1239,7 +1265,7 @@ We're also adding a couple of new colours:
 dark_green = color.rgb(0, 125, 0)
 light_green = color.rgb(42, 255, 42)
 ```
-There's just one finishing touch. Badgeware also offers a function, `badge.is_charging()` which returns whether or not the unit is fully charging. Let's add a text line, in the same place as the voltage readout when unplugged, to say "Charging" or "Fully Charged" and change the colour accordingly:
+There's just one finishing touch. Badgeware also offers a function, `badge.is_charging()` which returns whether or not the unit is currently charging. Let's add a text line, in the same place as the voltage readout is when unplugged, to say "Charging" or "Fully Charged" and change the colour accordingly:
 ```python-raw
     if badge.usb_connected():
         plug1, _ = make_chart(left_centre_x, centre_y, radius_inner, radius_outer, 100)
@@ -1471,6 +1497,8 @@ def update():
 
     if badge.pressed(BUTTON_A):
         toggle_caselights()
+
+run(update)
 ```
 
 Finally we're at the end of this tutorial. In the next one, we'll look at making things MOVE.

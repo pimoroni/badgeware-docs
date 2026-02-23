@@ -38,6 +38,8 @@ def update():
     step = (x * 255) / 160
     screen.pen = color.rgb(step, 255 - step, 150)
     screen.line(x, 0, x, 120)
+
+run(update)
 ```
 
 ## hsv
@@ -65,6 +67,8 @@ def update():
     value = 255
     screen.pen = color.hsv(hue, saturation, value)
     screen.line(x, 0, x, 120)
+
+run(update)
 ```
 
 ## oklch
@@ -91,6 +95,8 @@ def update():
     hue = 255 * (x / 160)
     screen.pen = color.oklch(lightness, chroma, hue)
     screen.line(x, 0, x, 120)
+
+run(update)
 ```
 # Constants
 
@@ -142,4 +148,6 @@ def update():
 
     screen.pen = palette[i]
     screen.circle(32 + (i * 6), 60, 20)
+
+run(update)
 ```

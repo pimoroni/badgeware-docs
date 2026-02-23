@@ -48,6 +48,7 @@ def update():
   screen.antialias = image.X4
   screen.shape(shape.circle(130, 60, 20))
 
+run(update)
 ```
 
 ## alpha
@@ -77,6 +78,8 @@ def update():
 
     # blit the sprite
     screen.blit(sprite, x, y)
+
+run(update)
 ```
 
 ## pen
@@ -92,6 +95,8 @@ def update():
 
   screen.pen = color.grape
   screen.circle(120, 60, 30)
+
+run(update)
 ```
 
 ## font
@@ -113,6 +118,8 @@ def update():
 
   # draw the text
   screen.text("hey badgeware!", x, 55)
+
+run(update)
 ```
 
 > Note: Badgeware comes with thirty pre-loaded fonts, check out the `pixel_font` article for a full list!
@@ -133,6 +140,8 @@ Fills the entire image or drawing surface with the current brush.
 def update():
   screen.pen = color.orange
   screen.clear()
+
+run(update)
 ```
 
 > Note: the canvas will be cleared by default each frame. You can disable this, or set the clear colour, using `badge.default_clear()`.
@@ -172,6 +181,8 @@ def update():
     x = random.randint(0, 160)
     y = random.randint(0, 160)
     screen.put(x, y)
+
+run(update)
 ```
 
 ## rectangle()
@@ -199,6 +210,8 @@ def update():
   r = rect(70, 50, 40, 40)
   screen.pen = color.red
   screen.rectangle(r)
+
+run(update)
 ```
 
 ## circle()
@@ -226,6 +239,8 @@ def update():
   screen.pen = color.blue
   p = vec2(110, 60)
   screen.circle(p, 20)
+
+run(update)
 ```
 
 ## line()
@@ -255,6 +270,8 @@ def update():
   p1 = vec2(10, 30)
   p2 = vec2(50, 100)
   screen.line(p1, p2)
+
+run(update)
 ```
 
 ## triangle()
@@ -286,6 +303,8 @@ def update():
   p1 = vec2(130, 50)
   p2 = vec2(100, 100)
   screen.triangle(p0, p1, p2)
+
+run(update)
 ```
 
 ## shape()
@@ -316,6 +335,8 @@ def update():
   screen.pen = color.red
   arc = shape.arc(80, 70, 30, 40, 130, 260)
   screen.shape(arc)
+
+run(update)
 ```
 
 # Text
@@ -348,6 +369,8 @@ def update():
 
   # using full coordinates
   screen.text("Hello, Badgeware!", 5, 5)
+
+run(update)
 ```
 
 ## measure_text()
@@ -372,6 +395,8 @@ def update():
   x = (screen.width / 2) - (w / 2)
   y = (screen.height / 2) - (h / 2)
   screen.text(message, x, y)
+
+run(update)
 ```
 
 # Filters
@@ -397,6 +422,8 @@ def update():
   screen.circle(80, 60, 20)
   screen.blit(sprite, vec2(40, 50))
   screen.blur((math.sin(io.ticks / 500) + 1) * 5)
+
+run(update)
 ```
 
 ## dither()
@@ -410,6 +437,8 @@ def update():
   screen.circle(80, 60, 20)
   screen.blit(sprite, vec2(40, 50))
   screen.dither()
+
+run(update)
 ```
 
 ## onebit()
@@ -423,6 +452,8 @@ def update():
   screen.circle(80, 60, 20)
   screen.blit(sprite, vec2(40, 50))
   screen.onebit()
+
+run(update)
 ```
 
 ## monochrome()
@@ -436,6 +467,8 @@ def update():
   screen.circle(80, 60, 20)
   screen.blit(sprite, vec2(40, 50))
   screen.monochrome()
+
+run(update)
 ```
 
 # Loading images
@@ -459,6 +492,8 @@ sprite = image.load("/system/assets/skull.png")
 
 def update():
   screen.blit(sprite, vec2(10, 10))
+
+run(update)
 ```
 
 # Blitting
@@ -506,6 +541,8 @@ def update():
 
   # crop a 16x16 tile and scale it up to 32x32
   screen.blit(sprite, rect(0, 0, 16, 16), rect(10, 60, 32, 32))
+
+run(update)
 ```
 
 ## blit_vspan()
@@ -551,6 +588,8 @@ def update():
 
     # blit the span!
     screen.blit_vspan(sprite, i, 60 - o, 2 * o, u, 0, u, 1)
+
+run(update)
 ```
 
 ## blit_hspan()

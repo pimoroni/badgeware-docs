@@ -41,6 +41,8 @@ def update():
   screen.font = rom_font.unfair
   screen.pen = color.blue
   screen.text("Arr Cap'n!", 10, 50)
+
+run(update)
 ```
 
 These samples should give you a good idea of the style of each font:

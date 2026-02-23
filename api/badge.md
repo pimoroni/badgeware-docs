@@ -19,12 +19,6 @@ The number of ticks (milliseconds) since the previous time `update()` was called
 ## uid
 Provides a unique ID for the badge.
 
-## default_clear()
-This represents the colour the display will be cleared to before each `update()` loop. You can set this to `None` to disable clearing the screen between updates.
-
-## default_pen()
-The default colour that `screen.pen` will be set to at the start of every `update()`. Note that this will not accept `None`, only a colour.
-
 ## resolution
 The display resolution of the badge as a tuple containing pixel width and height as ints.
 
@@ -121,10 +115,33 @@ def update():
   if last_event:
     screen.pen = color.white
     screen.text(last_event, 10, 10)
+
+run(update)
 ```
 
-## badge.poll()
-If you are creating your own program without the use of the Badgeware menu and app system, you will need to poll the badge using this method to get updated status on the buttons and other features. If you're working within the Badgeware menu system, `poll()` is called automatically every update and you don't need to use this.
+# Program flow
+The functions in this section are for use if you're 'rolling your won' software without the use of Badgeware's app and menu system.
+
+## screen.update()
+This method is on the `screen` image rather than in `badge`, but is listed here for completeness. This will take the current contents of the `screen` image, and update the physical display. Used if you are creating your own program loop without using the `update()` ecosystem and instead creating your own program loop - if you're working within the Badgeware menu system, `screen.update()` is called automatically every update and you don't need to use this.
+
+### Returns
+None
+
+## clear()
+This resets the framebuffer, clearing the `screen` image to the colour specified by `badge.default_clear()` and setting `screen.pen` to the colour specified in `badge.default_pen()`. If the former is set to `None` the screen will not be cleared.
+
+### Returns
+None
+
+## poll()
+If you are creating your own program without the use of the Badgeware menu and app system, you will need to poll the badge using this method to get updated status on the buttons and other features. If you're working within the Badgeware menu system, `badge.poll()` is called automatically every update and you don't need to use this.
+
+### Returns
+None
+
+## update()
+This is a convenient method which simply runs `screen.update()`, `badge.clear()` and `badge.poll()` together.
 
 ### Returns
 None
@@ -145,6 +162,12 @@ Returns a boolean reflecting whether the USB cable is currently connected.
 Returns a boolean reflecting whether the battery is currently charging.
 
 # Graphics
+
+## default_clear()
+This represents the colour the display will be cleared to before each `update()` loop. You can set this to `None` to disable clearing the screen between updates.
+
+## default_pen()
+The default colour that `screen.pen` will be set to at the start of every `update()`. Note that this will not accept `None`, only a colour.
 
 ## mode()
 Changes the display mode of the badge. You can apply more than one mode at once, where applicable, by using the pipe symbol, e.g. `badge.mode(HIRES | VSYNC)`.

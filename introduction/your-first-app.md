@@ -38,7 +38,7 @@ The first optional element of your app is the `init()` method. This will run onc
 
 Anything you want to set up, such as loading in a saved state or setting initial conditions for the app, is performed here.
 
-Next up is your `update()` method. This one is not optional, as it forms the main program loop. `update()` will loop endlessly, until the program is ended either by pressing the `HOME` button to return to the menu or by resetting the unit.
+Next up is your `update()` method. This one forms the main program loop. `update()` will loop endlessly, until the program is ended either by pressing the `HOME` button to return to the menu or by resetting the unit. This is paired with `run(update)` at the very end of the code - this will start the loop when your app starts.
 
 NOTE: Badger uses `update()` in a slightly different way. This is explained [here](/introduction/badge-differences.md). 
 
@@ -74,4 +74,6 @@ def update():
 # called before returning to the menu to allow you to save state (optional)
 def on_exit():
   pass
+
+run(update)
 ```
