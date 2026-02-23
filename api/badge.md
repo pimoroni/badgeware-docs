@@ -120,7 +120,7 @@ run(update)
 ```
 
 # Program flow
-The functions in this section are for use if you're 'rolling your won' software without the use of Badgeware's app and menu system.
+The functions in this section are for use if you're 'rolling your own' software without the use of Badgeware's app and menu system.
 
 ## screen.update()
 This method is on the `screen` image rather than in `badge`, but is listed here for completeness. This will take the current contents of the `screen` image, and update the physical display. Used if you are creating your own program loop without using the `update()` ecosystem and instead creating your own program loop - if you're working within the Badgeware menu system, `screen.update()` is called automatically every update and you don't need to use this.
