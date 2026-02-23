@@ -24,13 +24,12 @@ Once you have the basics down check out our guides to each of the different feat
 
 ## API
 
-- [image](types/image.md)
-- [color](types/color.md)
-- [brush](types/brush.md)
-- [shape](types/shape.md)
-- [mat3](types/mat3.md)
-- [rect](types/rect.md)
-- [vec2](types/vec2.md)
-- [pixel_font](types/pixel_font.md)
-- [vector_font](types/font.md)
-- [io](modules/io.md)
+- [image](api/image.md)
+- [color](api/color.md)
+- [brush](api/brush.md)
+- [shape](api/shape.md)
+- [mat3](api/mat3.md)
+- [rect](api/rect.md)
+- [vec2](api/vec2.md)
+- [pixel_font](api/pixel_font.md)
+- [io](api/io.md)

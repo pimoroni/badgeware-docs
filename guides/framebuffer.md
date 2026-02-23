@@ -8,7 +8,7 @@ publish: false
 
 # Working with the screen
 
-The framebuffer is a 160 × 120 true colour `Image` named `screen`. [Click here for full documentation of the `Image` class](api/types/Image.md).
+The framebuffer is a 160 × 120 true colour `Image` named `screen`. [Click here for full documentation of the `Image` class](api/image.md).
 
 Your application can draw to the screen during the update() function.
 After your code finishes executing, the badge automatically pixel-doubles the framebuffer to fit the display.

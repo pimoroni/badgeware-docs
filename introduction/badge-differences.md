@@ -18,7 +18,7 @@ Another difference between the badges is colour. While Tufty is full RGB, Badger
 
 Again, for the most part you don't need to worry about this. You can work with colour images and they will automatically be converted to greyscale for Blinky or quantized for Badger - however, if you want fine control over grey levels you may want to work in greyscale behind the scenes anyway.
 
-You can also dither your image on any of the badges, although it is by far the most useful on Badger. This will give the appearance of more levels of grey, at the cost of a repeating pattern across your image. See the [image](/api/types/image.md) documentation for an example of this.
+You can also dither your image on any of the badges, although it is by far the most useful on Badger. This will give the appearance of more levels of grey, at the cost of a repeating pattern across your image. See the [image](/api/image.md) documentation for an example of this.
 
 # Refresh rate
 
