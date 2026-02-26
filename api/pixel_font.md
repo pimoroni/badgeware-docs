@@ -44,7 +44,7 @@ def update():
   screen.pen = color.lime
   screen.text("Arr Cap'n!", 10, 30)
 
-  screen.font = pixel_font.load("/system/assets/fonts/unfair.af")
+  screen.font = pixel_font.load("/system/assets/fonts/unfair.ppf")
   screen.pen = color.blue
   screen.text("Arr Cap'n!", 10, 50)
 
