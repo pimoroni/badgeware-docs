@@ -68,7 +68,7 @@ def update():
   # draw ten ghostly (ghastly?!) skulls
   for i in range(0, 10):
     # swirling animation
-    step = (io.ticks + i * 250) / 500
+    step = (badge.ticks + i * 250) / 500
     x = math.sin(step) * (i * 5)
     y = math.cos(step) * (i * 5)
 
@@ -105,7 +105,7 @@ The font used for drawing text. This can be either a `pixel_font` or a `vector_f
 ```python
 import math
 
-# load a built in font - see pixel_font for full list
+# load a built in font - see pixel_font for list
 screen.font = rom_font.nope
 
 def update():
@@ -114,7 +114,7 @@ def update():
   x = (screen.width / 2) - (w / 2)
 
   # create a side to side bounce offset
-  x += math.sin(io.ticks / 250) * 20
+  x += math.sin(badge.ticks / 250) * 20
 
   # draw the text
   screen.text("hey badgeware!", x, 55)
@@ -174,7 +174,7 @@ def update():
   screen.pen = color.smoke
 
   # set a new random seed every 250ms
-  random.seed(io.ticks // 250)
+  random.seed(badge.ticks // 250)
 
   # using full coordinates
   for i in range(0, 1000):
@@ -421,7 +421,7 @@ sprite = image.load("/system/assets/skull.png")
 def update():
   screen.circle(80, 60, 20)
   screen.blit(sprite, vec2(40, 50))
-  screen.blur((math.sin(io.ticks / 500) + 1) * 5)
+  screen.blur((math.sin(badge.ticks / 500) + 1) * 5)
 
 run(update)
 ```
@@ -581,10 +581,10 @@ def update():
 
   for i in range(160):
     # create a sine wave offset for drawing
-    o = abs(math.sin((io.ticks + i * 5) / 500) * 30) + 2
+    o = abs(math.sin((badge.ticks + i * 5) / 500) * 30) + 2
 
     # calculate the u coordinate to sample from
-    u = (i + (io.ticks / 50)) / sprite.width
+    u = (i + (badge.ticks / 50)) / sprite.width
 
     # blit the span!
     screen.blit_vspan(sprite, i, 60 - o, 2 * o, u, 0, u, 1)

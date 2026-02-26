@@ -312,7 +312,7 @@ But we don't want to go diving around in the code to change our mood, that would
 
 # Button input
 
-Every refresh, just before update() is called, the Badgeware software polls the hardware and asks it what buttons are pressed, and then compares it against what was pressed last update. This gives it lists of which buttons were pressed, released or held down between the last update and the current one. You can read more about it [here](/api/io.md#reading-button-state).
+Every refresh, just before update() is called, the Badgeware software polls the hardware and asks it what buttons are pressed, and then compares it against what was pressed last update. This gives it lists of which buttons were pressed, released or held down between the last update and the current one. You can read more about it [here](/api/badge.md#reading-button-state).
 
 Right now, we're just going to check if a button's been pressed, and if it has, we can add one to that selected_mood variable. We need to do one more thing - now we're not just reading the selected_mood variable, we're wanting to change it, so we have to tell the program that it's a global variable. This means that when we ask it to add 1 to selected_mood, it knows that that's the selected_mood we're talking about.
 

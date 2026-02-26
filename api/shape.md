@@ -75,7 +75,7 @@ A `shape` representing the created shape.
 ### Example
 ```python
 def update():
-  sides = ((io.ticks // 500) % 10) + 3
+  sides = ((badge.ticks // 500) % 10) + 3
 
   polygon = shape.regular_polygon(80, 60, 40, sides)
   screen.pen = color.red
@@ -164,7 +164,7 @@ A `shape` representing the created shape.
 ### Example
 ```python
 def update():
-  angle = io.ticks / 10
+  angle = badge.ticks / 10
   arc = shape.arc(80, 60, 30, 40, angle + 30, angle + 150)
   screen.pen = color.cyan
   screen.shape(arc)
@@ -190,7 +190,7 @@ A `shape` representing the created shape.
 ### Example
 ```python
 def update():
-  a = io.ticks / 10
+  a = badge.ticks / 10
   p = shape.pie(80, 60, 40, a + 30, a + 150)
   screen.pen = color.green
   screen.shape(p)

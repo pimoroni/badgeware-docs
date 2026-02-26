@@ -58,7 +58,7 @@ def draw_grid():
 
 def update():
   point = vec2(5.3, 3.4)
-  angle = (io.ticks / 50) * (math.pi / 180)
+  angle = (badge.ticks / 50) * (math.pi / 180)
   depth = 10
 
   draw_grid()
