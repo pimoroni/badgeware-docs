@@ -115,6 +115,7 @@ def update():
 
 run(update)
 ```
+
 So, `pen_glyph_renderer()` is called by placing `[pen:r, g, b]` in the middle of the text, as its key in the `glyph_renderers` dictionary is `pen`.
 
 It doesn't use the `image` or `cursor` parameters, so they have an underscore before them to discard them. Changing the colour doesn't use up any space in the text, so if `measure` is set (which happens when the software is asking for the width of this glyph), it just returns zero.
@@ -146,6 +147,7 @@ def update():
 
 run(update)
 ```
+
 Here you can see that this draws a 12px x 12px square in the current pen colour. This time round, `parameters` isn't used. `cursor` gives us the position we're 'at' in the text - we're using that as the coordinates of the top left of the square. If `measure` is true, we should return the width of what we're drawing, which in this case is 12.
 
 # Scrolling text
