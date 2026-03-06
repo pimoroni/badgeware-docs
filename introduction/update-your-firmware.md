@@ -39,7 +39,7 @@ Since the firmware update rebuilds the filesystem, any apps or files on your bad
 - Drag and drop the `.uf2` file you downloaded onto the **RP2350** drive
 - Your badge will automatically reboot into the new firmware
 
-The whole process takes just a few seconds.
+The whole process takes a couple of minutes.
 
 ### Step 4: Restore Your Code
 
