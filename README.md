@@ -1,10 +1,12 @@
 ## Welcome to Badgeware! ❤️
 
+**New here? Start with our [Getting Started](introduction/getting-started.md) guide** — it'll walk you through creating your first app in minutes.
+
 ## Start here
 
 There are a few things it's worth getting familiar with before trying to code your badge.
 
-- [Introduction](https://badgewa.re/docs)
+- [Getting Started](introduction/getting-started.md)
 - [Creating an app](introduction/your-first-app.md)
 - [Coding for the different badges](introduction/badge-differences.md)
 - [Badge modes](introduction/editing-on-device.md)
