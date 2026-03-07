@@ -89,7 +89,7 @@ current = 0
 def update():
     global current
 
-    if io.BUTTON_UP in io.pressed:
+    if badge.pressed(BUTTON_UP):
         current = (current + 1) % len(messages)
 
     screen.pen = color.navy
@@ -120,7 +120,7 @@ current = 0
 def update():
     global current
 
-    if io.BUTTON_UP in io.pressed:
+    if badge.pressed(BUTTON_UP):
         current = (current + 1) % len(messages)
 
     screen.pen = color.navy
