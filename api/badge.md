@@ -212,9 +212,9 @@ Gets and sets the brightness value for the rear lighting on the badge.
 ### Usage
 - `.caselights()` - Returns the current level of the rear LEDs as a tuple.
 - `.caselights(level)`
-        - `level` - Brightness to set on all rear LEDs (0-255)
+        - `level` - Brightness to set on all rear LEDs (0-1)
 - `.caselights(level1, level2, level3, level4)`
-        - `level1`, `level2`, `level3`, `level4` - Brightness to set for each rear LED individually (0-255)
+        - `level1`, `level2`, `level3`, `level4` - Brightness to set for each rear LED individually (0-1)
 
 ### Returns
 `None`, or a tuple if no parameter specified.
@@ -276,7 +276,7 @@ badge.battery_level() -> int
 badge.battery_voltage() -> float
 badge.changed() -> tuple
 badge.changed(button: input) -> bool
-badge.caselights([light1: int, light2: int, light3: int, light4: int]) -> None | tuple
+badge.caselights([light1: float, light2: float, light3: float, light4: float]) -> None | tuple
 badge.disk_free(mountpoint: string="/") -> int
 badge.held() -> tuple
 badge.held(button: input) -> bool

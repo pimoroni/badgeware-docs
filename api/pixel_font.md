@@ -20,13 +20,19 @@ The height, in pixels, of the font's glyph bounding box.
 ## name
 The name of the pixel font.
 
-# Font gallery
+# Methods
+## ROM fonts
+There are many pixel fonts preloaded onto your badge. These can be used with `rom_font` along with the name of the font.
 
+## load()
+If not using a ROM font, individual font files can be loaded into variables. This is accomplished with `pixel_font.load(path)`, where `path` is the full path of the font file.
+
+# Font gallery
 Text wouldn’t be nearly as engaging without a great selection of fonts. When we came across [Ivano's](https://somepx.itch.io) extensive collection of pixel fonts, we knew they were a perfect match for Badgeware.
 
 Included are a wide range of styles covering everything from clean, readable text to bold display typefaces inspired by classic arcade and sci-fi aesthetics.
 
-Our pixel font file format is called Pixel Perfect Font (`.ppf`) and all of the fonts are pre-loaded onto your badge and accessible via `rom_font`.
+Our pixel font file format is called Pixel Perfect Font (`.ppf`).
 
 ```python
 def update():
@@ -38,7 +44,7 @@ def update():
   screen.pen = color.lime
   screen.text("Arr Cap'n!", 10, 30)
 
-  screen.font = rom_font.unfair
+  screen.font = pixel_font.load("/system/assets/fonts/unfair.ppf")
   screen.pen = color.blue
   screen.text("Arr Cap'n!", 10, 50)
 

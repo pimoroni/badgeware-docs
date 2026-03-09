@@ -9,7 +9,7 @@ Represents an RGBA colour.
 
 The `color` type provides methods for creating colours from RGBA, HSV, and OKLCH colour spaces. Colours can be adjusted, blended, and combined using a range of utility methods.
 
-Regardless of how a colour is constructed, it is stored internally as a premultiplied RGBA value.
+Regardless of how a colour is constructed, it is stored internally as a premultiplied RGBA value. `color` is a type of `brush` object and can be used interchangeably with them for different effects.
 
 # Properties
 
@@ -98,6 +98,7 @@ def update():
 
 run(update)
 ```
+
 # Constants
 
 ## Default palette
