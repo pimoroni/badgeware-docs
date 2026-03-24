@@ -5,6 +5,8 @@ icon: diamond_shine
 publish: true
 ---
 
+# Test edit to SpriteSheet
+
 # Introduction
 Sprites are an easy way or organising multiple graphical elements while keeping memory usage down. Very simply, a spritesheet is a single large image which is split into regular cells. These cells can then be used as individual images themselves while all still referring back to the single image in memory.
 
