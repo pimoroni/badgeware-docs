@@ -1,7 +1,7 @@
 ---
 title: brush
 summary: Methods for painting images or patterns as fill when creating vector shapes.
-icon: palette
+icon: brush
 publish: true
 ---
 # Introduction

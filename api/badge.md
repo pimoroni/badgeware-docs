@@ -1,12 +1,12 @@
 ---
 title: badge
 summary: Access to various system and hardware features such as the battery status and user buttons.
-icon: build
+icon: badge
 publish: true
 ---
 
 # Introduction
-The `badge` class offers access to the badge's hardware. Using this class you can find out important system information, access the buttons and control the rear lighting. 
+The `badge` class offers access to the badge's hardware. Using this class you can find out important system information, access the buttons and control the rear lighting.
 
 # Properties
 
@@ -204,7 +204,7 @@ Prints to console the amount of free RAM, prepended with the message if specifie
 > Note: This is not actually part of the Badge class, and so doesn't need `badge.` before it in your code.
 
 # Lighting
-Badgeware is fitted with four onboard white LEDs on the back of the board. These can be used as indicators, decoration or anything else you can think of. Tufty also has a front-mounted light sensor which 
+Badgeware is fitted with four onboard white LEDs on the back of the board. These can be used as indicators, decoration or anything else you can think of. Tufty also has a front-mounted light sensor which
 
 ## caselights()
 Gets and sets the brightness value for the rear lighting on the badge.

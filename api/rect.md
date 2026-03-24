@@ -1,7 +1,7 @@
 ---
 title: rect
 summary: Represents a 2D rectangle and provides helpful methods for manipulating and working with rectangular regions.
-icon: activity_zone
+icon: check_box_outline_blank
 publish: true
 ---
 # Introduction
