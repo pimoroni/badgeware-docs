@@ -1,5 +1,5 @@
 ---
-title: The Filesystem
+title: Filesystem
 summary: Provides storage for apps, as well as the ability to read and write saved data from them.
 icon: save
 publish: true
