@@ -1,7 +1,7 @@
 ---
 title: rtc
 summary: Access to the Realtime Clock functions.
-icon: build
+icon: clock
 publish: true
 ---
 
