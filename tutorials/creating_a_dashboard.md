@@ -1,5 +1,5 @@
 ---
-title: Dashboard
+title: Sensor dashboard
 summary: "Accessing Badgeware's hardware features"
 icon: readiness_score
 publish: true

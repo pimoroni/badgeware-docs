@@ -1,5 +1,5 @@
 ---
-title: A Simple Badge
+title: A simple badge
 summary: An absolute beginner's guide to coding an app for Badgeware.
 icon: badge
 publish: true
