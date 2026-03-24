@@ -1,7 +1,7 @@
 ---
-title: "Tutorial 3: A simple game"
+title: A simple game
 summary: "Animation, sprites and interactivity"
-icon: build
+icon: sports_esports
 publish: true
 ---
 # Tutorial 3: A simple game
