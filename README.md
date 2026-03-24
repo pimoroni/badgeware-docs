@@ -11,15 +11,12 @@ Each badge runs the same API, so code you write for one model will mostly work o
 Every app is built around a single `update()` function that the badge calls once per frame. Here's the smallest complete app:
 
 ```python
-def update():
-    # screen.pen = color.navy
-    # screen.clear()
+import time
+for i in range(0, 100):
+  screen.text("Hello, world!", i, 50)
+  badge.update()
+  time.sleep(0.1)
 
-    # screen.pen = color.white
-    # screen.font = rom_font.smart
-    screen.text("Hello, world!", 10, 50)
-
-run(update)
 ```
 
 Want to make it interactive? Add button input:
