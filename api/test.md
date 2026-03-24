@@ -1,7 +1,7 @@
 ---
 title: test
 summary: A test article
-icon: test
+icon:
 publish: true
 ---
 
