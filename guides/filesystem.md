@@ -1,7 +1,7 @@
 ---
 title: The Filesystem
 summary: Provides storage for apps, as well as the ability to read and write saved data from them.
-icon: disc
+icon: save
 publish: true
 ---
 # Introduction
@@ -49,3 +49,14 @@ This deletes the specified JSON file. Next time `State.load()` is used, it will 
 
 ### Returns
 `None`.
+
+### Writing to files from application code
+
+The badge has a writeable LittleFS partition located at `/` which is intended for applications to store state information and cache any data they may need to hold on to across resets.
+
+You can use normal Python style file access from your code:
+
+```python
+with open("/storage/myfile.txt", "w") as out:
+  out.write("this is some text i want to keep\n")
+```
