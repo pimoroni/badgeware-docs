@@ -1,3 +1,9 @@
+---
+title: Badge differences
+summary: Learn about the different Badgeware badges
+icon: function
+---
+
 # Introduction
 
 The three different models of Badgeware may have different displays, but behind the scenes they are running very similar hardware. Almost all of the API described in this guide can be used on any of the three models - but of course, you'll have to consider the particular characteristics of the display.
