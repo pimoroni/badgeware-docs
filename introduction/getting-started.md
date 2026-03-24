@@ -1,5 +1,5 @@
 ---
-title: "Getting Started"
+title: Getting started
 summary: Get up and running with your first Badgeware app in minutes.
 icon: rocket
 publish: true
