@@ -1,7 +1,7 @@
 ---
 title: Badge differences
 summary: Learn about the different Badgeware badges
-icon: function
+icon:
 sort: 2
 ---
 
