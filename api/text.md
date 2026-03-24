@@ -1,7 +1,7 @@
 ---
 title: text
 summary: Provides methods for advanced drawing of text to the screen.
-icon: build
+icon: format_align_left
 publish: true
 ---
 # Introduction
@@ -45,7 +45,7 @@ This method breaks down a string into its component parts, allowing the `draw()`
 
 ### Usage
 - `text.tokenise(image, text, glyph_renderers, size)`
-    - `image` - 
+    - `image` -
     - `text` - The string to be tokenised.
     - `glyph_renderers` (Optional) - a dictionary of glyph renderers (see below) to be applied to the text.
     - `size` (Optional) - the text size to render, if you're using a vector font.
