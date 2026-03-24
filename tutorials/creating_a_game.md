@@ -1,5 +1,5 @@
 ---
-title: A simple game
+title: Creating a game
 summary: "Animation, sprites and interactivity"
 icon: sports_esports
 publish: true
