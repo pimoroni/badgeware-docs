@@ -1,5 +1,5 @@
 ---
-title: Tufty v Badger v Blinky
+title: Different Models
 summary: Learn about the different Badgeware badges
 icon:
 sort: 2
