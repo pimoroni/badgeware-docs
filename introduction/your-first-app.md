@@ -1,3 +1,9 @@
+---
+title: Creating your first app
+summary: Learn how to build a Badgeware app
+icon:
+sort: 3
+---
 
 # Creating your first app
 
@@ -40,7 +46,7 @@ Anything you want to set up, such as loading in a saved state or setting initial
 
 Next up is your `update()` method. This one forms the main program loop. `update()` will loop endlessly, until the program is ended either by pressing the `HOME` button to return to the menu or by resetting the unit. This is paired with `run(update)` at the very end of the code - this will start the loop when your app starts.
 
-NOTE: Badger uses `update()` in a slightly different way. This is explained [here](/introduction/badge-differences.md). 
+NOTE: Badger uses `update()` in a slightly different way. This is explained [here](/introduction/badge-differences.md).
 
 Another optional method is `on_exit()`. This will be called when you leave the app by pressing the `HOME` button, and is the last thing that the program will do before closing, so it is useful for things like saving the program's state and so forth. Note that a power loss, like resetting the unit, going into disk mode or running out of battery, won't fire this method and data won't be saved.
 
