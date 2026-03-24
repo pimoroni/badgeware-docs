@@ -1,7 +1,7 @@
 ---
-title: "Tutorial 2: Dashboard"
+title: Dashboard
 summary: "Accessing Badgeware's hardware features"
-icon: build
+icon: readiness_score
 publish: true
 ---
 # Tutorial 2: A Dashboard
@@ -251,10 +251,10 @@ def update():
     screen.shape(right_pie_background)
 
     left_pie_filled, left_pie_unfilled = make_chart(left_centre_x, centre_y, radius_inner, radius_outer, battery_percent)
-    
+
     memory_percent = (used_flash / total_flash) * 100
     right_pie_filled, right_pie_unfilled = make_chart(right_centre_x, centre_y, radius_inner, radius_outer, memory_percent)
-    
+
     screen.pen = light_red
     screen.shape(left_pie_filled)
     screen.pen = dark_red
@@ -370,10 +370,10 @@ def update():
     screen.clear()
 
     left_pie_filled, left_pie_unfilled = make_chart(left_centre_x, centre_y, radius_inner, radius_outer, battery_percent)
-    
+
     memory_percent = (used_flash / total_flash) * 100
     right_pie_filled, right_pie_unfilled = make_chart(right_centre_x, centre_y, radius_inner, radius_outer, memory_percent)
-    
+
     draw_drop_shadow(left_pie_filled, med_grey, shadow_matrix)
     draw_drop_shadow(left_pie_unfilled, med_grey, shadow_matrix)
     draw_drop_shadow(right_pie_filled, med_grey, shadow_matrix)
@@ -494,10 +494,10 @@ def update():
     screen.clear()
 
     left_pie_filled, left_pie_unfilled = make_chart(left_centre_x, centre_y, radius_inner, radius_outer, battery_percent)
-    
+
     memory_percent = (used_flash / total_flash) * 100
     right_pie_filled, right_pie_unfilled = make_chart(right_centre_x, centre_y, radius_inner, radius_outer, memory_percent)
-    
+
     draw_drop_shadow(left_pie_filled, med_grey, shadow_matrix)
     draw_drop_shadow(left_pie_unfilled, med_grey, shadow_matrix)
     draw_drop_shadow(right_pie_filled, med_grey, shadow_matrix)
@@ -590,10 +590,10 @@ def update():
     screen.clear()
 
     left_pie_filled, left_pie_unfilled = make_chart(left_centre_x, centre_y, radius_inner, radius_outer, battery_percent)
-    
+
     memory_percent = (used_flash / total_flash) * 100
     right_pie_filled, right_pie_unfilled = make_chart(right_centre_x, centre_y, radius_inner, radius_outer, memory_percent)
-    
+
     draw_drop_shadow(left_pie_filled, med_grey, shadow_matrix)
     draw_drop_shadow(left_pie_unfilled, med_grey, shadow_matrix)
     draw_drop_shadow(right_pie_filled, med_grey, shadow_matrix)
@@ -767,10 +767,10 @@ def update():
     screen.clear()
 
     left_pie_filled, left_pie_unfilled = make_chart(left_centre_x, centre_y, radius_inner, radius_outer, battery_percent)
-    
+
     memory_percent = (used_flash / total_flash) * 100
     right_pie_filled, right_pie_unfilled = make_chart(right_centre_x, centre_y, radius_inner, radius_outer, memory_percent)
-    
+
     draw_drop_shadow(left_pie_filled, med_grey, shadow_matrix)
     draw_drop_shadow(left_pie_unfilled, med_grey, shadow_matrix)
     draw_drop_shadow(right_pie_filled, med_grey, shadow_matrix)
@@ -1015,7 +1015,7 @@ def update():
     # BATTERY READOUT STARTS HERE
 
     left_pie_filled, left_pie_unfilled = make_chart(left_centre_x, centre_y, radius_inner, radius_outer, battery_percent)
-    
+
     draw_drop_shadow(left_pie_filled, med_grey, shadow_matrix)
     draw_drop_shadow(left_pie_unfilled, med_grey, shadow_matrix)
 
@@ -1043,7 +1043,7 @@ def update():
 
     memory_percent = (used_flash / total_flash) * 100
     right_pie_filled, right_pie_unfilled = make_chart(right_centre_x, centre_y, radius_inner, radius_outer, memory_percent)
-    
+
     draw_drop_shadow(right_pie_filled, med_grey, shadow_matrix)
     draw_drop_shadow(right_pie_unfilled, med_grey, shadow_matrix)
 
@@ -1194,7 +1194,7 @@ def update():
 
     if badge.usb_connected():
         left_pie_filled, left_pie_unfilled = make_chart(left_centre_x, centre_y, radius_inner, radius_outer, battery_percent)
-        
+
         draw_drop_shadow(left_pie_filled, med_grey, shadow_matrix)
         draw_drop_shadow(left_pie_unfilled, med_grey, shadow_matrix)
 
@@ -1222,7 +1222,7 @@ def update():
 
     memory_percent = (used_flash / total_flash) * 100
     right_pie_filled, right_pie_unfilled = make_chart(right_centre_x, centre_y, radius_inner, radius_outer, memory_percent)
-    
+
     draw_drop_shadow(right_pie_filled, med_grey, shadow_matrix)
     draw_drop_shadow(right_pie_unfilled, med_grey, shadow_matrix)
 
@@ -1472,7 +1472,7 @@ def update():
         screen.shape(plug6)
     else:
         left_pie_filled, left_pie_unfilled = make_chart(left_centre_x, centre_y, radius_inner, radius_outer, battery_percent)
-        
+
         draw_drop_shadow(left_pie_filled, med_grey, shadow_matrix)
         draw_drop_shadow(left_pie_unfilled, med_grey, shadow_matrix)
 
@@ -1500,7 +1500,7 @@ def update():
 
     memory_percent = (used_flash / total_flash) * 100
     right_pie_filled, right_pie_unfilled = make_chart(right_centre_x, centre_y, radius_inner, radius_outer, memory_percent)
-    
+
     draw_drop_shadow(right_pie_filled, med_grey, shadow_matrix)
     draw_drop_shadow(right_pie_unfilled, med_grey, shadow_matrix)
 

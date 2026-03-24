@@ -1,10 +1,11 @@
 ---
-title: "Tutorial 1: A Simple Badge"
+title: A Simple Badge
 summary: An absolute beginner's guide to coding an app for Badgeware.
-icon: build
+icon: badge
 publish: true
+sort: 1
 ---
-# Tutorial 1: A Simple Badge
+# A Simple Badge
 
 In this tutorial, we're going to demonstrate how to do the basic setup of graphics on the screen by making a badge similar to the one preloaded onto the badges already. It'll show a name and picture, and a current mood which you can change using the buttons. It doesn't require any familiarity with Badgeware, but does assume you know basic programming principles like variables, if/then, methods and so on as well as how to navigate around your computer, copy and rename files and so forth.
 
