@@ -2,6 +2,7 @@
 title: Badge differences
 summary: Learn about the different Badgeware badges
 icon: function
+sort: 2
 ---
 
 # Introduction
