@@ -1,5 +1,5 @@
 ---
-title: Updating Your Firmware
+title: Updating firmware
 summary: Keep your badge up to date with the latest Badgeware firmware.
 icon:
 publish: true
