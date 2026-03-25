@@ -81,7 +81,7 @@ Let's break down what that code does:
 
 - **`run(update)`** — This sits at the very end and tells the badge to start running your `update()` loop.
 
-# Step 5: Make It Interactive
+# Make It Interactive
 
 Now let's add a button press. We'll make the text change when you press a button:
 
@@ -112,7 +112,7 @@ run(update)
 
 Save, eject, and run the app again. Each time you press the **Up** button, the message will cycle through the list. We're also centring the text on screen now by measuring its width first.
 
-# Step 6: Add Some Colour
+# Add Some Colour
 
 Let's make things a bit more visual by adding a coloured rectangle behind the text:
 
