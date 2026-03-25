@@ -11,13 +11,23 @@ Each badge runs the same API, so code you write for one model will mostly work o
 
 # Meet the badges
 
-| **Tufty** | **Badger** | **Blinky** |
-|----------|----------|----------|
-| ![Tufty](/assets/tufty_web_front.png) | ![Badger](/assets/badger_web_front.png) | ![Blinky](/assets/blinky_web_front.png) |
-| 320x240 full-colour IPS LCD | 264x176 e-paper (black, white, 2 greys) | 39x26 LED matrix (255 levels greyscale) |
-| Graphics-heavy apps, games, animations | Low-power name badges, dashboards, e-readers | Wearable light displays, pixel art, notifications |
-| Continuous — redraws as fast as your code runs | Sleeps between updates — perfect for all-day battery life | Continuous — smooth animations at high frame rates |
-| 1000mAh rechargeable (up to 8 hours active) | 1000mAh rechargeable (up to 100 days standby) | 1000mAh rechargeable (up to 8 hours active) |
+## Tufty
+
+![Tufty](/assets/tufty_web_front.png)
+
+Full-colour IPS LCD (320x240). Great for graphics-heavy apps, games, and animations. Redraws continuously — as fast as your code runs.
+
+## Badger
+
+![Badger](/assets/badger_web_front.png)
+
+E-paper display (264x176, black, white, and two greys). Perfect for low-power name badges, dashboards, and e-readers. Sleeps between updates for all-day battery life.
+
+## Blinky
+
+![Blinky](/assets/blinky_web_front.png)
+
+39x26 LED matrix (255 levels of greyscale). Ideal for wearable light displays, pixel art, and notifications. Continuous refresh for smooth animations.
 
 All three are powered by the **RP2350** (dual-core ARM Cortex-M33 @ 200MHz) with 16MB flash, 8MB PSRAM, WiFi, Bluetooth 5, and USB-C. See [The hardware](/introduction/hardware.md) for the full spec.
 
