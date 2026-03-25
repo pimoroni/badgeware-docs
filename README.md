@@ -42,35 +42,6 @@ def update():
 run(update)
 ```
 
-Want to make it interactive? Add button input:
-
-```python
-messages = ["Hello, world!", "Badgeware rocks!", "Press a button!"]
-current = 0
-
-def update():
-    global current
-
-    if badge.pressed(BUTTON_UP):
-        current = (current + 1) % len(messages)
-
-    screen.pen = color.navy
-    screen.clear()
-
-    screen.pen = color.white
-    screen.font = rom_font.smart
-
-    text = messages[current]
-    width, _ = screen.measure_text(text)
-    x = (screen.width / 2) - (width / 2)
-
-    screen.text(text, x, 50)
-
-run(update)
-```
-
-Press **Up** to cycle through the messages. That's it — everything else is just building on these ideas.
-
 ---
 
 ## Start here
