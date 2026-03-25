@@ -5,18 +5,20 @@ icon: rocket
 publish: true
 sort: 1
 ---
-# Getting Started
+# Introduction
 
 Just got your badge? Let's get something on that screen. This quick guide will walk you through creating your very first app — from plugging in to seeing your code running. No prior experience with Badgeware is needed, just a basic familiarity with editing text files.
 
-# What You'll Need
+# What you'll need
 
 - Your Badgeware badge (Tufty, Badger, or Blinky)
 - A USB-C cable
 - A computer (any OS)
 - A text editor — anything from Notepad to VS Code will do
 
-# Step 1: Connect Your Badge
+# Step by step
+
+## Connect your badge
 
 Plug your badge into your computer with the USB-C cable. To copy files onto it, you'll need to put it into Disk Mode:
 
@@ -26,7 +28,7 @@ Plug your badge into your computer with the USB-C cable. To copy files onto it, 
 
 Open the drive and you'll see an `/apps` folder — this is where your code will live.
 
-# Step 2: Create Your App Folder
+## Create your app folder
 
 Inside `/apps`, create a new folder called `hello`. This folder name becomes your app's name in the menu, so it will show up as "Hello".
 
@@ -37,7 +39,7 @@ Your app needs a minimum of two things:
 
 For now, you can grab a copy of `icon.png` from one of the other app folders on the badge. We'll focus on the code.
 
-# Step 3: Write Your First App
+## Write your first app
 
 Create a file called `__init__.py` inside your `hello` folder and open it in your text editor. Type in the following:
 
@@ -55,7 +57,7 @@ run(update)
 
 Save the file. That's it — that's a complete Badgeware app!
 
-# Step 4: Run It
+## Run it!
 
 Eject the badge drive safely from your computer. Your badge will reboot back to the menu. Navigate to your new "Hello" app and select it.
 
