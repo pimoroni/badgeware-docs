@@ -43,7 +43,7 @@ run(update)
 
 # Properties
 
-## `width`
+## width
 The width of the image, measured in pixels. This property is read-only and returns an integer value.
 
 ## height
