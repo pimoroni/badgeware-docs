@@ -1,3 +1,9 @@
+---
+title: Welcome to Badgeware!
+summary: An introduction to Badgeware and the Badgeware SDK
+hide_toc: true
+---
+
 ## Welcome to Badgeware! ❤️
 
 Badgeware is a MicroPython-powered platform for our family of programmable badges — **Tufty**, **Badger**, and **Blinky** (aka Badgeware). Write a short Python script, copy it to your badge over USB, and it runs. No toolchains, no compilers, no fuss.
