@@ -9,7 +9,7 @@ The `image` type is the core graphics primitive in Badgeware. Images are true co
 
 A global image instance called `screen` represents the device framebuffer. All rendering to the display is done by drawing to `screen` — whether using primitives like `screen.circle()`, rendering text with `screen.text()`, or compositing sprites with `screen.blit()`.
 
-# Creation
+# Creating images
 
 ## image()
 Returns an `image` with the specified width and height.
@@ -20,6 +20,26 @@ Returns an `image` with the specified width and height.
 
 ### Returns
 `image`
+
+## load()
+Loads an image from the specified file path and returns it as a new `image` object.
+
+### Usage
+- `image_name = image.load(path)`
+    - `path`: Path to the image file to load
+
+### Returns
+An `image` object the dimensions of the file.
+
+### Example
+```python
+sprite = image.load("/system/assets/skull.png")
+
+def update():
+  screen.blit(sprite, vec2(10, 10))
+
+run(update)
+```
 
 # Properties
 
@@ -467,31 +487,6 @@ def update():
   screen.circle(80, 60, 20)
   screen.blit(sprite, vec2(40, 50))
   screen.monochrome()
-
-run(update)
-```
-
-# Loading images
-Load image data from files or byte streams into image objects.
-
-> Note: currently only PNG format images are supported
-
-## load()
-Loads an image from the specified file path and returns it as a new `image` object.
-
-### Usage
-- `image_name = image.load(path)`
-    - `path`: Path to the image file to load
-
-### Returns
-An `image` object the dimensions of the file.
-
-### Example
-```python
-sprite = image.load("/system/assets/skull.png")
-
-def update():
-  screen.blit(sprite, vec2(10, 10))
 
 run(update)
 ```
