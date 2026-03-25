@@ -4,11 +4,18 @@ summary: An introduction to Badgeware and the Badgeware SDK
 hide_toc: true
 ---
 
-## Welcome to Badgeware! ❤️
+# Welcome to Badgeware!
 
 Badgeware is a MicroPython-powered platform for our family of programmable badges — **Tufty**, **Badger**, and **Blinky** (aka Badgeware). Write a short Python script, copy it to your badge over USB, and it runs. No toolchains, no compilers, no fuss.
 
 Each badge runs the same API, so code you write for one model will mostly work on the others. The main differences are screen resolution and colours — see [Coding for the different badges](/introduction/badge-differences.md) for the details.
+
+| Tufty | Badger | Blinky |
+|----------|----------|----------|
+| ![Tufty](/docs/assets/tufty_web_front.png) | ![Tufty](/docs/assets/tufty_web_front.png) | ![Tufty](/docs/assets/tufty_web_front.png) |
+| Row 2 A  | Row 2 B  | Row 2 C  |
+| Row 3 A  | Row 3 B  | Row 3 C  |
+| Row 4 A  | Row 4 B  | Row 4 C  |
 
 ---
 
