@@ -59,11 +59,11 @@ def update():
     screen.clear()
 
     screen.pen = color.orange
-    screen.circle(x, y, 5)
+    screen.circle(x, y, 10)
 
     screen.pen = color.white
     screen.font = rom_font.smart
-    screen.text("Hello, Badgeware!", 10, 50)
+    screen.text("Hello, Badgeware!", 20, 50)
 
 run(update)
 ```
