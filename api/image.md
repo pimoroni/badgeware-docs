@@ -125,7 +125,7 @@ The font used for drawing text. This can be either a `pixel_font` or a `vector_f
 ```python
 import math
 
-# load a built in font - see pixel_font for list
+  # load a built in font - see pixel_font for list
 screen.font = rom_font.nope
 
 def update():
