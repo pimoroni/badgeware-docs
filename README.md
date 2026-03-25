@@ -13,23 +13,17 @@ Each badge runs the same API, so code you write for one model will mostly work o
 
 ## Tufty
 
-![Tufty](/assets/tufty_web_front.png)
-
-Full-colour IPS LCD (320x240). Great for graphics-heavy apps, games, and animations. Redraws continuously — as fast as your code runs.
+A full-colour IPS LCD badge with a 320x240 display (or 160x120 in low-res mode for extra performance). Tufty is the most versatile of the three — its high refresh rate and RGB colour make it ideal for graphics-heavy apps, games, animations, and rich user interfaces. The screen redraws continuously, so your `update()` function runs as fast as your code allows. If you want smooth movement and vibrant visuals, Tufty is the one to reach for.
 
 ## Badger
 
-![Badger](/assets/badger_web_front.png)
-
-E-paper display (264x176, black, white, and two greys). Perfect for low-power name badges, dashboards, and e-readers. Sleeps between updates for all-day battery life.
+An e-paper badge with a 264x176 display in black, white, and two shades of grey. E-paper only draws power when the screen updates, so Badger is designed around that — it sleeps between updates and wakes on a button press or RTC alarm. This makes it perfect for things that don't need to change often: name badges, conference schedules, dashboards, to-do lists, and e-readers. A single charge can last up to 100 days in standby. The trade-off is speed — full screen refreshes take a moment, though a fast-update mode is available for more responsive interfaces.
 
 ## Blinky
 
-![Blinky](/assets/blinky_web_front.png)
+A 39x26 LED matrix badge with 255 levels of brightness per pixel, making it essentially a greyscale display you can wear. Blinky is compact, eye-catching, and great for scrolling text, pixel art, simple animations, and notification displays. Like Tufty, it refreshes continuously so animations run smoothly. The matrix has cutouts for case corners and buttons — anything drawn into those pixels is automatically ignored, so you don't need to worry about them in your code.
 
-39x26 LED matrix (255 levels of greyscale). Ideal for wearable light displays, pixel art, and notifications. Continuous refresh for smooth animations.
-
-All three are powered by the **RP2350** (dual-core ARM Cortex-M33 @ 200MHz) with 16MB flash, 8MB PSRAM, WiFi, Bluetooth 5, and USB-C. See [The hardware](/introduction/hardware.md) for the full spec.
+All three badges are powered by the **RP2350** (dual-core ARM Cortex-M33 @ 200MHz) with 16MB flash, 8MB PSRAM, WiFi, Bluetooth 5, USB-C charging, and a 1000mAh rechargeable battery. See [The hardware](/introduction/hardware.md) for the full spec.
 
 # A taste of Badgeware
 
