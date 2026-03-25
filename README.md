@@ -13,6 +13,8 @@ This site is your guide. You'll find step-by-step tutorials to get you up and ru
 
 # Meet the badges
 
+Each badge runs the same API, so code you write for one model will mostly work on the others. The main differences are screen resolution, colour, and refresh behaviour — see [Coding for the different badges](/introduction/badge-differences.md) for the full details.
+
 ## Tufty
 
 A full-colour IPS LCD badge with a 320x240 display (or 160x120 in low-res mode for extra performance). Tufty is the most versatile of the three — its high refresh rate and RGB colour make it ideal for graphics-heavy apps, games, animations, and rich user interfaces. The screen redraws continuously, so your `update()` function runs as fast as your code allows. If you want smooth movement and vibrant visuals, Tufty is the one to reach for.
@@ -37,8 +39,6 @@ Despite their different displays, all three badges share the same core hardware 
 - **Inputs** — five front-facing buttons, plus RESET and BOOTSEL on the back
 - **Software** — the same Badgeware MicroPython API, so code written for one badge runs on the others with minimal changes
 - **Disk Mode** — double-tap RESET to mount the badge as a USB drive, drag your files on, eject, and go
-
-Each badge runs the same API, so code you write for one model will mostly work on the others. The main differences are screen resolution, colour, and refresh behaviour — see [Coding for the different badges](/introduction/badge-differences.md) for the full details.
 
 # A taste of Badgeware
 
@@ -69,41 +69,3 @@ run(update)
 ```
 
 That's a complete, runnable app — copy it onto your badge and it just works. Everything else is building on these ideas: drawing to the screen, reading buttons, and letting `update()` do its thing.
-
-# Guides
-
-Feature-focused walkthroughs for when you're ready to go deeper.
-
-- [Text](/guides/text.md) — fonts, colour, positioning, and effects like drop shadows
-- [Buttons](/guides/buttons.md) — single presses, holds, and building menus
-- [Sprites](/guides/sprites.md) — loading and drawing images and sprite sheets
-- [Vector Shapes](/guides/vector_shapes.md) — lines, circles, polygons, and transforms
-- [Files](/guides/filesystem.md) — reading and writing to the badge filesystem
-- [Time](/guides/time.md) — the real-time clock and scheduling updates
-- [Animation](/guides/animation.md) — smooth movement and frame timing
-- [The Framebuffer](/guides/framebuffer.md) — how the screen works under the hood
-
-# API reference
-
-The full reference for every module. Useful when you know what you want but need the exact method signature.
-
-- [badge](/api/badge.md) — buttons, LEDs, and system control
-- [image](/api/image.md) — loading and drawing images
-- [color](/api/color.md) — named colours and custom RGB values
-- [brush](/api/brush.md) — pens, fills, and drawing styles
-- [font](/api/font.md) — loading and using fonts
-- [pixel_font](/api/pixel_font.md) — bitmap pixel fonts
-- [text](/api/text.md) — drawing and measuring text
-- [shape](/api/shape.md) — vector shape primitives
-- [SpriteSheet](/api/SpriteSheet.md) — sprite sheet loading and animation
-- [rect](/api/rect.md) — rectangle helpers
-- [vec2](/api/vec2.md) — 2D vector maths
-- [mat3](/api/mat3.md) — 3x3 transformation matrices
-- [algorithm](/api/algorithm.md) — path-finding, sorting, and utilities
-- [rtc](/api/rtc.md) — real-time clock
-- [filesystem](/api/filesystem.md) — file and storage access
-
-# Get help
-
-- [GitHub](https://github.com/pimoroni/badgeware-docs) — report issues or suggest improvements to these docs
-- [Pimoroni Store](https://shop.pimoroni.com) — pick up accessories and breakouts
