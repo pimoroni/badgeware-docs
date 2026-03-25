@@ -25,7 +25,7 @@ An e-paper badge with a 264x176 display in black, white, and two shades of grey.
 
 A 39x26 LED matrix badge with 255 levels of brightness per pixel, making it essentially a greyscale display you can wear. Blinky is compact, eye-catching, and great for scrolling text, pixel art, simple animations, and notification displays. Like Tufty, it refreshes continuously so animations run smoothly. The matrix has cutouts for case corners and buttons — anything drawn into those pixels is automatically ignored, so you don't need to worry about them in your code.
 
-## What they have in common
+## Features
 
 Despite their different displays, all three badges share the same core hardware and software platform:
 
