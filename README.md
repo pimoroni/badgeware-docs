@@ -7,6 +7,10 @@ summary: An introduction to Badgeware and the Badgeware SDK
 
 Badgeware is a MicroPython-powered platform for our family of programmable badges — **Tufty**, **Badger**, and **Blinky**. Write a short Python script, copy it to your badge over USB, and it runs. No toolchains, no compilers, no fuss.
 
+Your badge comes preloaded with a set of apps, but the real fun starts when you write your own. Everything is built around a simple `update()` function that the badge calls once per frame — draw to the screen, read some buttons, and you've got an app. If you've ever written a few lines of Python, you already have everything you need to get started.
+
+This site is your guide. You'll find step-by-step tutorials to get you up and running, feature guides that go deeper on topics like sprites, text, and vector shapes, and a full API reference for when you need the details. Whether you're building a name badge for a conference, a tiny game to pass the time, or a dashboard that pulls live data over WiFi — it all starts here.
+
 # Meet the badges
 
 ## Tufty
