@@ -12,7 +12,7 @@ Each badge runs the same API, so code you write for one model will mostly work o
 
 | Tufty | Badger | Blinky |
 |----------|----------|----------|
-| ![Tufty](/docs/assets/tufty_web_front.png) | ![Tufty](/docs/assets/tufty_web_front.png) | ![Tufty](/docs/assets/tufty_web_front.png) |
+| ![Tufty](/assets/tufty_web_front.png) | ![Tufty](/assets/tufty_web_front.png) | ![Tufty](/assets/tufty_web_front.png) |
 | Row 2 A  | Row 2 B  | Row 2 C  |
 | Row 3 A  | Row 3 B  | Row 3 C  |
 | Row 4 A  | Row 4 B  | Row 4 C  |
