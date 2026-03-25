@@ -70,22 +70,6 @@ run(update)
 
 That's a complete, runnable app — copy it onto your badge and it just works. Everything else is building on these ideas: drawing to the screen, reading buttons, and letting `update()` do its thing.
 
-# Start here
-
-New to Badgeware? Work through these in order.
-
-1. [Getting Started](/introduction/getting-started.md) — plug in, create your first app, and run it in minutes
-2. [Creating an app](/introduction/your-first-app.md) — the full app structure, including `init()` and `on_exit()`
-3. [The hardware](/introduction/hardware.md) — what's inside your badge
-4. [Coding for the different badges](/introduction/badge-differences.md) — how Tufty, Badger, and Blinky differ and how to handle it
-5. [Badge modes](/introduction/editing-on-device.md) — Disk Mode, deep sleep, and firmware updates
-
-Then try one of the tutorials:
-
-- [Tutorial 1: A Simple Badge](/tutorials/creating_a_simple_badge.md) — images, text, and interaction
-- [Tutorial 2: Dashboard](/tutorials/creating_a_dashboard.md) — fetching and displaying live data
-- [Tutorial 3: A Simple Game](/tutorials/creating_a_game.md) — animation, input, and game loops
-
 # Guides
 
 Feature-focused walkthroughs for when you're ready to go deeper.
@@ -118,10 +102,6 @@ The full reference for every module. Useful when you know what you want but need
 - [algorithm](/api/algorithm.md) — path-finding, sorting, and utilities
 - [rtc](/api/rtc.md) — real-time clock
 - [filesystem](/api/filesystem.md) — file and storage access
-
-# What's new
-
-**28th February 2026** — Firmware 2.0.1 is out! Fixes for FAT filesystem corruption, vector shape rendering, deep sleep power consumption, and more. A new `badge` module replaces `io` with many extra features. See the [full release notes](https://github.com/pimoroni/badger2350/releases/tag/v2.0.1) and [how to update](/introduction/update-your-firmware.md).
 
 # Get help
 
