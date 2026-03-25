@@ -10,9 +10,7 @@ Badgeware is a MicroPython-powered platform for our family of programmable badge
 
 Each badge runs the same API, so code you write for one model will mostly work on the others. The main differences are screen resolution, colour, and refresh behaviour — see [Coding for the different badges](/introduction/badge-differences.md) for the full details.
 
----
-
-## Meet the badges
+# Meet the badges
 
 | **Tufty** | **Badger** | **Blinky** |
 |----------|----------|----------|
@@ -24,9 +22,7 @@ Each badge runs the same API, so code you write for one model will mostly work o
 
 All three are powered by the **RP2350** (dual-core ARM Cortex-M33 @ 200MHz) with 16MB flash, 8MB PSRAM, WiFi, Bluetooth 5, and USB-C. See [The hardware](/introduction/hardware.md) for the full spec.
 
----
-
-## A taste of Badgeware
+# A taste of Badgeware
 
 Every app is built around a single `update()` function that the badge calls once per frame. Here's the smallest complete app:
 
@@ -42,9 +38,7 @@ def update():
 run(update)
 ```
 
----
-
-## Start here
+# Start here
 
 New to Badgeware? Work through these in order.
 
@@ -60,9 +54,7 @@ Then try one of the tutorials:
 - [Tutorial 2: Dashboard](/tutorials/creating_a_dashboard.md) — fetching and displaying live data
 - [Tutorial 3: A Simple Game](/tutorials/creating_a_game.md) — animation, input, and game loops
 
----
-
-## Guides
+# Guides
 
 Feature-focused walkthroughs for when you're ready to go deeper.
 
@@ -75,9 +67,7 @@ Feature-focused walkthroughs for when you're ready to go deeper.
 - [Animation](/guides/animation.md) — smooth movement and frame timing
 - [The Framebuffer](/guides/framebuffer.md) — how the screen works under the hood
 
----
-
-## API reference
+# API reference
 
 The full reference for every module. Useful when you know what you want but need the exact method signature.
 
@@ -97,15 +87,11 @@ The full reference for every module. Useful when you know what you want but need
 - [rtc](/api/rtc.md) — real-time clock
 - [filesystem](/api/filesystem.md) — file and storage access
 
----
-
-## What's new
+# What's new
 
 **28th February 2026** — Firmware 2.0.1 is out! Fixes for FAT filesystem corruption, vector shape rendering, deep sleep power consumption, and more. A new `badge` module replaces `io` with many extra features. See the [full release notes](https://github.com/pimoroni/badger2350/releases/tag/v2.0.1) and [how to update](/introduction/update-your-firmware.md).
 
----
-
-## Get help
+# Get help
 
 - [GitHub](https://github.com/pimoroni/badgeware-docs) — report issues or suggest improvements to these docs
 - [Pimoroni Store](https://shop.pimoroni.com) — pick up accessories and breakouts
