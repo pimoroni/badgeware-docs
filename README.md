@@ -61,8 +61,6 @@ def update():
     screen.pen = color.orange
     screen.circle(x, y, 10)
 
-    screen.blur(5)
-
     screen.pen = color.white
     screen.font = rom_font.smart
     screen.text("Hello, Badgeware!", 24, 50)
