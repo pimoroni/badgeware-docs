@@ -23,7 +23,20 @@ An e-paper badge with a 264x176 display in black, white, and two shades of grey.
 
 A 39x26 LED matrix badge with 255 levels of brightness per pixel, making it essentially a greyscale display you can wear. Blinky is compact, eye-catching, and great for scrolling text, pixel art, simple animations, and notification displays. Like Tufty, it refreshes continuously so animations run smoothly. The matrix has cutouts for case corners and buttons — anything drawn into those pixels is automatically ignored, so you don't need to worry about them in your code.
 
-All three badges are powered by the **RP2350** (dual-core ARM Cortex-M33 @ 200MHz) with 16MB flash, 8MB PSRAM, WiFi, Bluetooth 5, USB-C charging, and a 1000mAh rechargeable battery. See [The hardware](/introduction/hardware.md) for the full spec.
+## What they have in common
+
+Despite their different displays, all three badges share the same core hardware and software platform:
+
+- **Processor** — RP2350 dual-core ARM Cortex-M33 @ 200MHz with hardware floating point
+- **Memory** — 16MB flash for firmware, code, and assets plus 8MB PSRAM for runtime use
+- **Connectivity** — 2.4GHz WiFi and Bluetooth 5 for downloading data, syncing, or communicating between badges
+- **Power** — 1000mAh rechargeable battery with USB-C charging
+- **Expansion** — Qw/ST port for connecting breakout accessories, SWD port for debugging
+- **Inputs** — five front-facing buttons, plus RESET and BOOTSEL on the back
+- **Software** — the same Badgeware MicroPython API, so code written for one badge runs on the others with minimal changes
+- **Disk Mode** — double-tap RESET to mount the badge as a USB drive, drag your files on, eject, and go
+
+See [The hardware](/introduction/hardware.md) for the full spec.
 
 # A taste of Badgeware
 
