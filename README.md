@@ -56,7 +56,8 @@ New to Badgeware? Work through these in order.
 - [The hardware](/introduction/hardware.md) — what's inside your badge
 - [Coding for the different badges](/introduction/badge-differences.md) — how Tufty, Badger, and Blinky differ and how to handle it
 - [Badge modes](/introduction/editing-on-device.md) — Disk Mode, deep sleep, and firmware updates
-- [Tutorial 1: Absolute Beginners](/introduction/tutorial_1.md) — a longer guided project with images, text, and interaction
+- [Tutorial 1: A Simple Badge](/introduction/tutorial_1.md) — a short guided project to create a very simple badge using text and images
+- [Tutorial 2: A Dashboard](/introduction/tutorial_2.md) — a longer guided project to create a dashboard app using vector graphics
 
 ---
 <!--
@@ -78,15 +79,22 @@ Feature-focused walkthroughs for when you're ready to go further.
 
 The full reference for every module. Useful when you know what you want but need the exact method signature.
 
-- [image](/api/image.md)
-- [color](/api/color.md)
+
+- [algorithm](/api/algorithm.md)
+- [badge](/api/badge.md)
 - [brush](/api/brush.md)
-- [shape](/api/shape.md)
+- [color](/api/color.md)
+- [The Filesystem](/api/filesystem.md)
+- [font](/api/font.md)
+- [image](/api/image.md)
 - [mat3](/api/mat3.md)
-- [rect](/api/rect.md)
-- [vec2](/api/vec2.md)
 - [pixel_font](/api/pixel_font.md)
-- [io](/api/io.md)
+- [rect](/api/rect.md)
+- [rtc](/api/rtc.md)
+- [shape](/api/shape.md)
+- [SpriteSheet](/api/SpriteSheet.md)
+- [text](/api/text.md)
+- [vec2](/api/vec2.md)
 
 ---
 
