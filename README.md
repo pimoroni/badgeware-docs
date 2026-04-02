@@ -56,8 +56,10 @@ New to Badgeware? Work through these in order.
 - [The hardware](/introduction/hardware.md) — what's inside your badge
 - [Coding for the different badges](/introduction/badge-differences.md) — how Tufty, Badger, and Blinky differ and how to handle it
 - [Badge modes](/introduction/editing-on-device.md) — Disk Mode, deep sleep, and firmware updates
-- [Tutorial 1: A Simple Badge](/introduction/tutorial_1.md) — a short guided project to create a very simple badge
-- [Tutorial 2: A Dashboard](/introduction/tutorial_2.md) — a longer guided project to create a dashboard app.
+- [Tutorial 1: A Simple Badge](/introduction/tutorial_1.md) — a short guided project to create a very simple badge using text and images
+- [Tutorial 2: A Dashboard](/introduction/tutorial_2.md) — a longer guided project to create a dashboard app using vector graphics
+- [Tutorial 3: A Simple Game: Acorn Highway (Part 1)](/introduction/tutorial_3.md) — putting everything together to create a basic but fully-featured game. Part 1 covers game mechanics.
+- [Tutorial 4: A Simple Game: Acorn Highway (Part 2)](/introduction/tutorial_4.md) — putting everything together to create a basic but fully-featured game. Part 2 covers graphics and animation.
 
 ---
 <!--
