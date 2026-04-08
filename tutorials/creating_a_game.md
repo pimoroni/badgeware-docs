@@ -2,6 +2,6 @@
 title: Creating a game
 summary: "Animation, sprites and interactivity"
 icon: sports_esports
-publish: true
+publish: false
 ---
 # Tutorial 3: A simple game
