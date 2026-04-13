@@ -1,7 +1,7 @@
 ---
 title: Sprites
 summary: Load spritesheets and extract individual sprites and animation cycles for drawing.
-icon: diamond_shine
+icon: background_grid_small
 ---
 
 # Introduction

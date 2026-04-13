@@ -1,8 +1,8 @@
 ---
-title: "Tutorial 3: A simple game (Part 1)"
-summary: "Game mechanics"
+title: Creating a game
+summary: "Animation, sprites and interactivity"
 icon: sports_esports
-publish: true
+publish: false
 ---
 # Tutorial 3: A simple game: Acorn Highway (Part 1)
 

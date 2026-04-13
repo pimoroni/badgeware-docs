@@ -1,7 +1,7 @@
 ---
 title: vec2
 summary: Represents a 2D vector (point) with x and y coordinates, commonly used for positions and directions.
-icon: polyline
+icon: diagonal_line
 publish: true
 ---
 # Introduction

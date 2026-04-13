@@ -1,105 +1,71 @@
-## Welcome to Badgeware! ❤️
-
-Badgeware is a MicroPython-powered platform for our family of programmable badges — **Tufty**, **Badger**, and **Blinky** (aka Badgeware). Write a short Python script, copy it to your badge over USB, and it runs. No toolchains, no compilers, no fuss.
-
-Each badge runs the same API, so code you write for one model will mostly work on the others. The main differences are screen resolution and colours — see [Coding for the different badges](/introduction/badge-differences.md) for the details.
-
+---
+title: Welcome to Badgeware!
+summary: An introduction to Badgeware and the Badgeware SDK
 ---
 
-## A taste of Badgeware
+# Welcome to Badgeware!
 
-Every app is built around a single `update()` function that the badge calls once per frame. Here's the smallest complete app:
+Badgeware is a MicroPython-powered platform for our family of programmable badges — **Tufty**, **Badger**, and **Blinky**. Write a short Python script, copy it to your badge over USB, and it runs. No toolchains, no compilers, no fuss.
+
+Your badge comes preloaded with a set of apps, but the real fun starts when you write your own. Everything is built around a simple `update()` function that the badge calls once per frame — draw to the screen, read some buttons, and you've got an app. If you've ever written a few lines of Python, you already have everything you need to get started.
+
+This site is your guide. You'll find step-by-step tutorials to get you up and running, feature guides that go deeper on topics like sprites, text, and vector shapes, and a full API reference for when you need the details. Whether you're building a name badge for a conference, a tiny game to pass the time, or a dashboard that pulls live data over WiFi — it all starts here.
+
+# Meet the badges
+
+Each badge runs the same API, so code you write for one model will mostly work on the others. The main differences are screen resolution, colour, and refresh behaviour — see [Coding for the different badges](/introduction/badge-differences.md) for the full details.
+
+## Tufty
+
+A full-colour IPS LCD badge with a 320x240 display (or 160x120 in low-res mode for extra performance). Tufty is the most versatile of the three — its high refresh rate and RGB colour make it ideal for graphics-heavy apps, games, animations, and rich user interfaces. The screen redraws continuously, so your `update()` function runs as fast as your code allows. If you want smooth movement and vibrant visuals, Tufty is the one to reach for.
+
+## Badger
+
+An e-paper badge with a 264x176 display in black, white, and two shades of grey. E-paper only draws power when the screen updates, so Badger is designed around that — it sleeps between updates and wakes on a button press or RTC alarm. This makes it perfect for things that don't need to change often: name badges, conference schedules, dashboards, to-do lists, and e-readers. A single charge can last up to 100 days in standby. The trade-off is speed — full screen refreshes take a moment, though a fast-update mode is available for more responsive interfaces.
+
+## Blinky
+
+A 39x26 LED matrix badge with 255 levels of brightness per pixel, making it essentially a greyscale display you can wear. Blinky is compact, eye-catching, and great for scrolling text, pixel art, simple animations, and notification displays. Like Tufty, it refreshes continuously so animations run smoothly. The matrix has cutouts for case corners and buttons — anything drawn into those pixels is automatically ignored, so you don't need to worry about them in your code.
+
+## Features
+
+Despite their different displays, all three badges share the same core hardware and software platform:
+
+- **Processor** — RP2350 dual-core ARM Cortex-M33 @ 200MHz with hardware floating point
+- **Memory** — 16MB flash for firmware, code, and assets plus 8MB PSRAM for runtime use
+- **Connectivity** — 2.4GHz WiFi and Bluetooth 5 for downloading data, syncing, or communicating between badges
+- **Power** — 1000mAh rechargeable battery with USB-C charging
+- **Expansion** — Qw/ST port for connecting breakout accessories, SWD port for debugging
+- **Inputs** — five front-facing buttons, plus RESET and BOOTSEL on the back
+- **Software** — the same Badgeware MicroPython API, so code written for one badge runs on the others with minimal changes
+- **Disk Mode** — double-tap RESET to mount the badge as a USB drive, drag your files on, eject, and go
+
+# A taste of Badgeware
+
+Every app is built around a single `update()` function that the badge calls once per frame. Here's a quick example — a bouncing ball with a greeting, in about 20 lines:
 
 ```python
-def update():
-    # screen.pen = color.navy
-    # screen.clear()
+x, y = 80, 60
+dx, dy = 2, 1
 
-    # screen.pen = color.white
-    # screen.font = rom_font.smart
-    screen.text("Hello, world!", 10, 50)
+def update():
+    global x, y, dx, dy
+
+    x, y = x + dx, y + dy
+    if x < 5 or x > screen.width - 5:  dx = -dx
+    if y < 5 or y > screen.height - 5: dy = -dy
+
+    screen.pen = color.navy
+    screen.clear()
+
+    screen.pen = color.orange
+    screen.circle(x, y, 10)
+
+    screen.pen = color.white
+    screen.font = rom_font.smart
+    screen.text("Hello, Badgeware!", 24, 50)
 
 run(update)
 ```
 
-Want to make it interactive? Add button input:
-
-```python
-messages = ["Hello, world!", "Badgeware rocks!", "Press a button!"]
-current = 0
-
-def update():
-    global current
-
-    if badge.pressed(BUTTON_UP):
-        current = (current + 1) % len(messages)
-
-    text = messages[current]
-    width, _ = screen.measure_text(text)
-    x = (screen.width / 2) - (width / 2)
-
-    screen.text(text, x, 50)
-
-run(update)
-```
-
-Press **Up** to cycle through the messages. That's pretty much it — everything else is just building on these ideas.
-
----
-
-## Start here
-
-New to Badgeware? Work through these in order.
-
-- [Getting Started](/introduction/getting-started.md) — plug in, create your first app, and run it in minutes
-- [Creating an app](/introduction/your-first-app.md) — the full app structure, including `init()` and `on_exit()`
-- [The hardware](/introduction/hardware.md) — what's inside your badge
-- [Coding for the different badges](/introduction/badge-differences.md) — how Tufty, Badger, and Blinky differ and how to handle it
-- [Badge modes](/introduction/editing-on-device.md) — Disk Mode, deep sleep, and firmware updates
-- [Tutorial 1: A Simple Badge](/introduction/tutorial_1.md) — a short guided project to create a very simple badge using text and images
-- [Tutorial 2: A Dashboard](/introduction/tutorial_2.md) — a longer guided project to create a dashboard app using vector graphics
-- [Tutorial 3: A Simple Game: Acorn Highway (Part 1)](/introduction/tutorial_3.md) — putting everything together to create a basic but fully-featured game. Part 1 covers game mechanics.
-- [Tutorial 4: A Simple Game: Acorn Highway (Part 2)](/introduction/tutorial_4.md) — putting everything together to create a basic but fully-featured game. Part 2 covers graphics and animation.
-
----
-<!--
-## Guides
-
-Feature-focused walkthroughs for when you're ready to go further.
-
-- [Text](/guides/text.md) — fonts, colour, positioning, and effects like drop shadows
-- [Buttons](/guides/buttons.md) — single presses, holds, and building menus
-- [Sprites](/guides/sprites.md) — loading and drawing images and sprite sheets
-- [Vector Shapes](/guides/vector_shapes.md) — lines, circles, polygons, and transforms
-- [Algorithms](/guides/algorithms.md) — path-finding, sorting, and other built-in utilities
-- [Files](/guides/files.md) — reading and writing to the badge filesystem
-- [Time](/guides/time.md) — the real-time clock and scheduling updates
-
---- -->
-
-## API reference
-
-The full reference for every module. Useful when you know what you want but need the exact method signature.
-
-
-- [algorithm](/api/algorithm.md)
-- [badge](/api/badge.md)
-- [brush](/api/brush.md)
-- [color](/api/color.md)
-- [The Filesystem](/api/filesystem.md)
-- [font](/api/font.md)
-- [image](/api/image.md)
-- [mat3](/api/mat3.md)
-- [pixel_font](/api/pixel_font.md)
-- [rect](/api/rect.md)
-- [rtc](/api/rtc.md)
-- [shape](/api/shape.md)
-- [SpriteSheet](/api/SpriteSheet.md)
-- [text](/api/text.md)
-- [vec2](/api/vec2.md)
-
----
-
-## What's new
-
-**28th February 2026** — Firmware update available. See [Updating your firmware](/introduction/update-your-firmware.md) for instructions.
+That's a complete, runnable app — copy it onto your badge and it just works. Everything else is building on these ideas: drawing to the screen, reading buttons, and letting `update()` do its thing.

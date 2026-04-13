@@ -1,7 +1,7 @@
 ---
 title: SpriteSheet
 summary: Load and manage spritesheets and animated sprites.
-icon: diamond_shine
+icon: background_grid_small
 publish: true
 ---
 

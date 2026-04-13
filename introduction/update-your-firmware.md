@@ -1,11 +1,9 @@
 ---
-title: Update Your Firmware
+title: Updating firmware
 summary: Keep your badge up to date with the latest Badgeware firmware.
-icon: download
+icon:
 publish: true
 ---
-
-> **Back up your code! The new firmware update will rebuild the filesystem on your badge!**
 
 # Update Your Firmware
 
@@ -14,6 +12,8 @@ Before you start coding, make sure your badge is running the latest firmware. Ne
 ## Latest Release: v2.0.1 (28th February 2026)
 
 This release fixes FAT filesystem corruption, vector rendering clipping, image blitting overflow, and power consumption during sleep mode. It also introduces the new `badge` module which replaces the previous `io` module with expanded functionality.
+
+> **Back up your code! The new firmware update will rebuild the filesystem on your badge!**
 
 Download the correct firmware for your badge:
 
