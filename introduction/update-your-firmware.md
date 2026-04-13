@@ -12,9 +12,9 @@ Before you start coding, make sure your badge is running the latest firmware. Ne
 ## Latest Release: v2.0.2 (10th April 2026)
 
 - v2.0.1 fixes FAT filesystem corruption, vector rendering clipping, image blitting overflow, and power consumption during sleep mode. It also introduces the new `badge` module which replaces the previous `io` module with expanded functionality.
-- v2.0.2 is a maintenance release to fix some bugs and quirks in PicoVector. Tufty also gets some updated graphics, and a new ISS app!
+- v2.0.2 is a maintenance release to fix some bugs and quirks in PicoVector. Tufty gets some updated graphics, and a new ISS app!
 
-> **If you're upgrading from an old (v1) version of the firmware you should back up your code! v2 will rebuild the filesystem on your badge!**
+> **If you're upgrading from an old (v1) version of the firmware you should back up your code! Recent builds will rebuild the filesystem on your badge!**
 
 Download the correct firmware for your badge:
 
