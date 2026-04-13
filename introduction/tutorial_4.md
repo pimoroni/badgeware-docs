@@ -8,7 +8,7 @@ publish: true
 
 So having followed Tutorial 3, you should have a working, if ugly and speedy, platformer made of coloured blocks. Let's get it looking really good. First of all, here's the code you should have in your app by the end of the last tutorial:
 
-```python
+```simulator
 import qwstpad
 import random
 
@@ -39,7 +39,7 @@ class player_base:
     @property
     def b(self):
         return self.y + self.h
-    
+
     @r.setter
     def r(self, a):
         self.x = a - self.w
@@ -65,7 +65,7 @@ class player_base:
         if self.b < platform.y and self.b + self.vy >= platform.y:
             return True
         return False
-    
+
     def is_airborne(self):
         airborne = True
         for platform in platforms:
@@ -141,15 +141,15 @@ class platform_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     @property
     def bounding_box(self):
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
-    
+
     def update(self):
         global score
 
@@ -176,12 +176,12 @@ class platform_base:
             if self.bounding_box.intersects(platform.bounding_box):
                 return True
         return False
-    
+
     def draw(self):
         screen.pen = color.blue
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
-    
+
 
 class acorn_base:
     def __init__(self, x, y):
@@ -193,15 +193,15 @@ class acorn_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     @property
     def bounding_box(self):
         return rect(self.x, self.y, self.w, self.h)
-    
+
     def draw(self):
         screen.pen = color.lime
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
@@ -513,7 +513,7 @@ class player_base:
     @property
     def b(self):
         return self.y + self.h
-    
+
     @r.setter
     def r(self, a):
         self.x = a - self.w
@@ -539,7 +539,7 @@ class player_base:
         if self.b < platform.y and self.b + self.vy >= platform.y:
             return True
         return False
-    
+
     def is_airborne(self):
         airborne = True
         for platform in platforms:
@@ -615,15 +615,15 @@ class platform_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     @property
     def bounding_box(self):
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
-    
+
     def update(self):
         global score
 
@@ -650,12 +650,12 @@ class platform_base:
             if self.bounding_box.intersects(platform.bounding_box):
                 return True
         return False
-    
+
     def draw(self):
         screen.pen = color.blue
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
-    
+
 
 class acorn_base:
     def __init__(self, x, y):
@@ -667,15 +667,15 @@ class acorn_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     @property
     def bounding_box(self):
         return rect(self.x, self.y, self.w, self.h)
-    
+
     def draw(self):
         screen.pen = color.lime
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
@@ -1016,7 +1016,7 @@ class player_base:
     @property
     def b(self):
         return self.y + self.h
-    
+
     @r.setter
     def r(self, a):
         self.x = a - self.w
@@ -1042,7 +1042,7 @@ class player_base:
         if self.b < platform.y and self.b + self.vy >= platform.y:
             return True
         return False
-    
+
     def is_airborne(self):
         airborne = True
         for platform in platforms:
@@ -1116,15 +1116,15 @@ class platform_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     @property
     def bounding_box(self):
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
-    
+
     def update(self):
         global score
 
@@ -1156,7 +1156,7 @@ class platform_base:
         screen.pen = brush.image(branch, mat3().translate(self.x, self.y))
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
-    
+
 
 class acorn_base:
     def __init__(self, x, y):
@@ -1168,15 +1168,15 @@ class acorn_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     @property
     def bounding_box(self):
         return rect(self.x, self.y, self.w, self.h)
-    
+
     def draw(self):
         screen.pen = color.lime
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
@@ -1422,7 +1422,7 @@ class player_base:
     @property
     def b(self):
         return self.y + self.h
-    
+
     @r.setter
     def r(self, a):
         self.x = a - self.w
@@ -1448,7 +1448,7 @@ class player_base:
         if self.b < platform.y and self.b + self.vy >= platform.y:
             return True
         return False
-    
+
     def is_airborne(self):
         airborne = True
         for platform in platforms:
@@ -1528,15 +1528,15 @@ class platform_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     @property
     def bounding_box(self):
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
-    
+
     def update(self):
         global score
 
@@ -1568,7 +1568,7 @@ class platform_base:
         screen.pen = brush.image(branch, mat3().translate(self.x, self.y))
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
-    
+
 
 class acorn_base:
     def __init__(self, x, y):
@@ -1580,15 +1580,15 @@ class acorn_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     @property
     def bounding_box(self):
         return rect(self.x, self.y, self.w, self.h)
-    
+
     def draw(self):
         screen.pen = color.lime
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
@@ -1835,7 +1835,7 @@ def gameplay_loop():
 
     for acorn in acorns:
         acorn.move()
-    
+
     for acorn in acorns:
         acorn.update()
 
@@ -1924,7 +1924,7 @@ class player_base:
     @property
     def b(self):
         return self.y + self.h
-    
+
     @r.setter
     def r(self, a):
         self.x = a - self.w
@@ -1950,7 +1950,7 @@ class player_base:
         if self.b < platform.y and self.b + self.vy >= platform.y:
             return True
         return False
-    
+
     def is_airborne(self):
         airborne = True
         for platform in platforms:
@@ -2030,15 +2030,15 @@ class platform_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     @property
     def bounding_box(self):
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
-    
+
     def update(self):
         global score
 
@@ -2066,7 +2066,7 @@ class platform_base:
             if self.bounding_box.intersects(platform.bounding_box):
                 return True
         return False
-    
+
     def spawn_acorn(self):
         global acorns
         acorn = acorn_base(random.randint(self.x, self.r - 10), self.y - 10)
@@ -2076,7 +2076,7 @@ class platform_base:
         screen.pen = brush.image(branch, mat3().translate(self.x, self.y))
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
-    
+
 
 class acorn_base:
     def __init__(self, x, y):
@@ -2088,15 +2088,15 @@ class acorn_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     @property
     def bounding_box(self):
         return rect(self.x, self.y, self.w, self.h)
-    
+
     def move(self):
         self.x -= foreground_scroll_speed
         self.draw()
@@ -2110,7 +2110,7 @@ class acorn_base:
 
         elif self.r < 0:
             acorns.remove(self)
-    
+
     def draw(self):
         screen.blit(acorn_sml, vec2(self.x, self.y))
 
@@ -2220,7 +2220,7 @@ def gameplay_loop():
 
     for acorn in acorns:
         acorn.move()
-    
+
     for acorn in acorns:
         acorn.update()
 
@@ -2460,7 +2460,7 @@ class player_base:
     @property
     def b(self):
         return self.y + self.h
-    
+
     @r.setter
     def r(self, a):
         self.x = a - self.w
@@ -2486,7 +2486,7 @@ class player_base:
         if self.b < platform.y and self.b + self.vy >= platform.y:
             return True
         return False
-    
+
     def is_airborne(self):
         airborne = True
         for platform in platforms:
@@ -2566,15 +2566,15 @@ class platform_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     @property
     def bounding_box(self):
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
-    
+
     def update(self):
         global score
 
@@ -2602,7 +2602,7 @@ class platform_base:
             if self.bounding_box.intersects(platform.bounding_box):
                 return True
         return False
-    
+
     def spawn_acorn(self):
         global acorns
         acorn = acorn_base(random.randint(self.x, self.r - 10), self.y - 10)
@@ -2612,7 +2612,7 @@ class platform_base:
         screen.pen = brush.image(branch, mat3().translate(self.x, self.y))
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
-    
+
 
 class acorn_base:
     def __init__(self, x, y):
@@ -2624,15 +2624,15 @@ class acorn_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     @property
     def bounding_box(self):
         return rect(self.x, self.y, self.w, self.h)
-    
+
     def move(self):
         self.x -= foreground_scroll_speed
         self.draw()
@@ -2646,7 +2646,7 @@ class acorn_base:
 
         elif self.r < 0:
             acorns.remove(self)
-    
+
     def draw(self):
         screen.blit(acorn_sml, vec2(self.x, self.y))
 
@@ -2789,7 +2789,7 @@ def gameplay_loop():
 
     for acorn in acorns:
         acorn.move()
-    
+
     for acorn in acorns:
         acorn.update()
 
@@ -2880,7 +2880,7 @@ First, let's do the image:
 ```python-raw
 def draw_score():
     global score
-    
+
     x = screen.width - 16
     y = 3
 
@@ -3052,7 +3052,7 @@ class player_base:
     @property
     def b(self):
         return self.y + self.h
-    
+
     @r.setter
     def r(self, a):
         self.x = a - self.w
@@ -3078,7 +3078,7 @@ class player_base:
         if self.b < platform.y and self.b + self.vy >= platform.y:
             return True
         return False
-    
+
     def is_airborne(self):
         airborne = True
         for platform in platforms:
@@ -3158,15 +3158,15 @@ class platform_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     @property
     def bounding_box(self):
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
-    
+
     def update(self):
         global score
 
@@ -3194,7 +3194,7 @@ class platform_base:
             if self.bounding_box.intersects(platform.bounding_box):
                 return True
         return False
-    
+
     def spawn_acorn(self):
         global acorns
         acorn = acorn_base(random.randint(self.x, self.r - 10), self.y - 10)
@@ -3204,7 +3204,7 @@ class platform_base:
         screen.pen = brush.image(branch, mat3().translate(self.x, self.y))
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
-    
+
 
 class acorn_base:
     def __init__(self, x, y):
@@ -3216,15 +3216,15 @@ class acorn_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     @property
     def bounding_box(self):
         return rect(self.x, self.y, self.w, self.h)
-    
+
     def move(self):
         self.x -= foreground_scroll_speed
         self.draw()
@@ -3238,7 +3238,7 @@ class acorn_base:
 
         elif self.r < 0:
             acorns.remove(self)
-    
+
     def draw(self):
         screen.blit(acorn_sml, vec2(self.x, self.y))
 
@@ -3409,7 +3409,7 @@ def gameplay_loop():
 
     for acorn in acorns:
         acorn.move()
-    
+
     for acorn in acorns:
         acorn.update()
 

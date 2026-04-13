@@ -78,7 +78,7 @@ The `@property` on these makes them very useful. They're defined like methods, b
 
 This essentially works the same, but in reverse. It allows people to assign values to `player.r` or `player.b`, and this will be taken in as the parameter `a` and used to calculate how to change the x and y coordinates. Let's try this out - alter `update()` so that the whole program looks like this:
 
-```python
+```simulator
 class player_base:
     def __init__(self, x, y):
         self.x = x
@@ -96,7 +96,7 @@ class player_base:
     @property
     def b(self):
         return self.y + self.h
-    
+
     @r.setter
     def r(self, a):
         self.x = a - self.w
@@ -140,17 +140,17 @@ class platform_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     def draw(self):
         screen.pen = color.blue
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
 ```
-    
+
 You'll notice `platform_base` has an extra parameter when you create it, which is just a unique name for that particular platform. It's not important now, but useful later. The length of the platform is also randomly generated for each one, somewhere between half the screen width and the full screen width. Remember to insert `import random` at the very beginning of the file to import the random number functions.
 
 ```python-raw
@@ -164,11 +164,11 @@ class acorn_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     def draw(self):
         screen.pen = color.lime
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
@@ -197,7 +197,7 @@ class player_base:
     @property
     def b(self):
         return self.y + self.h
-    
+
     @r.setter
     def r(self, a):
         self.x = a - self.w
@@ -223,16 +223,16 @@ class platform_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     def draw(self):
         screen.pen = color.blue
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
-    
+
 
 class acorn_base:
     def __init__(self, x, y):
@@ -244,11 +244,11 @@ class acorn_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     def draw(self):
         screen.pen = color.lime
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
@@ -289,7 +289,7 @@ class player_base:
     @property
     def b(self):
         return self.y + self.h
-    
+
     @r.setter
     def r(self, a):
         self.x = a - self.w
@@ -378,7 +378,7 @@ class player_base:
     @property
     def b(self):
         return self.y + self.h
-    
+
     @r.setter
     def r(self, a):
         self.x = a - self.w
@@ -432,16 +432,16 @@ class platform_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     def draw(self):
         screen.pen = color.blue
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
-    
+
 
 class acorn_base:
     def __init__(self, x, y):
@@ -453,11 +453,11 @@ class acorn_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     def draw(self):
         screen.pen = color.lime
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
@@ -526,7 +526,7 @@ class player_base:
     @property
     def b(self):
         return self.y + self.h
-    
+
     @r.setter
     def r(self, a):
         self.x = a - self.w
@@ -548,7 +548,7 @@ class player_base:
         if self.b < platform.y and self.b + self.vy >= platform.y:
             return True
         return False
-    
+
     def is_airborne(self):
         airborne = True
         for platform in platforms:
@@ -602,7 +602,7 @@ class player_base:
     @property
     def b(self):
         return self.y + self.h
-    
+
     @r.setter
     def r(self, a):
         self.x = a - self.w
@@ -624,7 +624,7 @@ class player_base:
         if self.b < platform.y and self.b + self.vy >= platform.y:
             return True
         return False
-    
+
     def is_airborne(self):
         airborne = True
         for platform in platforms:
@@ -665,16 +665,16 @@ class platform_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     def draw(self):
         screen.pen = color.blue
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
-    
+
 
 class acorn_base:
     def __init__(self, x, y):
@@ -686,11 +686,11 @@ class acorn_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     def draw(self):
         screen.pen = color.lime
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
@@ -861,7 +861,7 @@ class player_base:
     @property
     def b(self):
         return self.y + self.h
-    
+
     @r.setter
     def r(self, a):
         self.x = a - self.w
@@ -883,7 +883,7 @@ class player_base:
         if self.b < platform.y and self.b + self.vy >= platform.y:
             return True
         return False
-    
+
     def is_airborne(self):
         airborne = True
         for platform in platforms:
@@ -927,16 +927,16 @@ class platform_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     def draw(self):
         screen.pen = color.blue
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
-    
+
 
 class acorn_base:
     def __init__(self, x, y):
@@ -948,11 +948,11 @@ class acorn_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     def draw(self):
         screen.pen = color.lime
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
@@ -1028,7 +1028,7 @@ Running is easy, we just add a bit of acceleration to the player in the appropri
 ```python-raw
     if controls["MOVE_RIGHT"]:
         self.vx += 1.5
-        
+
     if controls["MOVE_LEFT"]:
         self.vx -= 1.5
 ```
@@ -1148,7 +1148,7 @@ class player_base:
     @property
     def b(self):
         return self.y + self.h
-    
+
     @r.setter
     def r(self, a):
         self.x = a - self.w
@@ -1170,7 +1170,7 @@ class player_base:
         if self.b < platform.y and self.b + self.vy >= platform.y:
             return True
         return False
-    
+
     def is_airborne(self):
         airborne = True
         for platform in platforms:
@@ -1231,16 +1231,16 @@ class platform_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     def draw(self):
         screen.pen = color.blue
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
-    
+
 
 class acorn_base:
     def __init__(self, x, y):
@@ -1252,11 +1252,11 @@ class acorn_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     def draw(self):
         screen.pen = color.lime
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
@@ -1454,7 +1454,7 @@ Then we can alter the method we use to generate the bounding box, using `keepout
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
 ```
 
-And now we've got nicely spawning, nicely spaced platforms. 
+And now we've got nicely spawning, nicely spaced platforms.
 
 > Note: It's possible to get the game to lock up completely here. If you decide you want more than three platforms at once, or if the keepout value is too high, then it's possible to get a situation where there isn't a big enough gap for a new platform to spawn into. If this happens, then the game will completely freeze while it goes round in an endless loop trying to find a gap and never finding one. Which makes Tufty sad.
 
@@ -1483,7 +1483,7 @@ class player_base:
     @property
     def b(self):
         return self.y + self.h
-    
+
     @r.setter
     def r(self, a):
         self.x = a - self.w
@@ -1509,7 +1509,7 @@ class player_base:
         if self.b < platform.y and self.b + self.vy >= platform.y:
             return True
         return False
-    
+
     def is_airborne(self):
         airborne = True
         for platform in platforms:
@@ -1571,15 +1571,15 @@ class platform_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     @property
     def bounding_box(self):
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
-    
+
     def update(self):
         self.x -= foreground_scroll_speed
 
@@ -1603,12 +1603,12 @@ class platform_base:
             if self.bounding_box.intersects(platform.bounding_box):
                 return True
         return False
-    
+
     def draw(self):
         screen.pen = color.blue
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
-    
+
 
 class acorn_base:
     def __init__(self, x, y):
@@ -1620,15 +1620,15 @@ class acorn_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     @property
     def bounding_box(self):
         return rect(self.x, self.y, self.w, self.h)
-    
+
     def draw(self):
         screen.pen = color.lime
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
@@ -1956,7 +1956,7 @@ class player_base:
     @property
     def b(self):
         return self.y + self.h
-    
+
     @r.setter
     def r(self, a):
         self.x = a - self.w
@@ -1982,7 +1982,7 @@ class player_base:
         if self.b < platform.y and self.b + self.vy >= platform.y:
             return True
         return False
-    
+
     def is_airborne(self):
         airborne = True
         for platform in platforms:
@@ -2050,15 +2050,15 @@ class platform_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     @property
     def bounding_box(self):
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
-    
+
     def update(self):
         global score
 
@@ -2085,12 +2085,12 @@ class platform_base:
             if self.bounding_box.intersects(platform.bounding_box):
                 return True
         return False
-    
+
     def draw(self):
         screen.pen = color.blue
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
-    
+
 
 class acorn_base:
     def __init__(self, x, y):
@@ -2102,15 +2102,15 @@ class acorn_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     @property
     def bounding_box(self):
         return rect(self.x, self.y, self.w, self.h)
-    
+
     def draw(self):
         screen.pen = color.lime
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
@@ -2327,7 +2327,7 @@ class player_base:
     @property
     def b(self):
         return self.y + self.h
-    
+
     @r.setter
     def r(self, a):
         self.x = a - self.w
@@ -2353,7 +2353,7 @@ class player_base:
         if self.b < platform.y and self.b + self.vy >= platform.y:
             return True
         return False
-    
+
     def is_airborne(self):
         airborne = True
         for platform in platforms:
@@ -2429,15 +2429,15 @@ class platform_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     @property
     def bounding_box(self):
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
-    
+
     def update(self):
         global score
 
@@ -2464,12 +2464,12 @@ class platform_base:
             if self.bounding_box.intersects(platform.bounding_box):
                 return True
         return False
-    
+
     def draw(self):
         screen.pen = color.blue
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
-    
+
 
 class acorn_base:
     def __init__(self, x, y):
@@ -2481,15 +2481,15 @@ class acorn_base:
     @property
     def r(self):
         return self.x + self.w
-    
+
     @property
     def b(self):
         return self.y + self.h
-    
+
     @property
     def bounding_box(self):
         return rect(self.x, self.y, self.w, self.h)
-    
+
     def draw(self):
         screen.pen = color.lime
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)

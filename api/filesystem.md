@@ -1,7 +1,7 @@
 ---
 title: The Filesystem
 summary: Provides storage for apps, as well as the ability to read and write saved data from them.
-icon: disk
+icon: disc
 publish: true
 ---
 # Introduction
