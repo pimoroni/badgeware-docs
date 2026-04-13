@@ -174,13 +174,13 @@ Changes the display mode of the badge. You can apply more than one mode at once,
 
 ### Usage
 - `.mode(modes)`
-        - `LORES` (Tufty only) - puts the badge into 160x120 low resolution mode.
-        - `HIRES` (Tufty only) - puts the badge into 320x240 high resolution mode.
-        - `VSYNC` (Tufty only) - enables vertical sync, preventing screen tearing.
-        - `FAST_UPDATE` (Badger only) - sets the badge to update quickly at the cost of slight ghosting
-        - `FULL_UPDATE` (Badger only) - sets the badge to update fully each time at the cost of speed.
-        - `MEDIUM_UPDATE` (Badger only) - a middle ground between the above two.
-        - `DITHER` - applies an ordered dither to the framebuffer before writing to the screen, equivalent to running [dither()](/api/image.md#dither) after every update. Available on all models, but most useful for Badger.
+    - `LORES` (Tufty only) - puts the badge into 160x120 low resolution mode.
+    - `HIRES` (Tufty only) - puts the badge into 320x240 high resolution mode.
+    - `VSYNC` (Tufty only) - enables vertical sync, preventing screen tearing.
+    - `FAST_UPDATE` (Badger only) - sets the badge to update quickly at the cost of slight ghosting
+    - `FULL_UPDATE` (Badger only) - sets the badge to update fully each time at the cost of speed.
+    - `MEDIUM_UPDATE` (Badger only) - a middle ground between the above two.
+    - `DITHER` - applies an ordered dither to the framebuffer before writing to the screen, equivalent to running [dither()](/api/image.md#dither) after every update. Available on all models, but most useful for Badger.
 
 ### Returns
 `None`
@@ -204,7 +204,7 @@ Prints to console the amount of free RAM, prepended with the message if specifie
 > Note: This is not actually part of the Badge class, and so doesn't need `badge.` before it in your code.
 
 # Lighting
-Badgeware is fitted with four onboard white LEDs on the back of the board. These can be used as indicators, decoration or anything else you can think of. Tufty also has a front-mounted light sensor which
+Badgeware is fitted with four onboard white LEDs on the back of the board. These can be used as indicators, decoration or anything else you can think of. Tufty also has a front-mounted light sensor.
 
 ## caselights()
 Gets and sets the brightness value for the rear lighting on the badge.

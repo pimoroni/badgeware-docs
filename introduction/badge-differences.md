@@ -29,7 +29,7 @@ You can also dither your image on any of the badges, although it is by far the m
 
 # Refresh rate
 
-Tufty and Blinky wil continuously run `update()` as quickly as they can, so the screen will redraw in as much time as it takes to process the contents of your `update()` method. You can of course build in delays or timers in `update()` to get a constant frame rate if you need one.
+Tufty and Blinky will continuously run `update()` as quickly as they can, so the screen will redraw in as much time as it takes to process the contents of your `update()` method. You can of course build in delays or timers in `update()` to get a constant frame rate if you need one.
 
 Badger is a little different. Because Badger is an e-paper display, it only uses power when it is updating, meaning it's perfect for very low power operations. To take advantage of this, we've designed Badger to go to sleep between every update, waking up either on a signal from the RTC or when a button is pressed.
 

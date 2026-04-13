@@ -9,17 +9,18 @@ publish: true
 
 Before you start coding, make sure your badge is running the latest firmware. New releases include bug fixes, performance improvements, and new features — if something isn't working the way the docs describe, an outdated firmware is often the reason.
 
-## Latest Release: v2.0.1 (28th February 2026)
+## Latest Release: v2.0.2 (10th April 2026)
 
-This release fixes FAT filesystem corruption, vector rendering clipping, image blitting overflow, and power consumption during sleep mode. It also introduces the new `badge` module which replaces the previous `io` module with expanded functionality.
+- v2.0.1 fixes FAT filesystem corruption, vector rendering clipping, image blitting overflow, and power consumption during sleep mode. It also introduces the new `badge` module which replaces the previous `io` module with expanded functionality.
+- v2.0.2 is a maintenance release to fix some bugs and quirks in PicoVector. Tufty also gets some updated graphics, and a new ISS app!
 
-> **Back up your code! The new firmware update will rebuild the filesystem on your badge!**
+> **If you're upgrading from an old (v1) version of the firmware you should back up your code! v2 will rebuild the filesystem on your badge!**
 
 Download the correct firmware for your badge:
 
-- **Badger:** [badger-v2.0.1-micropython-with-filesystem.uf2](https://github.com/pimoroni/badger2350/releases/download/v2.0.1/badger-v2.0.1-micropython-with-filesystem.uf2)
-- **Tufty:** [tufty-v2.0.1-micropython-with-filesystem.uf2](https://github.com/pimoroni/tufty2350/releases/download/v2.0.1/tufty-v2.0.1-micropython-with-filesystem.uf2)
-- **Blinky:** [blinky-v2.0.1-micropython-with-filesystem.uf2](https://github.com/pimoroni/blinky2350/releases/download/v2.0.1/blinky-v2.0.1-micropython-with-filesystem.uf2)
+- **Badger:** [badger-v2.0.2-micropython-with-filesystem.uf2](https://github.com/pimoroni/badger2350/releases/download/v2.0.2/badger-v2.0.2-micropython-with-filesystem.uf2)
+- **Tufty:** [tufty-v2.0.2-micropython-with-filesystem.uf2](https://github.com/pimoroni/tufty2350/releases/download/v2.0.2/tufty-v2.0.2-micropython-with-filesystem.uf2)
+- **Blinky:** [blinky-v2.0.2-micropython-with-filesystem.uf2](https://github.com/pimoroni/blinky2350/releases/download/v2.0.2/blinky-v2.0.2-micropython-with-filesystem.uf2)
 
 ## How to Update
 
