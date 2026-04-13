@@ -1,7 +1,7 @@
 ---
 title: Creating your first app
 summary: Learn how to build a Badgeware app
-icon:
+icon: shapes
 sort: 3
 ---
 

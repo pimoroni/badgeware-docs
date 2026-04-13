@@ -1,10 +1,10 @@
 ---
-title: Creating a game
+title: "A simple game - part 1"
 summary: "Animation, sprites and interactivity"
 icon: sports_esports
-publish: false
+publish: true
 ---
-# Tutorial 3: A simple game: Acorn Highway (Part 1)
+# A simple game: Acorn Highway (Part 1)
 
 It's time to put everything together to make a simple but fun game, with lots of scope for expansion. In this part and the next part we'll cover using sprites and animations, as well as structuring the game, working with properties to easily align objects, saving and loading data through states, and working with brushes to produce animation effects. You'll make the main gameplay loop, as well as an animation when you die, and animated title and game over screens.
 

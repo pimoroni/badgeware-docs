@@ -1,7 +1,7 @@
 ---
-title: Different Models
+title: Different models
 summary: Learn about the different Badgeware badges
-icon:
+icon: badge
 sort: 2
 ---
 
