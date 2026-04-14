@@ -56,7 +56,7 @@ The badge has a writeable LittleFS partition located at `/` which is intended fo
 
 You can use normal Python style file access from your code:
 
-```python
+```python-raw
 with open("/storage/myfile.txt", "w") as out:
   out.write("this is some text i want to keep\n")
 ```

@@ -173,19 +173,18 @@ The text will always be drawn scrolling between both edges of the target image, 
 
 ### Example
 ```python
-
-text = "Hello world! Once again, this is a long piece of text which is supposed to scroll outside its area! Whoop whoop!"
+my_text = "Hello world! Once again, this is a long piece of text which is supposed to scroll outside its area! Whoop whoop!"
 
 # Now we set up the scrolling text itself, very simple.
-my_scroll = text.scroll(text)
+my_scroll = text.scroll(my_text)
 
 # This window is 10px within the screen boundaries.
 text_window = screen.window(10, 10, screen.width - 20, screen.height - 20)
 
 # This scroll is set up with a few more parameters.
-my_other_scroll = text.scroll(text, font_face=rom_font.ark, target=text_window, gap=20, align="bottom")
+my_other_scroll = text.scroll(my_text, font_face=rom_font.ark, target=text_window, gap=20, align="bottom")
 
-update():
+def update():
     # We call the closures we made every frame.
     my_scroll()
     # For this one we're taking the return value
@@ -193,7 +192,7 @@ update():
     progress = my_other_scroll()
 
     # And then we'll show that number.
-    screen.text(my_scroll, 10, 10)
+    screen.text(str(progress), 10, 10)
 
 run(update)
 ```

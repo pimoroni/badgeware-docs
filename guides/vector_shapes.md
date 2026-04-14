@@ -15,7 +15,7 @@ To define a custom shape, call the `shape.custom` static method with one or more
 
 Each point must be provided as a two-value tuple containing the point’s x and y coordinates.
 
-```python {len=6}
+```python
 import math
 
 screen.antialias = image.X4
@@ -26,7 +26,7 @@ def update():
   path2 = [] # outline of the flower centre
   for i in range(0, 360, 5):
     # create the petal shape
-    scale = (math.sin(((i + io.ticks / 50)) * 5 * math.pi / 180) * 10) + 30
+    scale = (math.sin(((i + badge.ticks / 50)) * 5 * math.pi / 180) * 10) + 30
     x = math.sin(i * math.pi / 180) * scale
     y = math.cos(i * math.pi / 180) * scale
     path1.append(vec2(x + 80, y + 60))
@@ -42,6 +42,8 @@ def update():
   # draw the shape to the display
   screen.pen = color.orange
   screen.shape(custom_shape)
+
+run(update)
 ```
 
 > Creating shapes can be an expensive process, if possible define the shape once and keep a reference to it for future use.
@@ -78,6 +80,8 @@ def update():
   screen.pen = color.latte
   arc = shape.arc(130, 90, 10, 20, 90, 270)
   screen.shape(arc)
+
+run(update)
 ```
 
 See the built in primitives for a full list of supported shapes.
@@ -89,38 +93,38 @@ To learn more about shapes [click here for full documentation of the `shapes` mo
 # Transforming vector shapes
 
 
-Shapes can also be given a transformation matrix to adjust their scale, rotation, and skew - this is very useful for creating smooth animations. [Click here for full documentation of the `Matrix` class](api/mat3.md).
+Shapes can also be given a transformation matrix to adjust their scale, rotation, and skew - this is very useful for creating smooth animations. [Click here for full documentation of the `mat3` class](api/mat3.md).
 
-```python {len=3}
+```python
 import math
 
 def update():
   # create a rectangle
-  rectangle = shapes.rectangle(-20, -20, 40, 40)
+  rectangle = shape.rectangle(-20, -20, 40, 40)
 
-  offset = math.sin(io.ticks / 1000) * 50
+  offset = math.sin(badge.ticks / 1000) * 50
   # transform and draw the transformed rectangle
-  rectangle.transform = Matrix().translate(80 + offset, 60).rotate(offset)
-  screen.draw(rectangle)
-```
+  rectangle.transform = mat3().translate(80 + offset, 60).rotate(offset)
+  screen.shape(rectangle)
 
-To learn more about transformations [click here for the Transforms guide](guides/transforms.md).
+run(update)
+```
 
 # Stroking vector shapes
 The shape-creation functions produce closed paths with a single outline. To draw a “thick” version of a shape, you need to stroke that outline, expanding it outward and inward by a chosen width. This effectively generates two offset copies of the original path, one larger and one smaller, which are then combined to form a new stroked shape.
 
-```python {len=5}
+```python
 import math
 
 def update():
   # create a circle with a radius of ten pixels
-  squircle = shapes.squircle(80, 60, 40, 4)
+  squircle = shape.squircle(80, 60, 40, 4)
 
   # create a stroked copy of the circle two pixels thick
-  thickness = (math.sin(io.ticks / 1000) * 5) + 6
+  thickness = (math.sin(badge.ticks / 1000) * 5) + 6
   squircle.stroke(thickness)
 
-  screen.draw(squircle)
+  screen.shape(squircle)
 ```
 
 # Styling
@@ -131,7 +135,7 @@ Antialiasing is a technique that smooths out the jagged, stair-step edges that a
 
 Vector shapes and text both support antialiasing which can be enabled and disabled at any time:
 
-```python
+```python-raw
 # 4x4 sample grid for antialiasing, best quality, slowest
 screen.antialias = Image.X4
 
@@ -150,49 +154,49 @@ Currently supported shapes are:
 
 ## Rectangle
 A rectangle with top left corner at `x, y` and size `w x h`.
-```python
+```python-raw
 shapes.rectangle(x, y, w, h)
 ```
 
 ## Circle
 A circle of radius `r` centered at point `x, y`.
-```python
+```python-raw
 circle(x, y, r)
 ```
 
 ## Arc
 An arc that spans the angles `t1` and to `t2` (theta, in degrees) with a radius of `r` centered at point `x, y`.
-```python
+```python-raw
 arc(x, y, r, t1, t2)
 ```
 
 ## Pie
 A pie slice (think pacman) that spans the angles `t1` and to `t2` (theta, in degrees) with a radius of `r` centered at point `x, y`.
-```python
+```python-raw
 pie(x, y, r, t1, t2)
 ```
 
 ## Line
 A line starting at `x1, y1` and ending at `x2, y2` with thickness `t`.
-```python
+```python-raw
 line(x1, y1, x2, y2, t)
 ```
 
 ## Rounded Rectangle
 A rectangle with rounded corners with top left corner at `x, y` and size `w x h`. corner radii are defined by `r1` (top left) and going clockwise.
 If `r2, r3, r4` are not specified then `r1` is used for all corners.
-```python
+```python-raw
 rounded_rectangle(x, y, w, h, r1[, r2, r3, r4])
 ```
 
 ## Regular Polygon
 A regular polygon of radius `r` centered at point `x, y` with `s` sides.
-```python
+```python-raw
 regular_polygon(x, y, r, s)
 ```
 
 ## Squircle
 A squircle of radius `r` centered at point `x, y`, `n` defines how rounded the end shape is.
-```python
+```python-raw
 squircle(x, y, r, n=4)
 ```
