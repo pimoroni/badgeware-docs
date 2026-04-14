@@ -42,7 +42,7 @@ badge.default_clear = color.rgb(192, 192, 192)
 
 def shadow_text(message, x, y):
   # draw the shadow offset by 1 pixel
-  screen.pen = color.rgb(0, 0, 0, 128)
+  screen.pen = color.rgb(0, 0, 0, 64)
   screen.text(message, x + 1, y + 1)
 
   # draw the text
