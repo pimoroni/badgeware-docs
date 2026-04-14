@@ -327,7 +327,7 @@ def update():
     global selected_mood
 
     # Checking for a button press...
-    if io.BUTTON_UP in io.pressed:
+    if badge.pressed(BUTTON_UP):
         # The += here is just a quicker way of saying
         # selected_mood = selected_mood + 1.
         selected_mood += 1
@@ -374,9 +374,9 @@ def update():
 run(update)
 ```
 
-So if you run the above code, you'll see it will change which mood is displayed - for a few presses, at least. Don't worry, we'll fix it. But what did we just do? Well, that if statement is checking `io.BUTTON_UP in io.pressed` to see whether it should advance through the list. But what does the `io.BUTTON_UP in io.pressed` part mean?
+So if you run the above code, you'll see it will change which mood is displayed - for a few presses, at least. Don't worry, we'll fix it. But what did we just do? Well, that if statement is checking `badge.pressed(BUTTON_UP)` to see whether it should advance through the list. But what does the `badge.pressed(BUTTON_UP)` part mean?
 
-Basically, when the Badgeware software polls the buttons, it puts its findings in several lists - `io.pressed`, `io.released`, `io.held` and `io.changed`. These lists are just like the ones you made to hold the different mood words. `io.BUTTON_UP` is just the internal name for the Up button and `in` is a useful statement to check if a list contains a specified value, so in natural language we're asking "Is the Up button in the list of buttons pressed between last update and this update?" and then doing different things depending on the answer.
+Basically, when the Badgeware software polls the buttons, it makes its findings available via several methods - `badge.pressed()`, `badge.released()`, `badge.held()` and `badge.changed()`. These lists are just like the ones you made to hold the different mood words. `BUTTON_UP` is just the internal name for the Up button and we're passing it into the method, so in natural language we're asking "Is the Up button in the list of buttons pressed between last update and this update?" and then doing different things depending on the True / False answer.
 
 But you'll find that pressing the button still makes the program crash eventually. Not to worry...
 
@@ -409,10 +409,10 @@ selected_mood = 0
 def update():
     global selected_mood
 
-    if io.BUTTON_UP in io.pressed:
+    if badge.pressed(BUTTON_UP):
         selected_mood += 1
 
-    elif io.BUTTON_DOWN in io.pressed:
+    elif badge.pressed(BUTTON_DOWN):
         selected_mood -= 1
 
     if selected_mood >= len(mood_text):
@@ -479,6 +479,12 @@ with
     selected_mood = selected_mood % len(mood_text)
 ```
 
+or even shorten it more. Remember how we were able to shorten terms like `x = x + 1` to `x += 1`? We can do the same with the modulo operator:
+
+```python-raw
+    selected_mood %= len(mood_text)
+```
+
 This covers us going in both directions - if the index goes up to 7, what's the remainder when 7 is divided by 7? Zero, of course. And if it drops to -1, what's the remainder when -1 is divided by 7? Six.
 
 # Cleaning up
@@ -494,12 +500,12 @@ selected_mood = 0
 def update():
     global selected_mood
 
-    if io.BUTTON_UP in io.pressed:
+    if badge.pressed(BUTTON_UP):
         selected_mood += 1
-    elif io.BUTTON_DOWN in io.pressed:
+    elif badge.pressed(BUTTON_DOWN):
         selected_mood -= 1
 
-    selected_mood = selected_mood % len(mood_text)
+    selected_mood %= len(mood_text)
 
     screen.pen = color.navy
     screen.clear()

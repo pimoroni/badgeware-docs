@@ -6,20 +6,22 @@ icon: gamepad_down
 
 # Introduction
 
-The `io` module provides all the functionality needed to detect button states and handle user input events in your application.
+The `badge` module provides all the functionality needed to detect button states and handle user input events in your application.
 
 # User and Home buttons
 
 Badgeware features five front-facing buttons — **A**, **B**, **C**, **UP**, and **DOWN** — along with a **HOME** button on the rear.
 
-You can query the state of these buttons using the `io` module, which provides three lists representing button activity during each frame:
+You can query the state of these buttons using the `badge` module, which provides four methods returning button activity during each frame:
 
-- `pressed`: buttons that were pressed during the current frame
-- `released`: buttons that were released during the current frame
-- `held`: buttons that are currently being held down
-- `changed`: buttons that have changed state this frame
+- `pressed()`: returns buttons that were pressed during the current frame
+- `released()`: returns buttons that were released during the current frame
+- `held()`: returns buttons that are currently being held down
+- `changed()`: returns buttons that have changed state this frame
 
 Each button is represented by a constant (for example, `BUTTON_A`). The API allows you to check whether a button has been pressed, released, or held, and whether its state has changed during the current frame.
+
+If you pass these methods a button constant as a parameter, they will return a bool representing whether that button fits the criteria. If you call them without a parameter as above, they will return a list of all button constants that fit the criteria.
 
 > For the **pressed** and **released** lists, buttons are only included on the first frame in which the event occurs.
 
