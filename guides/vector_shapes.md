@@ -26,7 +26,7 @@ def update():
   path2 = [] # outline of the flower centre
   for i in range(0, 360, 5):
     # create the petal shape
-    scale = (math.sin(((i + io.ticks / 50)) * 5 * math.pi / 180) * 10) + 30
+    scale = (math.sin(((i + badge.ticks / 50)) * 5 * math.pi / 180) * 10) + 30
     x = math.sin(i * math.pi / 180) * scale
     y = math.cos(i * math.pi / 180) * scale
     path1.append(vec2(x + 80, y + 60))
@@ -93,24 +93,22 @@ To learn more about shapes [click here for full documentation of the `shapes` mo
 # Transforming vector shapes
 
 
-Shapes can also be given a transformation matrix to adjust their scale, rotation, and skew - this is very useful for creating smooth animations. [Click here for full documentation of the `Matrix` class](api/mat3.md).
+Shapes can also be given a transformation matrix to adjust their scale, rotation, and skew - this is very useful for creating smooth animations. [Click here for full documentation of the `mat3` class](api/mat3.md).
 
 ```python
 import math
 
 def update():
   # create a rectangle
-  rectangle = shapes.rectangle(-20, -20, 40, 40)
+  rectangle = shape.rectangle(-20, -20, 40, 40)
 
-  offset = math.sin(io.ticks / 1000) * 50
+  offset = math.sin(badge.ticks / 1000) * 50
   # transform and draw the transformed rectangle
-  rectangle.transform = Matrix().translate(80 + offset, 60).rotate(offset)
-  screen.draw(rectangle)
+  rectangle.transform = mat3().translate(80 + offset, 60).rotate(offset)
+  screen.shape(rectangle)
 
 run(update)
 ```
-
-To learn more about transformations [click here for the Transforms guide](guides/transforms.md).
 
 # Stroking vector shapes
 The shape-creation functions produce closed paths with a single outline. To draw a “thick” version of a shape, you need to stroke that outline, expanding it outward and inward by a chosen width. This effectively generates two offset copies of the original path, one larger and one smaller, which are then combined to form a new stroked shape.
@@ -120,13 +118,13 @@ import math
 
 def update():
   # create a circle with a radius of ten pixels
-  squircle = shapes.squircle(80, 60, 40, 4)
+  squircle = shape.squircle(80, 60, 40, 4)
 
   # create a stroked copy of the circle two pixels thick
-  thickness = (math.sin(io.ticks / 1000) * 5) + 6
+  thickness = (math.sin(badge.ticks / 1000) * 5) + 6
   squircle.stroke(thickness)
 
-  screen.draw(squircle)
+  screen.shape(squircle)
 ```
 
 # Styling
