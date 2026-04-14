@@ -192,7 +192,7 @@ def update():
     progress = my_other_scroll()
 
     # And then we'll show that number.
-    screen.text(my_scroll, 10, 10)
+    screen.text(str(progress), 10, 10)
 
 run(update)
 ```
