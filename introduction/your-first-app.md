@@ -32,7 +32,7 @@ There are certain things your `__init__.py` will need to work, and certain thing
 
 First you'll need to import relevant modules as in any Python program. Badgeware takes care of all the importing of system modules, and changes your working directory to your app's directory. Changing the working directory means that you can now import assets and other python files using paths relative to `__init__.py`, like so:
 
-```bash
+```python-raw
 import my_module
 
 my_image = image.load("assets/my_image.png")
@@ -68,7 +68,7 @@ def update():
   screen.clear()
 
   # calculate and draw an animated sine wave
-  y = (math.sin(io.ticks / 100) * 20) + 80
+  y = (math.sin(badge.ticks / 100) * 20) + 80
   screen.pen = color.rgb(0, 255, 0)
   for x in range(160):
     screen.rectangle(x, y, 1, 1)

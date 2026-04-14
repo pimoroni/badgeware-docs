@@ -27,6 +27,8 @@ def update():
 
   screen.font = compass_font
   screen.text("this is compass", 10, 30)
+
+run(update)
 ```
 
 > Badgeware ships with a gorgeous set of thirty licensed bitmap fonts designed by https://somepx.itch.io - you are free to use them in your projects!
@@ -36,17 +38,21 @@ def update():
 Drawing text uses the currently selected brush. This lets you colour text and also implement effects like drop shadows.
 
 ```python
+badge.default_clear = color.rgb(192, 192, 192)
+
 def shadow_text(message, x, y):
   # draw the shadow offset by 1 pixel
   screen.pen = color.rgb(0, 0, 0, 128)
   screen.text(message, x + 1, y + 1)
 
   # draw the text
-  screen.pen = color.rgb(255, 255, 255)
+  screen.pen = color.rgb(128, 0, 0)
   screen.text(message, x, y)
 
 def update():
   shadow_text("Hello, Badgeware!", 10, 10)
+
+run(update)
 ```
 
 Many effects can be achieved including bolding text, shadows, outlines, and even gradients.

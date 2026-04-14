@@ -39,8 +39,6 @@ For example if we load a spritesheet that is 128 x 64 pixels in size, and specif
 
 ```python
 # example of loading a sprite and blitting it to the screen
-from badgeware import screen
-from lib import SpriteSheet
 
 # load spritesheet that has 8 columns and 4 rows
 sprites = SpriteSheet(f"sprites/character.png", 8, 4)
@@ -55,9 +53,9 @@ def update():
 
   # scale blit the sprite at 3, 0 in the spritesheet to the screen
   screen.scale_blit(sprites.sprite(0, 0), 50, 50, 30, 30)
-```
 
-# Drawing sprites
+run(update)
+```
 
 # Animating sprites
 
@@ -65,8 +63,6 @@ The `Image` class can load images from files on the filesystem which can then be
 
 ```python
 # example of loading a sprite and blitting it to the screen
-from badgeware import screen, brushes, Image
-from lib import SpriteSheet
 
 # load an image as a sprite sheet specifying the number of rows and columns
 mona = SpriteSheet(f"assets/mona-sprites/mona-default.png", 7, 1)
@@ -81,4 +77,6 @@ def update():
 
   # scale blit the sprite at 3, 0 in the spritesheet to the screen
   screen.scale_blit(mona.sprite(0, 0), 50, 50, 30, 30)
+
+run(update)
 ```
