@@ -152,11 +152,10 @@ Now your app has a banner with centred, cycling text — all in about 20 lines o
 
 You've got the basics down. Here are some good next steps:
 
-- **[Creating an App](your-first-app.md)** — Learn about the full app structure, including `init()` and `on_exit()` methods.
-- **[Tutorial 1: A Simple Badge](tutorial_1.md)** — A longer, guided project that adds images, more text, and deeper interaction.
-- **[The Hardware](hardware.md)** — Find out what's under the hood of your badge.
-- **[Badge Differences](badge-differences.md)** — Understand how Tufty, Badger, and Blinky differ and how to code for each.
-- **[Badge Modes](editing-on-device.md)** — Learn about Disk Mode, deep sleep, and firmware updates.
+- **[Update Your Firmware](/introduction/update-your-firmware.md)** — Make sure your badge is running the latest firmware! 
+- **[Creating an App](/introduction/your-first-app.md)** — Learn about the full app structure, including `init()` and `on_exit()` methods.
+- **[Badge Differences](/introduction/badge-differences.md)** — Understand how Tufty, Badger, and Blinky differ and how to code for each.
+- **[Tutorial 1: A Simple Badge](/tutorials/creating_a_simple_badge.md)** — A longer, guided project that adds images, more text, and deeper interaction
 
 Once you're comfortable, dive into the **[Guides](/README.md#guides)** for features like sprites, vector shapes, animation, and more — or browse the **[API reference](/README.md#api)** when you need the details.
 
