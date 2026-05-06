@@ -1,4 +1,4 @@
-![](hero.png)
+![](assets/hero.png)
 Our recommended process for working with [Badgeware](https://badgewa.re/) devices is to set the board as a USB disk — double tap reset or use the MSC app on your device — and then copy over your files. But, perhaps this isn't your preferred workflow, or you just need to test an idea without creating an app?
 
 We've got two alternative workflows for you to try, the first uses Thonny to write the project code on your computer and then copy over to your Badgeware device where it can be tested. The second uses a terminal application called mpremote to copy and run the files on your Badgeware device.
@@ -16,9 +16,9 @@ We're going to assume that you have Thonny installed. If not, head over to the [
 The first step is to make sure that our computer and Badgeware device can communicate with each other.
 1. **Connect your Badgeware device to your computer using a good quality data cable.**
 2. **Click on Stop to force Thonny to reset the connection the Badgeware device.** Thonny should auto-detect your device. If not, got to Tools >> Options >> Interpreter and select Raspberry Pi Pico and for Port set it to Auto. Then, retry.
-![](/Thonny/stop.png)
+![](/assets/Thonny/stop.png)
 3. **Check the Python Shell and you should see a working shell.** In the example image we have written a quick print() to prove that the shell is interactive.
-![](Thonny/shell.png)
+![](/assets/Thonny/shell.png)
 
 
 The test code for this tutorial is intentionally simple. We just want to write a message to the screen. The same process can be used to develop full applications with images and interactivity. With that in mind, the project code is as follows.
@@ -62,28 +62,28 @@ run(update)
 Moving files between Thonny and the Badgeware device is relatively simple thanks to Thonny's built-in file manager.
 
 1. **Click on View and make sure Files is enabled.**
-![](Thonny/files1.png)
+![](/assets/Thonny/files1.png)
 2. **Make sure that you can see the files on your computer, and the Badgeware device (Raspberry Pi Pico.)**
-![](Thonny/files2.png)
+![](/assets/Thonny/files2.png)
 3. **Navigate to where your saved main.py file is located.**
 ![](Thonny/files3.png)
 4. **Right click on main.py and select Upload to /.** This will copy the file to the filesystem root of your Badgeware device. This can also be used to copy directories from your computer to Badgeware devices.
-![](Thonny/files4.png)
+![](/assets/Thonny/files4.png)
 5. **You should now see the file copied to the Badgeware device.**
-![](Thonny/files5.png)
+![](/assets/Thonny/files5.png)
 6. **Double click on the Raspberry Pi Pico copy of main.py to open the file in the editor.**
-![](Thonny/files6.png)
+![](/assets/Thonny/files6.png)
 7. **Click on Run (the green play button) to run main.py on your Badgeware device.**
 ![](Thonny/files7.png)
 8. **The Badgeware device's screen should now show the text "RUNNING FROM THONNY".**
-![](Thonny/running.jpg)
+![](/assets/Thonny/running.jpg)
 9. **Stop the code by pressing the Stop button in Thonny, or you can reset the Badgeware device.**
 ![](Thonny/files8.png)
 
 You can now develop your Badgeware projects interactively with Thonny. Any errors or code output will be sent to Thonny's Python Shell, while the Badgeware device runs the code and displays your project.
 
 ### Thonny Filesystem Commands
-![](thonny/thonny-fs.png)
+![](/assets/thonny/thonny-fs.png)
 Right clicking on a file or in a directory inside of Thonny's file manager, will bring up a menu where we can.
 
 - Open a file in Thonny.
@@ -108,23 +108,23 @@ Mpremote provides the following tools
 - Install libraries / modules. 
 
 1. **Go to the Microsoft Store and search for Python, install the latest version.** At the time of writing this was Python 3.13. As we are using a Windows 11 PC, we are installing via the Microsoft Store as it automatically sets up the path config necessary for the upcoming steps. **Linux users:** Python typically comes pre-installed, but you can check by opening a terminal and typing *python*, you should see the Python shell appear. If not, install Python as per your distribution's instructions.
-![](mpremote/store.png)
+![](/assets/mpremote/store.png)
 2. **Open a Command Prompt.** In Windows 10 and 11 we can search for Command Prompt. Linux users, open a Terminal.
-![](mpremote/cmd.png)
+![](/assets/mpremote/cmd.png)
 3. **Use pip to install mpremote.** Pip is Python's built-in package management tool and installing mpremote via this method ensures that the tool is accessible from the Command Prompt / Terminal.
 ```
 pip install mpremote
 ```
-![](mpremote/pip-install.png)
+![](/assets/mpremote/pip-install.png)
 3. **In the Command Prompt / Terminal, use mpremote to check that you can communicate with the device by opening a REPL (Read, Eval, Print, Loop) Python shell.**
 ```
 mpremote repl
 ```
-![](mpremote/repl.png)
+![](/assets/mpremote/repl.png)
 4. **Press CTRL + C in the REPL to stop any running code and to enable input.** Here you can see that we wrote a line to print "Badgeware woz ere".
-![](repl2.png)
+![](/assets/repl2.png)
 5. **Press CTRL+D to reboot Badgeware, then CTRL + X to exit the mpremote session.**
-![](repl3.png)
+![](/assets/mpremote/repl3.png)
 
 ### Copying Files and Directories With mpremote
 
@@ -177,11 +177,11 @@ python -m mpremote cp -r assets/ :/
 python -m mpremote run main.py
 ```
 5. **Check the Badgeware device**, you should see the code running on the screen.
-![](mpremote/cake.gif)6. **Press Reset on your Badgeware device to stop and reset the device.** The code will continue running even if we press **CTRL + C** or **CTRL + D**.
+![](/assets/mpremote/cake.gif)6. **Press Reset on your Badgeware device to stop and reset the device.** The code will continue running even if we press **CTRL + C** or **CTRL + D**.
 
 ### Mpremote Filesystem Commands
 
-![](mpremote/cat.png)
+![](/assets/mpremote/cat.png)
 Using mpremote we can also perform basic filesystem commands on Badgeware and other MicroPython devices.
 
 From the Command Prompt / Terminal, use mpremote's *fs* command with the following subcommands.
@@ -226,7 +226,7 @@ Calculate the SHA256 sum of files.
 sha256sum <file>
 ```
 Print a directory tree.
-![](mpremote/subcommands.gif)
+![](/assets/mpremote/subcommands.gif)
 ``` 
 tree [-vsh] <dirs>
 ```
