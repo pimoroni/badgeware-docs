@@ -157,6 +157,9 @@ You've got the basics down. Here are some good next steps:
 - **[Badge Differences](/introduction/badge-differences.md)** — Understand how Tufty, Badger, and Blinky differ and how to code for each.
 - **[Tutorial 1: A Simple Badge](/tutorials/creating_a_simple_badge.md)** — A longer, guided project that adds images, more text, and deeper interaction
 
-Once you're comfortable, dive into the **[Guides](/README.md#guides)** for features like sprites, vector shapes, animation, and more — or browse the **[API reference](/README.md#api)** when you need the details.
+Once you're comfortable, dive into the **[Guides](/README.md#guides)** for features like sprites, vector shapes, animation, and more — or browse the **[API reference](/README.md#api)** when you need the details. You can also find some related guides on our Learn portal:
+
+- **[Alternative Badgeware Workflows](https://learn.pimoroni.com/article/alternative-badgeware-workflows)** - How to program Badgeware with Thonny or `mpremote`.
+- **[Remote Controlled LEDs with Badgeware and MQTT](https://learn.pimoroni.com/article/mqtt-remote-control)** - Use Badgeware to wirelessly control another RP2350 device.
 
 Happy hacking!
