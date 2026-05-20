@@ -88,7 +88,7 @@ See the built in primitives for a full list of supported shapes.
 
 
 
-To learn more about shapes [click here for full documentation of the `shapes` module](api/modules/shapes.md).
+To learn more about shapes [click here for full documentation of the `shape` module](/api/shape.md).
 
 # Transforming vector shapes
 
