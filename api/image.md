@@ -15,8 +15,8 @@ A global image instance called `screen` represents the device framebuffer. All r
 Returns an `image` with the specified width and height.
 
 ### Usage
-- `image_name = image(w, h)`
-    - `w, h`: Width and height of the image to create.
+`image_name = image(w, h)`
+  - `w, h`: Width and height of the image to create.
 
 ### Returns
 `image`
