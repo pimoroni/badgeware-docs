@@ -16,8 +16,7 @@ Returns an `image` with the specified width and height.
 
 ### Usage
 
-`image_name = image(w, h)`
-
+`image_name = image(w, h)`\
   - `w, h`: Width and height of the image to create.
 
 ### Returns
