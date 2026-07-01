@@ -25,8 +25,8 @@ Returns an `image` with the specified width and height.
 Loads an image from the specified file path and returns it as a new `image` object.
 
 ### Usage
-- `image_name = image.load(path)`
-    - `path`: Path to the image file to load
+`image_name = image.load(path)`
+  - `path`: Path to the image file to load
 
 ### Returns
 An `image` object the dimensions of the file.
