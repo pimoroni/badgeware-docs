@@ -17,6 +17,8 @@ def update():
 run(update)
 ```
 
+> This tutorial uses the [`run()`](/api/run.md) helper: you write an `update()` function and `run(update)` calls it once per frame. It's equivalent to writing your own `while True:` loop that ends with `badge.update()` (as shown in the getting-started guide) — `run()` just gives the loop a name so we can build it up piece by piece as the tutorial goes on.
+
 And just like the first time - yay, a blank screen!
 
 Just like in the first tutorial, you don't have to use the same colours that are mentioned here - use whatever works on your badge and to your tastes. One thing that we'll do here though is make all of our dimensions relative to the screen dimensions, rather than fixed numbers of pixels - that way, it should display the same whether you're on Tufty or Badger. Blinky is tricky, of course, because of its resolution but many of the same techniques I'm doing here will still work. You might just have to leave out some text.

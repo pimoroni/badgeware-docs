@@ -6,7 +6,11 @@ publish: true
 ---
 # Tutorial 4: A simple game: Acorn Highway (Part 2)
 
-So having followed Tutorial 3, you should have a working, if ugly and speedy, platformer made of coloured blocks. Let's get it looking really good. First of all, here's the code you should have in your app by the end of the last tutorial:
+So having followed Tutorial 3, you should have a working, if ugly and speedy, platformer made of coloured blocks. Let's get it looking really good.
+
+> Like Part 1, this tutorial structures the game around a named `update()` function started with [`run(update)`](/api/run.md) — which is just a `while True:` loop ending in `badge.update()` given a name so we can refactor it as the game grows.
+
+First of all, here's the code you should have in your app by the end of the last tutorial:
 
 ```simulator
 import qwstpad

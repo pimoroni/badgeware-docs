@@ -6,20 +6,20 @@ icon: gamepad_down
 
 # Introduction
 
-The `io` module provides all the functionality needed to detect button states and handle user input events in your application.
+The `badge` object provides all the functionality needed to detect button states and handle user input events in your application.
 
 # User and Home buttons
 
 Badgeware features five front-facing buttons — **A**, **B**, **C**, **UP**, and **DOWN** — along with a **HOME** button on the rear.
 
-You can query the state of these buttons using the `io` module, which provides three lists representing button activity during each frame:
+You can query the state of these buttons using `badge`, which reports button activity during each frame:
 
 - `pressed`: buttons that were pressed during the current frame
 - `released`: buttons that were released during the current frame
 - `held`: buttons that are currently being held down
 - `changed`: buttons that have changed state this frame
 
-Each button is represented by a constant (for example, `io.BUTTON_A`). The API allows you to check whether a button has been pressed, released, or held, and whether its state has changed during the current frame.
+Each button is represented by a global constant (for example, `BUTTON_A`). You can check a specific button by passing its constant — `badge.pressed(BUTTON_A)` returns `True` or `False` — or call the method with no argument to get back the whole list of buttons in that state, e.g. `badge.pressed()`.
 
 > For the **pressed** and **released** lists, buttons are only included on the first frame in which the event occurs.
 
@@ -38,35 +38,35 @@ There are two main ways to handle button input:
 - Single press actions: for tasks like menu navigation or option selection, you typically want to respond only when a button is first pressed. Use **pressed**, **released**, and **changed** to handle button events like these.
 - Continuous actions: for games or repeated interactions, you often want something to happen continuously while a button is held down. Use **held** each frame to determine if a button is currently pressed.
 
-By testing whether a button appears in the pressed, held, released, or changed lists, you can respond to input events as they occur. This approach lets you distinguish between single actions, continuous input, and general state changes, giving you fine control over how your application reacts to user interaction.
+By testing whether a button is pressed, held, released, or changed, you can respond to input events as they occur. This approach lets you distinguish between single actions, continuous input, and general state changes, giving you fine control over how your application reacts to user interaction.
 
 > Note: Click on the emulator to allow it to capture input. Use the arrow keys and space on your keyboard to try the example out!
 
 ```python
 last_event = None
 
-def update():
-  global last_event
-
+while True:
   # true only when button A is newly pressed this frame
-  if io.BUTTON_A in io.pressed:
+  if badge.pressed(BUTTON_A):
     last_event = "BUTTON A PRESSED!"
 
   # true continuously while button B is being held
-  if io.BUTTON_B in io.held:
+  if badge.held(BUTTON_B):
     last_event = "BUTTON B HELD!"
 
   # true only if button C has been released this frame
-  if io.BUTTON_C in io.released:
+  if badge.released(BUTTON_C):
     last_event = "BUTTON C RELEASED!"
 
   # true only if button UP has changed state this frame
-  if io.BUTTON_UP in io.changed:
+  if badge.changed(BUTTON_UP):
     last_event = "BUTTON UP CHANGED!"
 
   if last_event:
     screen.pen = color.white
     screen.text(last_event, 10, 10)
+
+  badge.update()
 ```
 
 # Examples
@@ -88,14 +88,12 @@ menu_items = [
 ]
 selected = 0
 
-def update():
-  global selected
-
+while True:
   # adjust selected item index based on button presses
-  if io.BUTTON_UP in io.pressed:
+  if badge.pressed(BUTTON_UP):
     selected -= 1
 
-  if io.BUTTON_DOWN in io.pressed:
+  if badge.pressed(BUTTON_DOWN):
     selected += 1
 
   # wrap and clamp selected index to the range of items in the menu
@@ -117,6 +115,8 @@ def update():
 
     # write the menu item label
     screen.text(menu_items[i], 20, i * 15 + 50)
+
+  badge.update()
 ```
 
 ## Controlling a character
@@ -131,16 +131,14 @@ Gravity and basic physics are simulated to create a natural sense of movement.
 pos = vec2(80, 60)
 vec = vec2(0, 0)
 
-def update():
-  global pos, vec
-
-  if io.BUTTON_A in io.held:
+while True:
+  if badge.held(BUTTON_A):
     vec.x = -1 # move left
 
-  if io.BUTTON_C in io.held:
+  if badge.held(BUTTON_C):
     vec.x = 1 # move right
 
-  if io.BUTTON_B in io.pressed:
+  if badge.pressed(BUTTON_B):
     vec.y = -3 # jump when B is pressed
 
   # dampen sideways movement
@@ -163,4 +161,6 @@ def update():
   # draw the character
   screen.pen = color.red
   screen.circle(pos, 5)
+
+  badge.update()
 ```

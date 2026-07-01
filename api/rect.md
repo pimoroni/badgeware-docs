@@ -15,9 +15,12 @@ Although `x`, `y`, `w`, and `h` are stored as floating-point values, they repres
 Returns a `rect` with the specified dimensions and position.
 
 ### Usage
+- `rect_name = rect()` - Creates an empty rectangle at the origin.
 - `rect_name = rect(x, y, w, h)`
     - `x, y`: Pixel coordinates of the top left corner of the `rect`.
     - `w, h`: Width and height of the `rect`.
+- `rect_name = rect(other)`
+    - `other`: An existing `rect` to copy.
 
 # Properties
 
@@ -34,63 +37,66 @@ The width of the rectangle.
 The height of the rectangle.
 
 ## l
-The x-cordinate of the top-left corner of the rectangle.
+The left edge of the rectangle. This is an alias for `x`.
 
 ## r
-The x-coordinate of the bottom-right corner of the rectangle.
+The right edge of the rectangle (`x + w`). Assigning to it adjusts the width.
 
 ## t
-The y-cordinate of the top-left corner of the rectangle.
+The top edge of the rectangle. This is an alias for `y`.
 
 ## b
-The y-coordinate of the bottom-right corner of the rectangle.
+The bottom edge of the rectangle (`y + h`). Assigning to it adjusts the height.
 
 # Methods
 
 ## offset()
-Returns a new rectangle offset by the specified amount.
+Shifts the rectangle by the specified amount, **in place**, and returns the rectangle so calls can be chained.
 
 ### Usage
 - `rect_name.offset(x, y)`
     - `x, y`: Amount to offset the rectangle by.
+- `rect_name.offset(p)`
+    - `p`: A `vec2` to offset by.
 
 ### Returns
-A `rect` representing the offset rectangle.
+The `rect`, modified in place.
 
 ## deflate()
-Returns a new rectangle with its area reduced in size.
+Shrinks the rectangle inward on every side, **in place**, and returns the rectangle.
 
 ### Usage
 - `rect_name.deflate(a)`
-    - `a`: Amount to deflate each edge by.
-- `rect_name.deflate(t, r, b, l)`
-    - `t, r, b, l`: Amounts to deflate the top, right, bottom, and left edges.
+    - `a`: Amount to shrink every edge by.
+- `rect_name.deflate(x, y)`
+    - `x`: Amount to shrink the left and right edges by.
+    - `y`: Amount to shrink the top and bottom edges by.
 
 ### Returns
-A `rect` representing the smaller rectangle.
+The `rect`, modified in place.
 
 ## inflate()
-Returns a new rectangle with its area increased in size.
+Grows the rectangle outward on every side, **in place**, and returns the rectangle.
 
 ### Usage
 - `rect_name.inflate(a)`
-    - `a`: Amount to inflate each edge by.
-- `rect_name.inflate(t, r, b, l)`
-    - `t, r, b, l`: Amounts to inflate the top, right, bottom, and left edges.
+    - `a`: Amount to grow every edge by.
+- `rect_name.inflate(x, y)`
+    - `x`: Amount to grow the left and right edges by.
+    - `y`: Amount to grow the top and bottom edges by.
 
 ### Returns
-A `rect` representing the larger rectangle.
+The `rect`, modified in place.
 
 ## intersection()
-Returns a new rectangle representing the overlapping area between this rectangle and another.
-If the rectangles do not overlap, `None` is returned.
+Returns a **new** rectangle representing the overlapping area between this rectangle and another. If the rectangles do not overlap, an empty rectangle (zero width and height) is returned — test the result with `empty()`.
 
 ### Usage
 - `rect_name.intersection(other)`
     - `other`: The rectangle to intersect with.
 
 ### Returns
-A `rect` representing the intersection of the two operands.
+A `rect` representing the intersection of the two operands (empty if they are disjoint).
 
 ## intersects()
 Returns `True` if this rectangle overlaps with another rectangle, otherwise `False`.
@@ -103,11 +109,13 @@ Returns `True` if this rectangle overlaps with another rectangle, otherwise `Fal
 `bool`
 
 ## contains()
-Returns `True` if this rectangle fully contains another rectangle, otherwise `False`.
+Returns `True` if this rectangle fully contains another rectangle, or a point, otherwise `False`.
 
 ### Usage
 - `rect_name.contains(other)`
-    - `other`: The rectangle to test for containment.
+    - `other`: The `rect` to test for containment.
+- `rect_name.contains(point)`
+    - `point`: A `vec2` to test.
 
 ### Returns
 `bool`
@@ -122,6 +130,8 @@ Returns `True` if this rectangle has a width or height of zero, otherwise `False
 
 ## Constructor
 ```python-raw
+rect() -> rect
+rect(other: rect) -> rect
 rect(x: int|float, y: int|float, w: int|float, h: int|float) -> rect
 ```
 
@@ -140,12 +150,14 @@ rect.b -> float
 ## Methods
 ```python-raw
 rect.contains(other: rect) -> bool
+rect.contains(point: vec2) -> bool
 rect.deflate(a: int|float) -> rect
-rect.deflate(t: int|float, r: int|float, b: int|float, l: int|float) -> rect
+rect.deflate(x: int|float, y: int|float) -> rect
 rect.empty() -> bool
 rect.inflate(a: int|float) -> rect
-rect.inflate(t: int| float, r: int| float, b: int| float, l: int|float) -> rect
-rect.intersection(other: rect) -> rect | None
+rect.inflate(x: int|float, y: int|float) -> rect
+rect.intersection(other: rect) -> rect
 rect.intersects(other: rect) -> bool
 rect.offset(x: int|float, y: int|float) -> rect
+rect.offset(p: vec2) -> rect
 ```

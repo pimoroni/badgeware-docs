@@ -12,21 +12,25 @@ A global image instance called `screen` represents the device framebuffer. All r
 # Creating images
 
 ## image()
-Returns an `image` with the specified width and height.
+Returns an `image` with the specified width and height. A fresh buffer is allocated for you. Advanced users can wrap an existing buffer instead by passing it as the third argument — this is how `screen` is created around the display framebuffer.
 
 ### Usage
 - `image_name = image(w, h)`
     - `w, h`: Width and height of the image to create.
+- `image_name = image(w, h, buffer)`
+    - `buffer`: An existing buffer (for example a `memoryview`) to wrap instead of allocating a new one.
 
 ### Returns
 `image`
 
 ## load()
-Loads an image from the specified file path and returns it as a new `image` object.
+Loads a PNG or JPEG image and returns it as a new `image` object. The source can be a file path or a buffer of image data already in memory (for example bytes downloaded over WiFi).
 
 ### Usage
 - `image_name = image.load(path)`
-    - `path`: Path to the image file to load
+    - `path`: Path to the image file to load.
+- `image_name = image.load(data)`
+    - `data`: A buffer (`bytes`/`bytearray`) containing PNG or JPEG data.
 
 ### Returns
 An `image` object the dimensions of the file.
@@ -35,11 +39,21 @@ An `image` object the dimensions of the file.
 ```python
 sprite = image.load("/system/assets/skull.png")
 
-def update():
+while True:
   screen.blit(sprite, vec2(10, 10))
 
-run(update)
+  badge.update()
 ```
+
+## load_into()
+Loads a PNG or JPEG into an **existing** image buffer, in place, reusing its memory. This is handy when you want to swap the contents of an image without allocating a new one each time.
+
+### Usage
+- `image_name.load_into(path_or_data)`
+    - `path_or_data`: A file path, or a buffer of PNG/JPEG data.
+
+### Returns
+`None`
 
 # Properties
 
@@ -56,7 +70,7 @@ The current clipping rectangle for this image. Once set, all subsequent drawing 
 The current antialiasing level for vector drawing operations performed on this image. Valid values are `image.OFF`, `image.X2`, and `image.X4`.
 
 ```python
-def update():
+while True:
   screen.pen = color.red
 
   screen.antialias = image.OFF
@@ -68,8 +82,14 @@ def update():
   screen.antialias = image.X4
   screen.shape(shape.circle(130, 60, 20))
 
-run(update)
+  badge.update()
 ```
+
+## fill_rule
+The winding rule used when filling vector shapes with overlapping or self-intersecting contours. Valid values are `image.NON_ZERO` (the default) and `image.EVEN_ODD`. The even-odd rule is what creates a "hole" where two contours overlap, which is how `shape.custom()` cuts holes.
+
+## has_palette
+Read-only. `True` if this image is palettised (stores palette indices rather than full RGBA pixels), otherwise `False`.
 
 ## alpha
 A global alpha blending value used for all drawing operations. When set on an image (or the screen), future drawing operations will be alpha blended using this value.
@@ -81,7 +101,7 @@ import math
 
 sprite = image.load("/system/assets/skull.png")
 
-def update():
+while True:
   # set global alpha for drawing operations to the screen
   screen.alpha = 127
 
@@ -99,14 +119,14 @@ def update():
     # blit the sprite
     screen.blit(sprite, x, y)
 
-run(update)
+  badge.update()
 ```
 
 ## pen
 The color or brush used for drawing operations. This can be set to a `brush` or `color` object.
 
 ```python
-def update():
+while True:
   screen.pen = color.taupe
   screen.circle(40, 60, 30)
 
@@ -116,7 +136,7 @@ def update():
   screen.pen = color.grape
   screen.circle(120, 60, 30)
 
-run(update)
+  badge.update()
 ```
 
 ## font
@@ -128,7 +148,7 @@ import math
 # load a built in font - see pixel_font for list
 screen.font = rom_font.nope
 
-def update():
+while True:
   # use width of the text to centre on the screen
   w, _ = screen.measure_text("hey badgeware!")
   x = (screen.width / 2) - (w / 2)
@@ -139,7 +159,7 @@ def update():
   # draw the text
   screen.text("hey badgeware!", x, 55)
 
-run(update)
+  badge.update()
 ```
 
 > Note: Badgeware comes with thirty pre-loaded fonts, check out the `pixel_font` article for a full list!
@@ -157,11 +177,11 @@ Fills the entire image or drawing surface with the current brush.
 ### Example
 
 ```python
-def update():
+while True:
   screen.pen = color.orange
   screen.clear()
 
-run(update)
+  badge.update()
 ```
 
 > Note: the canvas will be cleared by default each frame. You can disable this, or set the clear colour, using `badge.default_clear()`.
@@ -190,7 +210,7 @@ Draws a single pixel using the current brush.
 ```python
 import random
 
-def update():
+while True:
   screen.pen = color.smoke
 
   # set a new random seed every 250ms
@@ -202,7 +222,7 @@ def update():
     y = random.randint(0, 160)
     screen.put(x, y)
 
-run(update)
+  badge.update()
 ```
 
 ## rectangle()
@@ -221,7 +241,7 @@ Draws a filled rectangle using the current brush.
 ### Example
 
 ```python
-def update():
+while True:
   # using full coordinates
   screen.pen = color.lime
   screen.rectangle(20, 30, 20, 20)
@@ -231,7 +251,7 @@ def update():
   screen.pen = color.red
   screen.rectangle(r)
 
-run(update)
+  badge.update()
 ```
 
 ## circle()
@@ -250,7 +270,7 @@ Draws a filled circle using the current brush.
 
 ### Example
 ```python
-def update():
+while True:
   # using full coordinates
   screen.pen = color.orange
   screen.circle(50, 60, 20)
@@ -260,7 +280,7 @@ def update():
   p = vec2(110, 60)
   screen.circle(p, 20)
 
-run(update)
+  badge.update()
 ```
 
 ## line()
@@ -280,7 +300,7 @@ Draws a straight line between two points.
 
 ### Example
 ```python
-def update():
+while True:
   # using full coordinates
   screen.pen = color.latte
   screen.line(10, 10, 100, 50)
@@ -291,7 +311,7 @@ def update():
   p2 = vec2(50, 100)
   screen.line(p1, p2)
 
-run(update)
+  badge.update()
 ```
 
 ## triangle()
@@ -312,7 +332,7 @@ Draws a filled triangle defined by three vertices.
 
 ### Example
 ```python
-def update():
+while True:
   # using full coordinates
   screen.pen = color.red
   screen.triangle(10, 10, 80, 20, 20, 50)
@@ -324,7 +344,7 @@ def update():
   p2 = vec2(100, 100)
   screen.triangle(p0, p1, p2)
 
-run(update)
+  badge.update()
 ```
 
 ## shape()
@@ -334,14 +354,14 @@ Vector shapes are created using one of the predefined helper methods on the shap
 
 ### Usage
 - `image_name.shape(s)`
-    - `s`: The shape to draw
+    - `s`: The shape to draw, or a list of shapes to draw with the current pen.
 
 ### Returns
 `None`
 
 ### Example
 ```python
-def update():
+while True:
   screen.antialias = image.X4
 
   screen.pen = color.lime
@@ -356,7 +376,32 @@ def update():
   arc = shape.arc(80, 70, 30, 40, 130, 260)
   screen.shape(arc)
 
-run(update)
+  badge.update()
+```
+
+## shapes()
+Draws a batch of shapes in one call, each with its own colour or brush. This is faster than a Python loop of `shape()` calls when you have many shapes, because the iteration happens in native code.
+
+Each entry in the list is either a `shape` (drawn with the current pen) or a `(shape, brush_or_color)` tuple (drawn with the supplied brush/colour).
+
+### Usage
+- `image_name.shapes(entries)`
+    - `entries`: A list of shapes, or `(shape, brush/color)` tuples.
+
+### Returns
+`None`
+
+### Example
+```python
+while True:
+  entries = [
+    (shape.circle(50, 60, 25), color.red),
+    (shape.circle(80, 60, 25), color.green),
+    (shape.circle(110, 60, 25), color.blue),
+  ]
+  screen.shapes(entries)
+
+  badge.update()
 ```
 
 # Text
@@ -384,13 +429,13 @@ The `text()` method can be called in two forms: by passing a `vec2` that defines
 
 ### Example
 ```python
-def update():
+while True:
   screen.pen = color.yellow
 
   # using full coordinates
   screen.text("Hello, Badgeware!", 5, 5)
 
-run(update)
+  badge.update()
 ```
 
 ## measure_text()
@@ -406,7 +451,7 @@ A `tuple` containing x and y dimensions in pixels
 
 ### Example
 ```python
-def update():
+while True:
   screen.pen = color.yellow
 
   # centre the message on screen
@@ -416,7 +461,7 @@ def update():
   y = (screen.height / 2) - (h / 2)
   screen.text(message, x, y)
 
-run(update)
+  badge.update()
 ```
 
 # Filters
@@ -438,12 +483,12 @@ import math
 
 sprite = image.load("/system/assets/skull.png")
 
-def update():
+while True:
   screen.circle(80, 60, 20)
   screen.blit(sprite, vec2(40, 50))
   screen.blur((math.sin(badge.ticks / 500) + 1) * 5)
 
-run(update)
+  badge.update()
 ```
 
 ## dither()
@@ -453,12 +498,12 @@ Performs an ordered dither on the image.
 ```python
 sprite = image.load("/system/assets/skull.png")
 
-def update():
+while True:
   screen.circle(80, 60, 20)
   screen.blit(sprite, vec2(40, 50))
   screen.dither()
 
-run(update)
+  badge.update()
 ```
 
 ## onebit()
@@ -468,12 +513,12 @@ Reduces the image to black and white.
 ```python
 sprite = image.load("/system/assets/skull.png")
 
-def update():
+while True:
   screen.circle(80, 60, 20)
   screen.blit(sprite, vec2(40, 50))
   screen.onebit()
 
-run(update)
+  badge.update()
 ```
 
 ## monochrome()
@@ -483,12 +528,12 @@ Reduces the image to greyscale.
 ```python
 sprite = image.load("/system/assets/skull.png")
 
-def update():
+while True:
   screen.circle(80, 60, 20)
   screen.blit(sprite, vec2(40, 50))
   screen.monochrome()
 
-run(update)
+  badge.update()
 ```
 
 # Blitting
@@ -510,13 +555,17 @@ Depending on the parameters provided, `blit` can:
 - `image_name.blit(source, p)`
     - `source`: The source `image` to blit
     - `p`: `vec2` containing the coordinates of the top-left corner of the destination
-- `image_name.blit(source, rect)`
+- `image_name.blit(source, rect, filter)`
     - `source`: The source `image` to blit
     - `rect`: Destination rectangle to blit into - the source image is scaled to fit rect
-- `image_name.blit(source, source_rect, dest_rect)`
+    - `filter` (Optional): The texture filter used when scaling. Defaults to `image.NEAREST`.
+- `image_name.blit(source, source_rect, dest_rect, filter)`
     - `source`: The source `image` to blit
     - `source_rect`: Source rectangle to blit from (crop region)
     - `dest_rect`: Destination rectangle to blit into - if dest_rect is a different size to source_rect, the blit is scaled
+    - `filter` (Optional): The texture filter used when scaling. Defaults to `image.NEAREST`.
+
+> Note: When a blit is scaled you can choose how it's sampled with the `filter` argument: `image.NEAREST` (fastest, blocky), `image.BILINEAR` (smooth) or `image.BICUBIC` (highest quality). The point and `vec2` forms always copy 1:1, so they don't take a filter.
 
 > Note: If the width and height of the destination rectangle are negative then the blit will flip vertically and/or horizontally!
 
@@ -527,7 +576,7 @@ Depending on the parameters provided, `blit` can:
 ```python
 sprite = image.load("/system/assets/skull.png")
 
-def update():
+while True:
   # 1:1 blit
   screen.blit(sprite, vec2(10, 10))
 
@@ -537,7 +586,7 @@ def update():
   # crop a 16x16 tile and scale it up to 32x32
   screen.blit(sprite, rect(0, 0, 16, 16), rect(10, 60, 32, 32))
 
-run(update)
+  badge.update()
 ```
 
 ## blit_vspan()
@@ -572,8 +621,7 @@ import math
 
 sprite = image.load("/system/assets/skull.png")
 
-def update():
-
+while True:
   for i in range(160):
     # create a sine wave offset for drawing
     o = abs(math.sin((badge.ticks + i * 5) / 500) * 30) + 2
@@ -584,7 +632,7 @@ def update():
     # blit the span!
     screen.blit_vspan(sprite, i, 60 - o, 2 * o, u, 0, u, 1)
 
-run(update)
+  badge.update()
 ```
 
 ## blit_hspan()
@@ -609,6 +657,18 @@ The returned image shares its underlying data with the original image. All drawi
 ### Returns
 An `image` object representing the contents of the window.
 
+## batch()
+Runs a list of draw commands in a single native loop, avoiding the per-call overhead of MicroPython. Each command is a `(method_name, *args)` tuple, where `method_name` is the name of an `image` drawing method such as `"circle"` or `"rectangle"`.
+
+This is an advanced optimisation — for most drawing you can just call the methods directly.
+
+### Usage
+- `image_name.batch(commands)`
+    - `commands`: A list of `(method_name, *args)` tuples.
+
+### Returns
+`None`
+
 ## raw
 A bytearray that references the start of the image’s backing buffer (advanced/unsafe). Don’t write past the end! (for experts only!)
 
@@ -624,6 +684,14 @@ A bytearray that references the start of the image’s backing buffer (advanced/
 ## Constructor
 ```python-raw
 image(w: int, h: int) -> image
+image(w: int, h: int, buffer) -> image
+```
+
+## Constants
+```python-raw
+image.OFF   image.X2   image.X4                # anti-aliasing
+image.NON_ZERO   image.EVEN_ODD                # fill rule
+image.NEAREST   image.BILINEAR   image.BICUBIC # texture filter
 ```
 
 ## Properties
@@ -631,41 +699,53 @@ image(w: int, h: int) -> image
 alpha: int
 antialias: image.OFF | image.X2 | image.X4
 clip: rect
-font: pixel_font | vector_font
+fill_rule: image.NON_ZERO | image.EVEN_ODD
+font: pixel_font | font
+has_palette: bool
 height: int
 pen: color | brush
+raw: bytearray
 width: int
+```
+
+## Static Methods
+```python-raw
+image.load(path: string) -> image
+image.load(data: buffer) -> image
 ```
 
 ## Methods
 ```python-raw
+image.batch(commands: list) -> None
 image.blit(source: image, x: int, y: int) -> None
 image.blit(source: image, p: vec2) -> None
-image.blit(source: image, rect: rect) -> None
-image.blit(source: image, source_rect: rect, dest_rect: rect) -> None
-image.blit_hspan(source: image, x: int, y: int, c: int, u0: float, v0: float, u1: float, v1: float) -> None
-image.blit_vspan(source: image, x: int, y: int, c: int, u0: float, v0: float, u1: float, v1: float) -> None
-image.blur(radius: int) -> None
-image.circle(point: vec2, radius: int) -> None
-image.circle(x: int|float, y: int|float, radius: int) -> None
+image.blit(source: image, dst: rect, filter: int=image.NEAREST) -> None
+image.blit(source: image, source_rect: rect, dest_rect: rect, filter: int=image.NEAREST) -> None
+image.blit_hspan(source: image, p: vec2, c: int, uv0: vec2, uv1: vec2, filter: int=image.NEAREST) -> None
+image.blit_vspan(source: image, p: vec2, c: int, uv0: vec2, uv1: vec2, filter: int=image.NEAREST) -> None
+image.blur(radius: int|float) -> None
+image.circle(point: vec2, radius: int|float) -> None
+image.circle(x: int|float, y: int|float, radius: int|float) -> None
 image.clear() -> None
 image.dither() -> None
-image.get(x: int, y: int) -> color
+image.get(p: vec2) -> color
+image.get(x: int|float, y: int|float) -> color
 image.line(start: vec2, end: vec2) -> None
 image.line(x0: int|float, y0: int|float, x1: int|float, y1: int|float) -> None
-image.load(path: string) -> None
-image.measure_text(message: string) -> tuple
+image.load_into(path_or_data) -> None
+image.measure_text(message: string, size: int|float=0) -> tuple
 image.monochrome() -> None
 image.onebit() -> None
-image.put(x: int, y: int) -> None
-image.raw() -> bytearray
+image.put(p: vec2) -> None
+image.put(x: int|float, y: int|float) -> None
 image.rectangle(x: int|float, y: int|float, w: int|float, h: int|float) -> None
 image.rectangle(rect: rect) -> None
-image.shape(s: shape) -> None
-image.text(message: string, p: vec2) -> None
-image.text(message: string, x: int|float, y: int|float) -> None
-image.triangle(p0: vec2, p1: vec2, p2: vec2) -> None
-image.triangle(: int|float, y0: int|float, x1: int|float, y1: int|float, x2: int|float, y2: int|float) -> None
+image.shape(s: shape | list) -> None
+image.shapes(entries: list) -> None
+image.text(message: string, p: vec2, size: int|float=12) -> None
+image.text(message: string, x: int|float, y: int|float, size: int|float=12) -> None
+image.triangle(a: vec2, b: vec2, c: vec2) -> None
+image.triangle(x0: int|float, y0: int|float, x1: int|float, y1: int|float, x2: int|float, y2: int|float) -> None
 image.window(r: rect) -> image
 image.window(x: int|float, y: int|float, w: int|float, h: int|float) -> image
 ```

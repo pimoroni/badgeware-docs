@@ -25,40 +25,40 @@ Finally it's time to get coding and create `__init__.py`. First, make a text fil
 
 Anyway, open `__init__.py` in your editor of choice (this tutorial was written in VS Code), and you can begin...
 
-# The update() method
+# The main loop
 
-Badgeware's apps centre around one particular method - the `update()` method. This forms the main program loop.
+Badgeware's apps centre around one thing - the **main loop**. This is a `while True:` loop that draws a frame and then calls `badge.update()`.
 
-When Badgeware starts an app, it looks for a method called `update()` in that app's `__init__.py`, paired with another method, `run(update)`, which sits at the very end of your code and tells the badge to start the update loop. When `run(update)` is called, `update()` runs over and over again in a loop until you return to the menu or power off the device. Anything you put in `update()` runs once every frame - Tufty and Blinky aim for 60 frames per second, and Badger updates with a new frame every time a button is pressed or on a timer from the internal clock.
+`badge.update()` is what makes each frame appear: it pushes everything you've drawn to the display, clears the screen ready for the next frame, and reads the buttons. The loop runs over and over until you return to the menu or power off the device. Anything you put inside the loop runs once every frame - Tufty and Blinky aim for 60 frames per second, and Badger updates with a new frame every time a button is pressed or on a timer from the internal clock.
 
-`update()` always finishes by updating the screen, so anything you want to put on the screen this frame should be included inside this method. Let's finally start coding and get something into your app.
+Every pass of the loop should finish by calling `badge.update()`, so anything you want to put on the screen this frame should be drawn before it. Let's finally start coding and get something into your app.
 
 ```python
-def update():
+while True:
     pass
 
-run(update)
+    badge.update()
 ```
 
 You can save and run this from the menu! And, how, er... exciting! A blank screen, yay!
 
-Of course, we've not told it to actually do anything yet. the `pass` line there just means "don't do anything" in MicroPython, because we can't leave the method with nothing inside it. Let's start drawing to the screen.
+Of course, we've not told it to actually do anything yet. The `pass` line there just means "don't do anything" in MicroPython, because we can't leave the loop body empty. Let's start drawing to the screen.
 
-> Note: if you are familiar with other Raspberry Pi Pico-based products, it is still possible to 'roll your own' and write your code in main.py just as on other devices, ignoring the update() method and creating your own program loop. This is outside the scope of this tutorial.
+> Note: Badgeware also offers a `run()` helper that wraps this exact loop around an `update()` function you write - it's what the built-in menu system uses. You can read about it in the [main loop reference](/api/run.md). This tutorial uses the plain `while True:` loop throughout.
 
 # Drawing to the screen
 
 The full set of controls for drawing are explained in depth elsewhere on this site, but the real basic version is that they are methods which you call, passing variables in for things like position and size. Let's start simple though, by setting the pen colour, and then clearing the screen. We're using the named colours in the built-in palette here, but we'll demonstrate defining colours further down.
 
 ```python
-def update():
+while True:
     screen.pen = color.navy
     screen.clear()
 
-run(update)
+    badge.update()
 ```
 
-And we should see that the screen is now navy blue. The screen here is actually an [image](/api/image.md) - it starts off clearing to black every frame, then during `update()` it gets altered in different ways, then finally after it gets sent to actually be displayed. With your first line of code in `update()` you're setting the screen's pen (i.e. the colour you're drawing with) to navy blue, then in the second you're calling the screen image's `clear()` method, which fills the entire image with the current pen.
+And we should see that the screen is now navy blue. The screen here is actually an [image](/api/image.md) - it starts off cleared to black every frame, then during the loop it gets altered in different ways, then `badge.update()` sends it off to actually be displayed. With your first line of code in the loop you're setting the screen's pen (i.e. the colour you're drawing with) to navy blue, then in the second you're calling the screen image's `clear()` method, which fills the entire image with the current pen.
 
 > Note: If you're a Badger user, this will probably come out all dark grey or black. This might be fine now, but when we get pictures involved we'll show you a way to dither them to give more of a range of greys on Badger's screen. If you're a Blinky user, your colours will be turned into brightnesses of the LEDs.
 
@@ -71,7 +71,7 @@ So far so good, but let's create a border. Keeping the code we already had, let'
 # the top, since it's not going to change between different loops of update().
 screen_border = 5
 
-def update():
+while True:
     screen.pen = color.navy
     screen.clear()
 
@@ -96,7 +96,7 @@ def update():
     screen.pen = color.smoke
     screen.rectangle(inside_rectangle)
 
-run(update)
+    badge.update()
 ```
 
 > Note: We could have passed the x, y, width and height straight into screen.rectangle() there, but putting them together into a rect object makes it nice and convenient if we want to use those same dimensions and position somewhere else in the code.
@@ -115,7 +115,7 @@ screen_border = 5
 # so we can do it here, outside the update loop.
 picture = image.load("assets/avatar.png")
 
-def update():
+while True:
     screen.pen = color.navy
     screen.clear()
 
@@ -148,7 +148,7 @@ def update():
     # made as parameters.
     screen.blit(picture, picture_rect)
 
-run(update)
+    badge.update()
 ```
 
 If you run your app now, you'll see the picture displaying. If you're a Badger user, you may find it doesn't look ideal, as a full colour picture broken down to the black/grey/grey/white screen of the Badger doesn't always look good. One thing you could do is edit your picture in GIMP or Photoshop, but a quick and easy way to improve things is to run `picture.dither()` right below `picture = image.load("assets/avatar.png")`. This will alter the image using an algorithm in the same way a newspaper photograph displays shades of grey using only black ink. You can see an example [here](/api/image.md#dither).
@@ -163,7 +163,7 @@ Now we'll add some text. We've got over 30 fantastic pixel fonts built in on Bad
 screen_border = 5
 picture = image.load("assets/avatar.png")
 
-def update():
+while True:
     screen.pen = color.navy
     screen.clear()
 
@@ -208,12 +208,12 @@ def update():
     # currently selected pen and font.
     screen.text(name_text, name_x, name_y)
 
-run(update)
+    badge.update()
 ```
 
 # Interaction
 
-The next thing to do is some more text, very much like the first. The big difference is that the actual text of what we want to write isn't defined in the update() method, it's defined outside it, where the image is loaded. I'm using ignore for the font here because it's nice and big.
+The next thing to do is some more text, very much like the first. The big difference is that the actual text of what we want to write isn't defined inside the loop, it's defined outside it, where the image is loaded. I'm using ignore for the font here because it's nice and big.
 
 ```python
 screen_border = 5
@@ -221,7 +221,7 @@ picture = image.load("assets/avatar.png")
 # Here's our text for our mood.
 mood_text = "Happy"
 
-def update():
+while True:
     screen.pen = color.navy
     screen.clear()
 
@@ -266,7 +266,7 @@ def update():
 
     screen.text(mood_text, mood_x, mood_y)
 
-run(update)
+    badge.update()
 ```
 
 Alright, that's most of the display part of the code done. But now we want to make it interactive. It's all very well to have a badge that says you're happy, but nobody's happy all the time. What if you could change what mood it displayed with a button press?
@@ -313,7 +313,7 @@ But we don't want to go diving around in the code to change our mood, that would
 
 # Button input
 
-Every refresh, just before update() is called, the Badgeware software polls the hardware and asks it what buttons are pressed, and then compares it against what was pressed last update. This gives it lists of which buttons were pressed, released or held down between the last update and the current one. You can read more about it [here](/api/badge.md#reading-button-state).
+Every frame, `badge.update()` polls the hardware and asks it what buttons are pressed, then compares it against what was pressed last frame. This gives it lists of which buttons were pressed, released or held down between the last frame and the current one, ready for you to check at the top of the next loop. You can read more about it [here](/api/badge.md#buttons).
 
 Right now, we're just going to check if a button's been pressed, and if it has, we can add one to that selected_mood variable. We need to do one more thing - now we're not just reading the selected_mood variable, we're wanting to change it, so we have to tell the program that it's a global variable. This means that when we ask it to add 1 to selected_mood, it knows that that's the selected_mood we're talking about.
 
@@ -323,11 +323,9 @@ picture = image.load("assets/avatar.png")
 mood_text = ["Happy", "Sad", "Angry", "Hungry", "Sleepy", "Silly", "Cuddly"]
 selected_mood = 0
 
-def update():
-    global selected_mood
-
+while True:
     # Checking for a button press...
-    if io.BUTTON_UP in io.pressed:
+    if badge.pressed(BUTTON_UP):
         # The += here is just a quicker way of saying
         # selected_mood = selected_mood + 1.
         selected_mood += 1
@@ -371,12 +369,12 @@ def update():
 
     screen.text(mood_text[selected_mood], mood_x, mood_y)
 
-run(update)
+    badge.update()
 ```
 
-So if you run the above code, you'll see it will change which mood is displayed - for a few presses, at least. Don't worry, we'll fix it. But what did we just do? Well, that if statement is checking `io.BUTTON_UP in io.pressed` to see whether it should advance through the list. But what does the `io.BUTTON_UP in io.pressed` part mean?
+So if you run the above code, you'll see it will change which mood is displayed - for a few presses, at least. Don't worry, we'll fix it. But what did we just do? Well, that if statement is calling `badge.pressed(BUTTON_UP)` to see whether it should advance through the list. But what does that part mean?
 
-Basically, when the Badgeware software polls the buttons, it puts its findings in several lists - `io.pressed`, `io.released`, `io.held` and `io.changed`. These lists are just like the ones you made to hold the different mood words. `io.BUTTON_UP` is just the internal name for the Up button and `in` is a useful statement to check if a list contains a specified value, so in natural language we're asking "Is the Up button in the list of buttons pressed between last update and this update?" and then doing different things depending on the answer.
+Basically, when the Badgeware software polls the buttons, it keeps track of which buttons were pressed, released, held and changed this frame. You can ask about a specific button by passing its constant — `badge.pressed(BUTTON_UP)` returns `True` or `False` — or call `badge.pressed()` with no argument to get the whole list of pressed buttons. `BUTTON_UP` is just the name for the Up button, so in natural language we're asking "Was the Up button pressed between last update and this update?" and then doing different things depending on the answer. There are matching methods for the other states too: `badge.released(...)`, `badge.held(...)` and `badge.changed(...)`.
 
 But you'll find that pressing the button still makes the program crash eventually. Not to worry...
 
@@ -406,13 +404,11 @@ picture = image.load("assets/avatar.png")
 mood_text = ["Happy", "Sad", "Angry", "Hungry", "Sleepy", "Silly", "Cuddly"]
 selected_mood = 0
 
-def update():
-    global selected_mood
-
-    if io.BUTTON_UP in io.pressed:
+while True:
+    if badge.pressed(BUTTON_UP):
         selected_mood += 1
 
-    elif io.BUTTON_DOWN in io.pressed:
+    elif badge.pressed(BUTTON_DOWN):
         selected_mood -= 1
 
     if selected_mood >= len(mood_text):
@@ -460,7 +456,7 @@ def update():
 
     screen.text(mood_text[selected_mood], mood_x, mood_y)
 
-run(update)
+    badge.update()
 ```
 
 That's one way to do it, but we could take four lines of code down to one using the `%` modulo sign. This gives us the remainder when one number is divided by another, so we could replace
@@ -491,12 +487,10 @@ picture = image.load("assets/avatar.png")
 mood_text = ["Happy", "Sad", "Angry", "Hungry", "Sleepy", "Silly", "Cuddly"]
 selected_mood = 0
 
-def update():
-    global selected_mood
-
-    if io.BUTTON_UP in io.pressed:
+while True:
+    if badge.pressed(BUTTON_UP):
         selected_mood += 1
-    elif io.BUTTON_DOWN in io.pressed:
+    elif badge.pressed(BUTTON_DOWN):
         selected_mood -= 1
 
     selected_mood = selected_mood % len(mood_text)
@@ -540,7 +534,7 @@ def update():
 
     screen.text(mood_text[selected_mood], mood_x, mood_y)
 
-run(update)
+    badge.update()
 ```
 
 # Where to go from here

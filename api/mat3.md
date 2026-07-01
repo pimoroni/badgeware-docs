@@ -21,6 +21,8 @@ Returns a new matrix with a translation applied to the current matrix.
 ### Usage
 - `matrix_name.translate(x, y)`
     - `x, y`: Amount to translate by.
+- `matrix_name.translate(p)`
+    - `p`: A `vec2` to translate by.
 
 ### Returns
 A `mat3` representing the translated matrix.
@@ -41,6 +43,8 @@ A `mat3` representing the rotated matrix.
 Returns a new matrix with a scale applied to the current matrix.
 
 ### Usage
+- `matrix_name.scale(factor)`
+    - `factor`: A single scale factor applied uniformly to both axes.
 - `matrix_name.scale(x, y)`
     - `x, y`: Scale factors for the x and y axes
 
@@ -48,7 +52,7 @@ Returns a new matrix with a scale applied to the current matrix.
 A `mat3` representing the scaled matrix.
 
 ## multiply()
-Returns a new matrix with another matrix multiplied with the current matrix.
+Returns a new matrix with another matrix multiplied with the current matrix. The `*` operator does the same thing, so `a.multiply(b)` and `a * b` are equivalent.
 
 ### Usage
 - `matrix_name.multiply(m)`
@@ -73,6 +77,13 @@ mat3.inverse() -> mat3
 mat3.multiply(m: mat3) -> mat3
 mat3.rotate(angle: int|float) -> mat3
 mat3.rotate_radians(angle: int|float) -> mat3
+mat3.scale(factor: int|float) -> mat3
 mat3.scale(x: int|float, y: int|float) -> mat3
 mat3.translate(x: int|float, y: int|float) -> mat3
+mat3.translate(p: vec2) -> mat3
+```
+
+## Operators
+```python-raw
+mat3 * mat3 -> mat3
 ```

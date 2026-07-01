@@ -35,7 +35,7 @@ Included are a wide range of styles covering everything from clean, readable tex
 Our pixel font file format is called Pixel Perfect Font (`.ppf`).
 
 ```python
-def update():
+while True:
   screen.font = rom_font.compass
   screen.pen = color.red
   screen.text("Arr Cap'n!", 10, 10)
@@ -48,7 +48,7 @@ def update():
   screen.pen = color.blue
   screen.text("Arr Cap'n!", 10, 50)
 
-run(update)
+  badge.update()
 ```
 
 These samples should give you a good idea of the style of each font:
@@ -90,3 +90,18 @@ These samples should give you a good idea of the style of each font:
 |manticore|14px|![manticore](/fonts/manticore.png)|strong, metal, horror|
 |more|15px|![more](/fonts/more.png)|chunky, huge, comic|
 |ignore|17px|![ignore](/fonts/ignore.png)|colossal, intrepid|
+
+Alongside these, two Badgeware-branded fonts are also on the badge: `badgeware` and `badgewaremax`. Load any ROM font by name with `rom_font.<name>`, for example `rom_font.badgeware`.
+
+# Reference
+
+## Properties
+```python-raw
+pixel_font.height -> int
+pixel_font.name -> str
+```
+
+## Static Methods
+```python-raw
+pixel_font.load(path: string) -> pixel_font
+```

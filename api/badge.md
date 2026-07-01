@@ -17,13 +17,13 @@ The number of ticks (milliseconds) since the badge was powered on when `update()
 The number of ticks (milliseconds) since the previous time `update()` was called. Useful for timing animations where the framerate isn't completely stable.
 
 ## uid
-Provides a unique ID for the badge.
+Provides a unique ID for the badge, as a hex string.
+
+## model
+The model of badge the code is running on, as a string: `"tufty"`, `"badger"`, or `"blinky"`. Useful for adapting an app to the different displays — see [Coding for the different badges](/introduction/badge-differences.md).
 
 ## resolution
 The display resolution of the badge as a tuple containing pixel width and height as ints.
-
-## update
-Allows you to set and switch between custom methods for the badge to replace `update()`. This allows you to, for example, easily flip between multiple screens, using a different method to draw each one.
 
 # Buttons
 There are two main ways to handle button input.
@@ -92,9 +92,7 @@ A list of button constants if no parameter was specified, otherwise a boolean.
 ```python
 last_event = None
 
-def update():
-  global last_event
-
+while True:
   # true only when button A is newly pressed this frame
   if badge.pressed(BUTTON_A):
     last_event = "BUTTON A PRESSED!"
@@ -116,7 +114,7 @@ def update():
     screen.pen = color.white
     screen.text(last_event, 10, 10)
 
-run(update)
+  badge.update()
 ```
 
 # Program flow
@@ -163,16 +161,17 @@ Returns a boolean reflecting whether the battery is currently charging.
 
 # Graphics
 
-## default_clear()
-This represents the colour the display will be cleared to before each `update()` loop. You can set this to `None` to disable clearing the screen between updates.
+## default_clear
+An attribute holding the colour the display will be cleared to before each `update()` loop, for example `badge.default_clear = color.black`. Set it to `None` to disable clearing the screen between updates.
 
-## default_pen()
-The default colour that `screen.pen` will be set to at the start of every `update()`. Note that this will not accept `None`, only a colour.
+## default_pen
+An attribute holding the colour that `screen.pen` will be set to at the start of every `update()`, for example `badge.default_pen = color.white`. This will not accept `None`, only a colour.
 
 ## mode()
-Changes the display mode of the badge. You can apply more than one mode at once, where applicable, by using the pipe symbol, e.g. `badge.mode(HIRES | VSYNC)`.
+Gets or changes the display mode of the badge. Called with no arguments it returns the current mode; called with a mode it switches to it. You can apply more than one mode at once, where applicable, by using the pipe symbol, e.g. `badge.mode(HIRES | VSYNC)`.
 
 ### Usage
+- `.mode()` - Returns the current display mode.
 - `.mode(modes)`
         - `LORES` (Tufty only) - puts the badge into 160x120 low resolution mode.
         - `HIRES` (Tufty only) - puts the badge into 320x240 high resolution mode.
@@ -183,7 +182,7 @@ Changes the display mode of the badge. You can apply more than one mode at once,
         - `DITHER` - applies an ordered dither to the framebuffer before writing to the screen, equivalent to running [dither()](/api/image.md#dither) after every update. Available on all models, but most useful for Badger.
 
 ### Returns
-`None`
+The current mode when called with no argument, otherwise `None`.
 
 # Memory
 These methods monitor the badge's flash space and RAM, so you can check how full your Badge is with software and assets.
@@ -191,20 +190,20 @@ These methods monitor the badge's flash space and RAM, so you can check how full
 ## disk_free()
 ### Usage
 - `.disk_free()`
-    - Returns a tuple containing total flash size, used flash and free flash in bytes.
+    - Returns a tuple containing total flash size, used flash and free flash in bytes for the `/system` mountpoint.
 - `.disk_free(mountpoint)`
-    - Returns as above, but for the specified mountpoint.
+    - Returns as above, but for the specified mountpoint. Defaults to `/system`.
 
 ### Returns
-A tuple containing three ints.
+A tuple of three ints: `(total, used, free)` in bytes.
 
-## memory.free(message)
+## free()
 Prints to console the amount of free RAM, prepended with the message if specified.
 
-> Note: This is not actually part of the Badge class, and so doesn't need `badge.` before it in your code.
+> Note: `free()` is a global helper, not part of the `badge` class, so you call it as `free()` — with no `badge.` prefix. See [helpers](/api/helpers.md#free) for details.
 
 # Lighting
-Badgeware is fitted with four onboard white LEDs on the back of the board. These can be used as indicators, decoration or anything else you can think of. Tufty also has a front-mounted light sensor which
+Badgeware is fitted with four onboard white LEDs on the back of the board. These can be used as indicators, decoration or anything else you can think of. Tufty also has a front-mounted light sensor.
 
 ## caselights()
 Gets and sets the brightness value for the rear lighting on the badge.
@@ -220,7 +219,7 @@ Gets and sets the brightness value for the rear lighting on the badge.
 `None`, or a tuple if no parameter specified.
 
 ## light_level() [TUFTY ONLY]
-Returns the level detected by the light sensor as a raw u16 value.
+Returns the level detected by the front light sensor as a raw u16 value (0–65535). Only Tufty has a light sensor — calling this on Badger or Blinky raises a `RuntimeError`.
 
 # Sleep and waking
 Badgeware has the ability to go into a very low power mode, conserving battery power for a very long time. These are the basic commands to deal with this; other commands to deal with timings can be found in the `rtc` article.
@@ -239,6 +238,19 @@ Returns True if the badge was woken up by a button being pressed, False otherwis
 
 ## woken_by_reset()
 Returns True if the badge was woken by being reset, False otherwise.
+
+## wake_reason()
+Returns a value describing why the badge last woke from sleep. Use the helpers `woken_by_button()` and `woken_by_reset()` for the common cases, or compare this value yourself for finer control.
+
+## pressed_to_wake()
+Tests whether a specific button was the one held down that woke the badge from sleep. Useful for offering different behaviour depending on which button the user pressed to wake the device.
+
+### Usage
+- `.pressed_to_wake(button)`
+    - `button` - A button constant such as `BUTTON_A`.
+
+### Returns
+`bool`
 
 # Reference
 
@@ -264,10 +276,10 @@ DITHER: binary
 badge.default_clear: color | None
 badge.default_pen: color
 badge.resolution: tuple
+badge.model: string
 badge.ticks: int
 badge.ticks_delta: int
 badge.uid: hex
-badge.update: function
 ```
 
 ## Methods
@@ -276,20 +288,27 @@ badge.battery_level() -> int
 badge.battery_voltage() -> float
 badge.changed() -> tuple
 badge.changed(button: input) -> bool
-badge.caselights([light1: float, light2: float, light3: float, light4: float]) -> None | tuple
-badge.disk_free(mountpoint: string="/") -> int
+badge.caselights() -> tuple
+badge.caselights(level: float) -> None
+badge.caselights(light1: float, light2: float, light3: float, light4: float) -> None
+badge.clear() -> bool
+badge.disk_free(mountpoint: string="/system") -> tuple
 badge.held() -> tuple
 badge.held(button: input) -> bool
 badge.is_charging() -> bool
 badge.light_level() -> int
+badge.mode() -> int | None
 badge.mode(modes: binary) -> None
 badge.poll() -> None
 badge.pressed() -> tuple
 badge.pressed(button: input) -> bool
+badge.pressed_to_wake(button: input) -> bool
 badge.released() -> tuple
 badge.released(button: input) -> bool
 badge.sleep(duration: int=None) -> None
+badge.update() -> bool
 badge.usb_connected() -> bool
+badge.wake_reason() -> int
 badge.woken_by_button() -> bool
 badge.woken_by_reset() -> bool
 ```

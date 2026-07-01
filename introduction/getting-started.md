@@ -44,7 +44,7 @@ For now, you can grab a copy of `icon.png` from one of the other app folders on 
 Create a file called `__init__.py` inside your `hello` folder and open it in your text editor. Type in the following:
 
 ```python
-def update():
+while True:
     screen.pen = color.navy
     screen.clear()
 
@@ -52,7 +52,7 @@ def update():
     screen.font = rom_font.smart
     screen.text("Hello, world!", 10, 50)
 
-run(update)
+    badge.update()
 ```
 
 Save the file. That's it — that's a complete Badgeware app!
@@ -67,7 +67,7 @@ You should see a navy blue screen with "Hello, world!" written on it in white. C
 
 Let's break down what that code does:
 
-- **`def update():`** — This is the heart of every Badgeware app. The badge calls this method over and over in a loop, once per frame. Everything you want to draw goes in here.
+- **`while True:`** — This is the heart of every Badgeware app: the main loop. Everything inside it runs over and over, once per frame. Everything you want to draw goes in here.
 
 - **`screen.pen = color.navy`** — Sets the drawing colour. Think of it like picking up a pen.
 
@@ -79,7 +79,7 @@ Let's break down what that code does:
 
 - **`screen.text("Hello, world!", 10, 50)`** — Draws text at position x=10, y=50 on the screen.
 
-- **`run(update)`** — This sits at the very end and tells the badge to start running your `update()` loop.
+- **`badge.update()`** — This finishes each frame: it pushes what you've drawn to the display, clears the screen ready for the next frame, and reads the buttons.
 
 # Make It Interactive
 
@@ -89,9 +89,7 @@ Now let's add a button press. We'll make the text change when you press a button
 messages = ["Hello, world!", "Badgeware rocks!", "Press a button!"]
 current = 0
 
-def update():
-    global current
-
+while True:
     if badge.pressed(BUTTON_UP):
         current = (current + 1) % len(messages)
 
@@ -107,7 +105,7 @@ def update():
 
     screen.text(text, x, 50)
 
-run(update)
+    badge.update()
 ```
 
 Save, eject, and run the app again. Each time you press the **Up** button, the message will cycle through the list. We're also centring the text on screen now by measuring its width first.
@@ -120,9 +118,7 @@ Let's make things a bit more visual by adding a coloured rectangle behind the te
 messages = ["Hello, world!", "Badgeware rocks!", "Press a button!"]
 current = 0
 
-def update():
-    global current
-
+while True:
     if badge.pressed(BUTTON_UP):
         current = (current + 1) % len(messages)
 
@@ -143,7 +139,7 @@ def update():
 
     screen.text(text, x, 45)
 
-run(update)
+    badge.update()
 ```
 
 Now your app has a banner with centred, cycling text — all in about 20 lines of code.
@@ -152,11 +148,10 @@ Now your app has a banner with centred, cycling text — all in about 20 lines o
 
 You've got the basics down. Here are some good next steps:
 
-- **[Creating an App](your-first-app.md)** — Learn about the full app structure, including `init()` and `on_exit()` methods.
-- **[Tutorial 1: A Simple Badge](tutorial_1.md)** — A longer, guided project that adds images, more text, and deeper interaction.
-- **[The Hardware](hardware.md)** — Find out what's under the hood of your badge.
-- **[Badge Differences](badge-differences.md)** — Understand how Tufty, Badger, and Blinky differ and how to code for each.
-- **[Badge Modes](editing-on-device.md)** — Learn about Disk Mode, deep sleep, and firmware updates.
+- **[Creating an App](/introduction/your-first-app.md)** — Learn about the full app structure, including `init()` and `on_exit()` methods.
+- **[Tutorial: A Simple Badge](/tutorials/creating_a_simple_badge.md)** — A longer, guided project that adds images, more text, and deeper interaction.
+- **[Badge Differences](/introduction/badge-differences.md)** — Understand how Tufty, Badger, and Blinky differ and how to code for each.
+- **[Editing on your Badge](/guides/editing-on-device.md)** — Learn about Disk Mode, deep sleep, and firmware updates.
 
 Once you're comfortable, dive into the **[Guides](/README.md#guides)** for features like sprites, vector shapes, animation, and more — or browse the **[API reference](/README.md#api)** when you need the details.
 

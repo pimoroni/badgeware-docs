@@ -29,13 +29,13 @@ You can also dither your image on any of the badges, although it is by far the m
 
 # Refresh rate
 
-Tufty and Blinky wil continuously run `update()` as quickly as they can, so the screen will redraw in as much time as it takes to process the contents of your `update()` method. You can of course build in delays or timers in `update()` to get a constant frame rate if you need one.
+Tufty and Blinky will continuously run your main loop as quickly as they can, so the screen will redraw in as much time as it takes to process the contents of the loop. You can of course build in delays or timers to get a constant frame rate if you need one.
 
 Badger is a little different. Because Badger is an e-paper display, it only uses power when it is updating, meaning it's perfect for very low power operations. To take advantage of this, we've designed Badger to go to sleep between every update, waking up either on a signal from the RTC or when a button is pressed.
 
-When Badger wakes up from sleep, although it remembers which program was running it basically restarts that program from the beginning. So `init()` runs every time, and anything you haven't saved in a save state will be forgotten.
+When Badger wakes up from sleep, although it remembers which program was running it basically restarts that program from the beginning. So everything at the top of your program runs every time, and anything you haven't saved in a save state will be forgotten.
 
-So your `update()` should look something like this:
+So each pass of your loop should do something like this:
 
 - Load in any data you saved last update.
 - Get any input such as buttons or RTC alarms.
@@ -55,9 +55,9 @@ One or more flags (see below), which can be combined as required.
 
 ### Example
 
-```
+```python-raw
 # enable high resolution mode on Tufty and dither the framebuffer
-mode(HIRES | DITHER)
+badge.mode(HIRES | DITHER)
 ```
 
 ### Tufty

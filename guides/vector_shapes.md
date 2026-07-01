@@ -11,22 +11,22 @@ Unlike raster drawing operations, vector shapes can be antialiased, producing sm
 
 # Custom shapes
 
-To define a custom shape, call the `shape.custom` static method with one or more lists of points. Each list represents a single path within the shape, allowing you to create complex geometry, including holes or self-intersecting outlines.
+To define a custom shape, call the `shape.custom` static method with a list of paths. Each path is itself a list of points, allowing you to create complex geometry — the first path is the outer contour, and any further paths cut holes out of it.
 
-Each point must be provided as a two-value tuple containing the point’s x and y coordinates.
+Each point is a `vec2` containing the point’s x and y coordinates.
 
 ```python {len=6}
 import math
 
 screen.antialias = image.X4
 
-def update():
+while True:
   # create a flower shape
   path1 = [] # outline of the flower petals
   path2 = [] # outline of the flower centre
   for i in range(0, 360, 5):
     # create the petal shape
-    scale = (math.sin(((i + io.ticks / 50)) * 5 * math.pi / 180) * 10) + 30
+    scale = (math.sin(((i + badge.ticks / 50)) * 5 * math.pi / 180) * 10) + 30
     x = math.sin(i * math.pi / 180) * scale
     y = math.cos(i * math.pi / 180) * scale
     path1.append(vec2(x + 80, y + 60))
@@ -37,11 +37,13 @@ def update():
     path2.append(vec2(x + 80, y + 60))
 
   # construct a custom shape from the two paths
-  custom_shape = shape.custom(path1, path2)
+  custom_shape = shape.custom([path1, path2])
 
   # draw the shape to the display
   screen.pen = color.orange
   screen.shape(custom_shape)
+
+  badge.update()
 ```
 
 > Creating shapes can be an expensive process, if possible define the shape once and keep a reference to it for future use.
@@ -53,7 +55,7 @@ For common shapes, a set of convenience methods is available. These methods let 
 ```python
 screen.antialias = image.X4
 
-def update():
+while True:
   # draw the circle
   screen.pen = color.red
   circle = shape.circle(30, 30, 20)
@@ -78,68 +80,71 @@ def update():
   screen.pen = color.latte
   arc = shape.arc(130, 90, 10, 20, 90, 270)
   screen.shape(arc)
+
+  badge.update()
 ```
 
-See the built in primitives for a full list of supported shapes.
-
-
-
-To learn more about shapes [click here for full documentation of the `shapes` module](api/modules/shapes.md).
+To learn more about shapes [click here for full documentation of the `shape` module](/api/shape.md).
 
 # Transforming vector shapes
 
-
-Shapes can also be given a transformation matrix to adjust their scale, rotation, and skew - this is very useful for creating smooth animations. [Click here for full documentation of the `Matrix` class](api/mat3.md).
+Shapes can also be given a transformation matrix to adjust their position, scale, rotation, and skew - this is very useful for creating smooth animations. [Click here for full documentation of the `mat3` class](/api/mat3.md).
 
 ```python {len=3}
 import math
 
-def update():
-  # create a rectangle
-  rectangle = shapes.rectangle(-20, -20, 40, 40)
+while True:
+  # create a rectangle centred on its own origin
+  rectangle = shape.rectangle(-20, -20, 40, 40)
 
-  offset = math.sin(io.ticks / 1000) * 50
+  offset = math.sin(badge.ticks / 1000) * 50
   # transform and draw the transformed rectangle
-  rectangle.transform = Matrix().translate(80 + offset, 60).rotate(offset)
-  screen.draw(rectangle)
+  rectangle.transform = mat3().translate(80 + offset, 60).rotate(offset)
+  screen.pen = color.blue
+  screen.shape(rectangle)
+
+  badge.update()
 ```
 
-To learn more about transformations [click here for the Transforms guide](guides/transforms.md).
-
 # Stroking vector shapes
-The shape-creation functions produce closed paths with a single outline. To draw a “thick” version of a shape, you need to stroke that outline, expanding it outward and inward by a chosen width. This effectively generates two offset copies of the original path, one larger and one smaller, which are then combined to form a new stroked shape.
+The shape-creation functions produce filled shapes. To draw a "thick outline" version of a shape, you can stroke it — replacing the filled shape with an outline of a chosen width. `stroke()` modifies the shape **in place** and returns it, so you can create and stroke in a single line. Keep a separate copy first if you also need the filled version.
 
 ```python {len=5}
 import math
 
-def update():
-  # create a circle with a radius of ten pixels
-  squircle = shapes.squircle(80, 60, 40, 4)
+while True:
+  # create a squircle
+  squircle = shape.squircle(80, 60, 40, 4)
 
-  # create a stroked copy of the circle two pixels thick
-  thickness = (math.sin(io.ticks / 1000) * 5) + 6
+  # replace it with a stroked outline of animated thickness
+  thickness = (math.sin(badge.ticks / 1000) * 5) + 6
   squircle.stroke(thickness)
 
-  screen.draw(squircle)
+  screen.pen = color.cyan
+  screen.shape(squircle)
+
+  badge.update()
 ```
 
+You can control the corners, caps and alignment of a stroke with flags — see [shape.stroke()](/api/shape.md#stroke) for the full set.
+
 # Styling
-Shapes are drawn using the currently assigned brush.
+Shapes are drawn using the currently assigned brush. As well as flat colours, you can fill a shape with a gradient, an image, a pattern, or an effect — see the [brush](/api/brush.md) reference.
 
 # Antialiasing
 Antialiasing is a technique that smooths out the jagged, stair-step edges that appear when drawing lines or curves on a pixel grid. It works by gently blending the edge into the background, making shapes look cleaner and more natural without harsh pixelation. It’s a small touch that makes graphics feel much smoother and easier on the eyes.
 
 Vector shapes and text both support antialiasing which can be enabled and disabled at any time:
 
-```python
-# 4x4 sample grid for antialiasing, best quality, slowest
-screen.antialias = Image.X4
+```python-raw
+# 4x supersampling for antialiasing, best quality, slowest
+screen.antialias = image.X4
 
-# 2x2 sample grid for antialiasing, good quality, faster
-screen.antialias = Image.X2
+# 2x supersampling for antialiasing, good quality, faster
+screen.antialias = image.X2
 
 # disable antialiasing
-screen.antialias = Image.OFF
+screen.antialias = image.OFF
 ```
 
 > Antialiasing can be pretty expensive so you should reserve its use for places where it really makes a difference!
@@ -150,49 +155,61 @@ Currently supported shapes are:
 
 ## Rectangle
 A rectangle with top left corner at `x, y` and size `w x h`.
-```python
-shapes.rectangle(x, y, w, h)
+```python-raw
+shape.rectangle(x, y, w, h)
 ```
 
 ## Circle
 A circle of radius `r` centered at point `x, y`.
-```python
-circle(x, y, r)
+```python-raw
+shape.circle(x, y, r)
+```
+
+## Ellipse
+An ellipse centred at `x, y` with horizontal radius `rx` and vertical radius `ry`.
+```python-raw
+shape.ellipse(x, y, rx, ry)
 ```
 
 ## Arc
-An arc that spans the angles `t1` and to `t2` (theta, in degrees) with a radius of `r` centered at point `x, y`.
-```python
-arc(x, y, r, t1, t2)
+An arc spanning the angles `from` to `to` (in degrees) between an inner radius `inner` and outer radius `outer`, centered at point `x, y`.
+```python-raw
+shape.arc(x, y, inner, outer, from, to)
 ```
 
 ## Pie
-A pie slice (think pacman) that spans the angles `t1` and to `t2` (theta, in degrees) with a radius of `r` centered at point `x, y`.
-```python
-pie(x, y, r, t1, t2)
+A pie slice (think pacman) that spans the angles `from` to `to` (in degrees) with a radius of `r` centered at point `x, y`.
+```python-raw
+shape.pie(x, y, r, from, to)
 ```
 
 ## Line
-A line starting at `x1, y1` and ending at `x2, y2` with thickness `t`.
-```python
-line(x1, y1, x2, y2, t)
+A line starting at `x1, y1` and ending at `x2, y2` with thickness `w`.
+```python-raw
+shape.line(x1, y1, x2, y2, w)
 ```
 
 ## Rounded Rectangle
-A rectangle with rounded corners with top left corner at `x, y` and size `w x h`. corner radii are defined by `r1` (top left) and going clockwise.
+A rectangle with rounded corners with top left corner at `x, y` and size `w x h`. Corner radii are defined by `r1` (top left) and going clockwise.
 If `r2, r3, r4` are not specified then `r1` is used for all corners.
-```python
-rounded_rectangle(x, y, w, h, r1[, r2, r3, r4])
+```python-raw
+shape.rounded_rectangle(x, y, w, h, r1[, r2, r3, r4])
 ```
 
 ## Regular Polygon
-A regular polygon of radius `r` centered at point `x, y` with `s` sides.
-```python
-regular_polygon(x, y, r, s)
+A regular polygon of radius `r` centered at point `x, y` with `sides` sides.
+```python-raw
+shape.regular_polygon(x, y, r, sides)
 ```
 
 ## Squircle
-A squircle of radius `r` centered at point `x, y`, `n` defines how rounded the end shape is.
-```python
-squircle(x, y, r, n=4)
+A squircle of size `s` centered at point `x, y`; `n` defines how square the end shape is (default 4).
+```python-raw
+shape.squircle(x, y, s, n=4)
+```
+
+## Star
+A star centred at `x, y` with `points` points, an outer radius `ro` and inner radius `ri`.
+```python-raw
+shape.star(x, y, points, ro, ri)
 ```

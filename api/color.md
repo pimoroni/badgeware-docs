@@ -32,14 +32,14 @@ Creates a new `color` object from red, green, blue, and optional alpha values.
 
 ### Example
 ```python
-def update():
+while True:
   # draw a gradient from cyan to magenta
   for x in range(0, 160):
     step = (x * 255) / 160
     screen.pen = color.rgb(step, 255 - step, 150)
     screen.line(x, 0, x, 120)
 
-run(update)
+  badge.update()
 ```
 
 ## hsv
@@ -59,7 +59,7 @@ HSV is not perceptually uniform, so equal changes in its values do not correspon
 
 ### Example
 ```python
-def update():
+while True:
   # draw a hue gradient
   for x in range(0, 160):
     hue = 255 * (x / 160)
@@ -68,7 +68,7 @@ def update():
     screen.pen = color.hsv(hue, saturation, value)
     screen.line(x, 0, x, 120)
 
-run(update)
+  badge.update()
 ```
 
 ## oklch
@@ -88,7 +88,7 @@ OKLCH is a perceptually uniform colour space, meaning equal changes in its value
 
 ### Example
 ```python
-def update():
+while True:
   for x in range(0, 160):
     lightness = 220
     chroma = 150
@@ -96,7 +96,7 @@ def update():
     screen.pen = color.oklch(lightness, chroma, hue)
     screen.line(x, 0, x, 120)
 
-run(update)
+  badge.update()
 ```
 
 # Constants
@@ -144,11 +144,43 @@ palette = [
   color.blue, color.orange, color.smoke, color.lime,
   color.latte, color.cyan, color.yellow, color.white
 ]
-def update():
+while True:
   for i in range(len(palette)):
 
     screen.pen = palette[i]
     screen.circle(32 + (i * 6), 60, 20)
 
-run(update)
+  badge.update()
+```
+
+> Note: `color.black` and `color.white` are tuned per model — on Tufty they use slightly softened values (`#141e28` and `#deeed6`) that look better on its colour LCD, while on Badger and Blinky they are true black and white.
+
+## Additional colours
+Alongside the 16 palette colours, a few extra named constants are available:
+
+- `color.transparent` — fully transparent (alpha 0). Useful as a clear colour or for the second colour of a pattern brush.
+- `color.light_grey` — a light grey, matched to Badger's e-ink greyscale.
+- `color.dark_grey` — a dark grey, matched to Badger's e-ink greyscale.
+
+# Reference
+
+## Properties
+```python-raw
+color.p -> int
+```
+
+## Static Methods
+```python-raw
+color.rgb(r: int, g: int, b: int, a: int=255) -> color
+color.hsv(h: int, s: int, v: int, a: int=255) -> color
+color.oklch(l: int, c: int, h: int, a: int=255) -> color
+```
+
+## Constants
+```python-raw
+color.black    color.grape   color.navy    color.grey
+color.brown    color.green   color.red     color.taupe
+color.blue     color.orange  color.smoke   color.lime
+color.latte    color.cyan    color.yellow  color.white
+color.transparent  color.light_grey  color.dark_grey
 ```

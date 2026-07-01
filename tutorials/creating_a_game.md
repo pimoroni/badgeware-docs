@@ -18,7 +18,7 @@ Create a new app with an icon, assets folder and `__init__.py`. Here's a good im
 
 ![Icon image for Acorn Highway](/tut4_res/icon.png)
 
-Inside `__init__.py` we'll make the classes. We will still need to do the usual `update()` loop, we'll just be putting it in later. We'll start by creating a class for the player:
+Inside `__init__.py` we'll make the classes. We will still need to do the usual main loop, we'll just be putting it in later. This tutorial builds that loop as a named `update()` function and starts it with [`run(update)`](/api/run.md) — the same thing as a `while True:` loop ending in `badge.update()`, just given a name so we can refactor it as the game grows. We'll start by creating a class for the player:
 
 ```python-raw
 class player_base:

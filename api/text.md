@@ -23,19 +23,19 @@ This method will write text into a specified area, wrapping onto new lines if it
     - `size` (Optional) - The height to render the text when using a vector font. Defaults to 24px.
 
 ### Returns
-`None`.
+A `rect` describing the bounding box of the text that was drawn. This is handy for laying out further content below or beside a block of wrapped text.
 
 ### Example
 ```python
 screen.font = rom_font.sins
 screen.pen = color.rgb(0, 0, 255)
 
-def update():
+while True:
     bounds = rect(10, 10, 140, 110)
     message = "Well hello there, world! This is a nice long message that's designed to split over several lines, so I'm just going to ramble on for a little while."
     text.draw(screen, message, bounds)
 
-run(update)
+    badge.update()
 ```
 
 ## tokenise()
@@ -58,13 +58,13 @@ A `list` containing the individual text tokens.
 screen.font = rom_font.sins
 screen.pen = color.rgb(0, 0, 255)
 
-def update():
+while True:
     bounds = rect(10, 10, 140, 110)
     message = "Well hello there, world!"
     tokens = text.tokenise(screen, message)
     text.draw(screen, tokens, bounds)
 
-run(update)
+    badge.update()
 ```
 
 # Glyph renderers
@@ -106,14 +106,14 @@ glyph_renderers = {
     "pen": pen_glyph_renderer
 }
 
-def update():
+while True:
     screen.pen = color.rgb(0, 0, 255)
     bounds = rect(10, 10, 140, 110)
     message = "I'm written in blue... [pen:255,0,0]or am I?"
     tokens = text.tokenise(screen, message, glyph_renderers)
     text.draw(screen, tokens, bounds)
 
-run(update)
+    badge.update()
 ```
 
 So, `pen_glyph_renderer()` is called by placing `[pen:r, g, b]` in the middle of the text, as its key in the `glyph_renderers` dictionary is `pen`.
@@ -139,13 +139,13 @@ glyph_renderers = {
     "square": square_glyph_renderer
 }
 
-def update():
+while True:
     bounds = rect(10, 10, 140, 110)
     message = "Come on, man, don't be a [square] all your life..."
     tokens = text.tokenise(screen, message, glyph_renderers)
     text.draw(screen, tokens, bounds)
 
-run(update)
+    badge.update()
 ```
 
 Here you can see that this draws a 12px x 12px square in the current pen colour. This time round, `parameters` isn't used. `cursor` gives us the position we're 'at' in the text - we're using that as the coordinates of the top left of the square. If `measure` is true, we should return the width of what we're drawing, which in this case is 12.
@@ -169,31 +169,43 @@ The text will always be drawn scrolling between both edges of the target image, 
     - `align` (Optional) - The vertical alignment of the text on the target. Options are `top`, `middle`, `bottom` or a y-coordinate. Default is `middle`.
 
 ### Returns
-`None`.
+A function (a closure). Call it once per frame to advance and draw the scroll. Each call returns a `float` describing how far through the scroll cycle it is.
+
+> Note: don't name your string variable `text` — that would shadow the `text` module you need to call `text.scroll()` on. The example below uses `message` instead.
 
 ### Example
 ```python
-
-text = "Hello world! Once again, this is a long piece of text which is supposed to scroll outside its area! Whoop whoop!"
+message = "Hello world! Once again, this is a long piece of text which is supposed to scroll outside its area! Whoop whoop!"
 
 # Now we set up the scrolling text itself, very simple.
-my_scroll = text.scroll(text)
+my_scroll = text.scroll(message)
 
 # This window is 10px within the screen boundaries.
 text_window = screen.window(10, 10, screen.width - 20, screen.height - 20)
 
 # This scroll is set up with a few more parameters.
-my_other_scroll = text.scroll(text, font_face=rom_font.ark, target=text_window, gap=20, align="bottom")
+my_other_scroll = text.scroll(message, font_face=rom_font.ark, target=text_window, gap=20, align="bottom")
 
-update():
+while True:
     # We call the closures we made every frame.
     my_scroll()
+
     # For this one we're taking the return value
     # to see how far along the scroll it is.
     progress = my_other_scroll()
 
     # And then we'll show that number.
-    screen.text(my_scroll, 10, 10)
+    screen.pen = color.white
+    screen.text(f"{progress:.2f}", 10, 10)
 
-run(update)
+    badge.update()
+```
+
+# Reference
+
+## Methods
+```python-raw
+text.draw(image: image, text: str|list, bounds: rect=None, line_spacing: int|float=1, word_spacing: int|float=1, size: int|float=24) -> rect
+text.tokenise(image: image, text: str, glyph_renderers: dict=None, size: int|float=24) -> list
+text.scroll(text: str, font_face: font|pixel_font=rom_font.sins, font_size: int|float=None, target: image=screen, speed: int|float=25, gap: int=None, align: str|int="middle") -> function
 ```

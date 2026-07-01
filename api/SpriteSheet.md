@@ -61,8 +61,11 @@ The basic constructor of the `AnimatedSprite` class, returning an instance of `A
 ### Returns
 An `AnimatedSprite` containing the selected frames.
 
-## count
-This property of AnimatedSprite simply returns how many frames are in the animation.
+## count()
+This method of AnimatedSprite returns how many frames are in the animation.
+
+### Returns
+An `int` — the number of frames.
 
 ## frame()
 Returns a single frame from the animation as an `image` object, just like getting a static sprite from a spritesheet.
@@ -82,14 +85,10 @@ AnimatedSprite(spritesheet: SpriteSheet, x: int, y: int, count: int, horizontal:
 SpriteSheet(image: string, columns: int, rows: int) -> SpriteSheet
 ```
 
-## Properties
-```python-raw
-AnimatedSprite.count: int
-```
-
 ## Methods
 ```python-raw
+AnimatedSprite.count() -> int
 AnimatedSprite.frame(index: int=0) -> image
-SpriteSheet.animation(x: int=0, y: int=0, count: int|None=None, horizontal: bool=True)
-SpriteSheet.sprite(x: int, y: int)
+SpriteSheet.animation(x: int=0, y: int=0, count: int|None=None, horizontal: bool=True) -> AnimatedSprite
+SpriteSheet.sprite(x: int, y: int) -> image
 ```

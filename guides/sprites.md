@@ -21,11 +21,11 @@ On resource-constrained systems, sprites were helpful to save memory and boost p
 
 ![Sprite sheet example](guides/assets/spritesheet1.png)
 
-Badgeware provides a `SpriteSheet` class that helps you load spritesheet images and access the individual sprites within it.
+Badgeware provides a `SpriteSheet` class that helps you load spritesheet images and access the individual sprites within it. `SpriteSheet` is available globally, so you don't need to import anything to use it.
 
-Each spritesheet contains a grid of images that can be referred to by their position in the spritesheet.
+Each spritesheet contains a grid of images that can be referred to by their position — a column and a row, both starting from 0.
 
-For example if we load a spritesheet that is 128 x 64 pixels in size, and specify that there are 8 columns and 4 rows.
+For example if we load a spritesheet that is 128 x 64 pixels in size, and specify that there are 8 columns and 4 rows, the cells are addressed like this:
 
 | | | | | | | | |
 |-|-|-|-|-|-|-|-|
@@ -34,51 +34,78 @@ For example if we load a spritesheet that is 128 x 64 pixels in size, and specif
 |0 , 2|1 , 2|2 , 2|3 , 2|4 , 2|5 , 2|6 , 2|7 , 2|
 |0 , 3|1 , 3|2 , 3|3 , 3|4 , 3|5 , 3|6 , 3|7 , 3|
 
+# Loading spritesheets
 
-# Loading sprite sheets
+To load a spritesheet, create a `SpriteSheet` with the path to the image and the number of columns and rows it contains. Badgeware slices the image into a grid for you. Each cell is a plain `image`, so you draw it with `screen.blit()` just like any other image.
 
 ```python
-# example of loading a sprite and blitting it to the screen
-from badgeware import screen
-from lib import SpriteSheet
+# load a spritesheet that has 8 columns and 4 rows
+sprites = SpriteSheet("/system/assets/character.png", 8, 4)
 
-# load spritesheet that has 8 columns and 4 rows
-sprites = SpriteSheet(f"sprites/character.png", 8, 4)
-
-def update():
-  # clear the background
-  screen.brush = brushes.color(20, 40, 60)
-  screen.clear()
-
-  # blit the sprite at 0, 0 in the spritesheet to the screen
+while True:
+  # blit the sprite at column 0, row 0 to the screen at (10, 10)
   screen.blit(sprites.sprite(0, 0), 10, 10)
 
-  # scale blit the sprite at 3, 0 in the spritesheet to the screen
-  screen.scale_blit(sprites.sprite(0, 0), 50, 50, 30, 30)
+  # blit the sprite at column 1, row 0
+  screen.blit(sprites.sprite(1, 0), 40, 10)
+
+  badge.update()
 ```
 
-# Drawing sprites
+Because each sprite is an `image`, you can scale it too — pass a destination `rect` to `blit()`:
+
+```python
+sprites = SpriteSheet("/system/assets/character.png", 8, 4)
+
+while True:
+  sprite = sprites.sprite(0, 0)
+
+  # draw it at 1:1
+  screen.blit(sprite, 10, 10)
+
+  # and scaled up into a 48x48 box
+  screen.blit(sprite, rect(70, 10, 48, 48))
+
+  badge.update()
+```
 
 # Animating sprites
 
-The `Image` class can load images from files on the filesystem which can then be blitted onto the screen. [Click here for full documentation of the `Image` class](api/image.md).
+Most spritesheets hold the frames of an animation — a walk cycle, a spinning coin, an explosion. The `animation()` method bundles a run of cells into an `AnimatedSprite`, which makes it easy to step through the frames over time.
+
+Call `animation(x, y, count)` to build an animation starting at a cell and taking `count` frames. By default the frames run **horizontally** (to the right); pass `horizontal=False` to run down a column instead.
 
 ```python
-# example of loading a sprite and blitting it to the screen
-from badgeware import screen, brushes, Image
-from lib import SpriteSheet
+sprites = SpriteSheet("/system/assets/character.png", 8, 4)
 
-# load an image as a sprite sheet specifying the number of rows and columns
-mona = SpriteSheet(f"assets/mona-sprites/mona-default.png", 7, 1)
+# a 7-frame walk cycle along the top row
+walk = sprites.animation(0, 0, 7)
 
-def update():
-  # clear the background
-  screen.brush = brushes.color(20, 40, 60)
-  screen.clear()
+while True:
+  # advance the animation using the badge clock;
+  # frame() loops automatically, so the cycle repeats forever
+  frame = walk.frame(badge.ticks / 100)
+  screen.blit(frame, 60, 40)
 
-  # blit the sprite at 0, 0 in the spritesheet to the screen
-  screen.blit(mona.sprite(0, 0), 10, 10)
-
-  # scale blit the sprite at 3, 0 in the spritesheet to the screen
-  screen.scale_blit(mona.sprite(0, 0), 50, 50, 30, 30)
+  badge.update()
 ```
+
+`frame()` takes a frame index and wraps it around the number of frames, so you can just feed it an ever-increasing number (like a scaled `badge.ticks`) to get a smooth looping cycle. Divide `badge.ticks` by a larger number to slow the animation down, or a smaller number to speed it up.
+
+You can keep several animations from the same sheet — for example a different row for each action:
+
+```python
+sprites = SpriteSheet("/system/assets/character.png", 8, 4)
+
+walk = sprites.animation(0, 0, 7)          # row 0: walking
+jump = sprites.animation(0, 1, 5)          # row 1: jumping
+
+while True:
+  # switch animation depending on a button
+  current = jump if badge.held(BUTTON_A) else walk
+  screen.blit(current.frame(badge.ticks / 100), 60, 40)
+
+  badge.update()
+```
+
+See the [SpriteSheet API reference](/api/SpriteSheet.md) for the full details of `SpriteSheet` and `AnimatedSprite`.

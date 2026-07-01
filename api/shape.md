@@ -31,12 +31,12 @@ A `shape` representing the created shape.
 
 ### Example
 ```python
-def update():
+while True:
   screen.pen = color.taupe
   circle = shape.circle(80, 60, 40)
   screen.shape(circle)
 
-run(update)
+  badge.update()
 ```
 
 ## rectangle()
@@ -52,12 +52,12 @@ A `shape` representing the created shape.
 
 ### Example
 ```python
-def update():
+while True:
   screen.pen = color.blue
   rectangle = shape.rectangle(30, 30, 100, 60)
   screen.shape(rectangle)
 
-run(update)
+  badge.update()
 ```
 
 ## regular_polygon()
@@ -74,7 +74,7 @@ A `shape` representing the created shape.
 
 ### Example
 ```python
-def update():
+while True:
   sides = ((badge.ticks // 500) % 10) + 3
 
   polygon = shape.regular_polygon(80, 60, 40, sides)
@@ -84,7 +84,7 @@ def update():
   screen.pen = color.white
   screen.text(f"{sides} sides", 5, 5)
 
-run(update)
+  badge.update()
 ```
 
 ## rounded_rectangle()
@@ -107,7 +107,7 @@ A `shape` representing the created shape.
 
 ### Example
 ```python
-def update():
+while True:
   screen.pen = color.yellow
   rounded_rectangle = shape.rounded_rectangle(15, 10, 60, 60, 10)
   screen.shape(rounded_rectangle)
@@ -116,7 +116,32 @@ def update():
   rounded_rectangle = shape.rounded_rectangle(85, 50, 60, 60, 0, 20, 0, 20)
   screen.shape(rounded_rectangle)
 
-run(update)
+  badge.update()
+```
+
+## ellipse()
+Creates a new `shape` representing an ellipse, with independent horizontal and vertical radii.
+
+### Usage
+- `shape_name = shape.ellipse(centre, rx, ry)`
+    - `centre`: Position of the centre point (`vec2`)
+    - `rx`: Horizontal radius in pixels
+    - `ry`: Vertical radius in pixels
+- `shape_name = shape.ellipse(x, y, rx, ry)`
+    - `x, y`: Position of the centre point
+    - `rx, ry`: Horizontal and vertical radii in pixels
+
+### Returns
+A `shape` representing the created shape.
+
+### Example
+```python
+while True:
+  screen.pen = color.grape
+  ellipse = shape.ellipse(80, 60, 60, 30)
+  screen.shape(ellipse)
+
+  badge.update()
 ```
 
 ## squircle
@@ -137,12 +162,12 @@ A `shape` representing the created shape.
 
 ### Example
 ```python
-def update():
+while True:
   screen.pen = color.orange
   squircle = shape.squircle(80, 60, 40)
   screen.shape(squircle)
 
-run(update)
+  badge.update()
 ```
 
 ## arc
@@ -163,13 +188,13 @@ A `shape` representing the created shape.
 
 ### Example
 ```python
-def update():
+while True:
   angle = badge.ticks / 10
   arc = shape.arc(80, 60, 30, 40, angle + 30, angle + 150)
   screen.pen = color.cyan
   screen.shape(arc)
 
-run(update)
+  badge.update()
 ```
 
 ## pie
@@ -189,13 +214,13 @@ A `shape` representing the created shape.
 
 ### Example
 ```python
-def update():
+while True:
   a = badge.ticks / 10
   p = shape.pie(80, 60, 40, a + 30, a + 150)
   screen.pen = color.green
   screen.shape(p)
 
-run(update)
+  badge.update()
 ```
 
 ## star
@@ -213,12 +238,12 @@ A `shape` representing the created shape.
 
 ### Example
 ```python
-def update():
+while True:
   star = shape.star(80, 60, 7, 25, 40)
   screen.pen = color.latte
   screen.shape(star)
 
-run(update)
+  badge.update()
 ```
 
 ## line
@@ -235,12 +260,35 @@ A `shape` representing the created shape.
 
 ### Example
 ```python
-def update():
+while True:
   line = shape.line(30, 30, 120, 80, 10)
   screen.pen = color.smoke
   screen.shape(line)
 
-run(update)
+  badge.update()
+```
+
+## custom()
+Creates a `shape` from one or more lists of points, letting you build completely arbitrary geometry. The first list is the outer contour. Any further lists are treated as holes cut out of the shape.
+
+### Usage
+- `shape_name = shape.custom(paths)`
+    - `paths`: A list of contours. Each contour is a list of `vec2` points. Pass a single list for a simple shape, or several for a shape with holes.
+
+### Returns
+A `shape` representing the created shape.
+
+### Example
+```python
+while True:
+  # an outer triangle with a triangular hole
+  outer = [vec2(80, 15), vec2(140, 110), vec2(20, 110)]
+  hole = [vec2(80, 55), vec2(110, 100), vec2(50, 100)]
+
+  screen.pen = color.lime
+  screen.shape(shape.custom([outer, hole]))
+
+  badge.update()
 ```
 
 # Properties
@@ -252,23 +300,47 @@ This allows shapes to be translated, rotated, scaled, or skewed without modifyin
 # Methods
 
 ## stroke()
-Returns a new shape representing the outline (stroke) of this shape.
+Replaces this shape with its **stroked outline** — the shape is modified **in place** and the method returns the shape itself, so calls can be chained. This turns a filled shape into a hollow outline of a given thickness, useful for borders, rings, and line art.
 
-Stroking is useful for drawing borders around filled shapes, creating hollow outlines, or generating thicker versions of existing geometry. The original shape is not modified — instead, `stroke()` produces a new shape that can be drawn like any other.
+Because `stroke()` mutates the shape, keep a separate copy if you also want the filled version. Since it returns the shape, you can create and stroke in one line: `outline = shape.circle(80, 60, 40).stroke(4)`.
 
-The supplied thickness controls where the outline is placed:
+The optional `flags` argument controls how the outline is built. OR together one value from each group (every default is the `0` value, so you only need to include the ones you want to change):
 
-- If the thickness is positive, the stroke expands outward from the shape’s edge.
-- If the thickness is negative, the stroke is applied inward, shrinking into the shape’s interior.
-
-This makes it possible to create both outer borders and inset outlines depending on the effect you want.
+- **Alignment** — where the stroke sits relative to the original edge: `shape.ALIGN_OUTER` (default, grows outward), `shape.ALIGN_INNER` (grows inward), `shape.ALIGN_CENTER` (straddles the edge).
+- **Path** — `shape.PATH_CLOSED` (default, a closed loop) or `shape.PATH_OPEN` (an open line, which adds end caps).
+- **Joins** — how corners are drawn: `shape.JOIN_MITER` (default, sharp), `shape.JOIN_ROUND`, `shape.JOIN_BEVEL`.
+- **Caps** — how the ends of an open path are drawn: `shape.CAP_BUTT` (default), `shape.CAP_ROUND`, `shape.CAP_SQUARE`.
 
 ### Usage
-- `shape_name.stroke(thickness)`
-    - `thickness`: Thickness of the stroke in pixels
+- `shape_name.stroke(width, flags, miter_limit)`
+    - `width`: Thickness of the stroke in pixels.
+    - `flags` (Optional): OR of the alignment/path/join/cap constants above. Defaults to `0`.
+    - `miter_limit` (Optional): Limit at which sharp mitre joins are clipped to bevels. Defaults to `4.0`.
 
 ### Returns
-A `shape` representing the stroke of the previous shape.
+The `shape`, replaced by its stroked outline.
+
+### Example
+```python
+while True:
+  a = badge.ticks / 20
+
+  # a rounded, outlined star
+  star = shape.star(80, 60, 6, 20, 45)
+  star.transform = mat3().rotate(a).translate(80, 60)
+  star.stroke(6, shape.JOIN_ROUND)
+
+  screen.pen = color.yellow
+  screen.shape(star)
+
+  badge.update()
+```
+
+## bounds()
+Returns the device-space bounding box of the shape as a `rect`. This is the shape's local bounding box run through its current transform, so it accounts for any rotation, scale or translation applied via `transform`.
+
+### Returns
+A `rect` describing the shape's bounds on screen.
 
 # Reference
 
@@ -277,6 +349,9 @@ A `shape` representing the stroke of the previous shape.
 shape.arc(x: int|float, y: int|float, inner: int|float, outer: int|float, from: int|float, to: int|float) -> shape
 shape.circle(centre: vec2, radius: int|float) -> shape
 shape.circle(x: int|float, y: int|float, radius: int|float) -> shape
+shape.custom(paths: list) -> shape
+shape.ellipse(centre: vec2, rx: int|float, ry: int|float) -> shape
+shape.ellipse(x: int|float, y: int|float, rx: int|float, ry: int|float) -> shape
 shape.line(x1: int|float, y1: int|float, x2: int|float, y2: int|float, w: int|float) -> shape
 shape.pie(x: int|float, y: int|float, r: int|float, f: int|float, t: int|float) -> shape
 shape.rectangle(x: int|float, y: int|float, width: int|float, height: int|float) -> shape
@@ -287,6 +362,14 @@ shape.squircle(x: int|float, y: int|float, s: int|float, n: int|float=4) -> shap
 shape.star(x: int|float, y: int|float, s: int, ro: int|float, ri: int|float) -> shape
 ```
 
+## Constants
+```python-raw
+shape.ALIGN_OUTER   shape.ALIGN_INNER   shape.ALIGN_CENTER
+shape.PATH_CLOSED   shape.PATH_OPEN
+shape.JOIN_MITER    shape.JOIN_ROUND    shape.JOIN_BEVEL
+shape.CAP_BUTT      shape.CAP_ROUND     shape.CAP_SQUARE
+```
+
 ## Properties
 ```python-raw
 shape.transform -> mat3
@@ -294,5 +377,6 @@ shape.transform -> mat3
 
 ## Methods
 ```python-raw
-shape.stroke(thickness: int) -> shape
+shape.stroke(width: int|float, flags: int=0, miter_limit: int|float=4.0) -> shape
+shape.bounds() -> rect
 ```

@@ -48,9 +48,7 @@ Every app is built around a single `update()` function that the badge calls once
 x, y = 80, 60
 dx, dy = 2, 1
 
-def update():
-    global x, y, dx, dy
-
+while True:
     x, y = x + dx, y + dy
     if x < 5 or x > screen.width - 5:  dx = -dx
     if y < 5 or y > screen.height - 5: dy = -dy
@@ -65,7 +63,7 @@ def update():
     screen.font = rom_font.smart
     screen.text("Hello, Badgeware!", 24, 50)
 
-run(update)
+    badge.update()
 ```
 
 That's a complete, runnable app — copy it onto your badge and it just works. Everything else is building on these ideas: drawing to the screen, reading buttons, and letting `update()` do its thing.

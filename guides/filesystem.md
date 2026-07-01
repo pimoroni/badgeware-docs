@@ -40,23 +40,28 @@ This writes the data from the specified save file into the specified dictionary.
 ### Returns
 `True` if data was loaded successfully, otherwise `False`.
 
-## state.delete()
+## State.delete()
 This deletes the specified JSON file. Next time `State.load()` is used, it will revert to defaults as described above.
 
 ### Usage
-- `State.load(app_name)`
+- `State.delete(app_name)`
 	- `app_name` - The name of the JSON file to delete. This can be found in `/state/`.
 
 ### Returns
 `None`.
 
-### Writing to files from application code
+> There's also `State.modify(app_name, data)`, which loads the current state, merges in the values you supply, and saves it again — handy when you only want to change a couple of keys. See the [State reference](/api/state.md) for the full API.
 
-The badge has a writeable LittleFS partition located at `/` which is intended for applications to store state information and cache any data they may need to hold on to across resets.
+# Writing to files from application code
 
-You can use normal Python style file access from your code:
+If you'd rather manage your own files instead of using `State`, you can. The `/state/` folder is writeable at runtime, so you can use normal Python file access to store text, logs, or cached data there that should survive resets and sleep.
 
 ```python
-with open("/storage/myfile.txt", "w") as out:
+with open("/state/myfile.txt", "w") as out:
   out.write("this is some text i want to keep\n")
+
+with open("/state/myfile.txt", "r") as f:
+  print(f.read())
 ```
+
+> Remember that `/system/` (your app folder) is read-only at runtime — write your data to `/state/` instead.

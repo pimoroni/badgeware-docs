@@ -24,14 +24,102 @@ import math
 
 skull = image.load("/system/assets/skull.png")
 
-def update():
+while True:
   t = mat3().translate(-12, -12).rotate(badge.ticks / 100).translate(80, 60).scale(math.sin(badge.ticks / 1000) * 4)
   imgbrush = brush.image(skull, t)
 
   screen.pen = imgbrush
   screen.shape(shape.circle(80, 60, 50))
 
-run(update)
+  badge.update()
+```
+
+# Gradient brushes
+A gradient brush blends smoothly between a series of colours. The gradient can be **linear** — running along the line from `(x1, y1)` to `(x2, y2)` — or **radial**, spreading outward from `(x1, y1)`. The `type` is chosen with `brush.LINEAR` or `brush.RADIAL`.
+
+Colours are supplied as a list of *stops*. Each stop is a `(position, color)` tuple, where `position` is a value from 0 to 1 along the gradient. You can supply up to 16 stops. An optional `mat3` transform can reposition, rotate or scale the whole gradient.
+
+### Usage
+- `brush.gradient(type, x1, y1, x2, y2, stops, transform)`
+    - `type` - `brush.LINEAR` or `brush.RADIAL`.
+    - `x1, y1` - Start point (also the centre for radial gradients).
+    - `x2, y2` - End point.
+    - `stops` - A list of `(position, color)` tuples, positions from 0 to 1 (up to 16).
+    - `transform` (Optional) - A `mat3` applied to the gradient. Defaults to `None`.
+
+### Returns
+A `brush` which can be used to set an `image`'s pen.
+
+### Example
+```python
+while True:
+  # a vertical linear gradient down the screen
+  linear = brush.gradient(brush.LINEAR, 0, 0, 0, 120, [
+    (0.0, color.navy),
+    (0.5, color.blue),
+    (1.0, color.cyan),
+  ])
+  screen.pen = linear
+  screen.rectangle(0, 0, 80, 120)
+
+  # a radial gradient centred at (120, 60)
+  radial = brush.gradient(brush.RADIAL, 120, 60, 120, 20, [
+    (0.0, color.yellow),
+    (1.0, color.red),
+  ])
+  screen.pen = radial
+  screen.shape(shape.circle(120, 60, 40))
+
+  badge.update()
+```
+
+# Effect brushes
+Some brushes don't paint a colour at all — instead they sample and modify whatever is already on the target where the shape is drawn. These are handy for spotlights, frosted panels, and pixelated censor bars.
+
+## blur()
+Box-blurs the area covered by the shape, using the given radius.
+
+### Usage
+- `brush.blur(radius)`
+    - `radius` - The blur radius in pixels (1 or more).
+
+## pixelate()
+Mosaics the area covered by the shape into blocks of the given size.
+
+### Usage
+- `brush.pixelate(size)`
+    - `size` - The block size in pixels (1 or more).
+
+## lighten()
+Adds `amount` (0–255) to each colour channel of the backdrop under the shape.
+
+### Usage
+- `brush.lighten(amount)`
+    - `amount` - How much to brighten by, 0 to 255.
+
+## darken()
+Subtracts `amount` (0–255) from each colour channel of the backdrop under the shape.
+
+### Usage
+- `brush.darken(amount)`
+    - `amount` - How much to darken by, 0 to 255.
+
+### Example
+```python
+import math
+
+skull = image.load("/system/assets/skull.png")
+
+while True:
+  # draw a background to sample from
+  screen.blit(skull, rect(0, 0, screen.width, screen.height))
+
+  # a roaming pixelation "lens"
+  x = 80 + math.sin(badge.ticks / 500) * 50
+  screen.pen = brush.pixelate(6)
+  screen.shape(shape.circle(x, 60, 30))
+
+  badge.update()
 ```
 
 # Pattern brushes
@@ -49,7 +137,7 @@ A `brush` representing the brush, which then can be used to set an `image`'s pen
 ```python
 import math
 
-def update():
+while True:
   custom_pattern = brush.pattern(color.rgb(255, 100, 100, 100), color.rgb(0, 0, 0, 0), (
     0b00000000,
     0b01111110,
@@ -70,7 +158,7 @@ def update():
   screen.pen = built_in_pattern
   screen.shape(shape.circle(80 + math.cos(badge.ticks / 250) * 60, 60 + math.sin(badge.ticks / 500) * 60, 30))
 
-run(update)
+  badge.update()
 ```
 
 > Note: The `0b` at the beginning of the numbers in the custom pattern signify that the number is binary. The 1s and 0s following it are each row of the pattern.
@@ -115,3 +203,24 @@ run(update)
 |35|![Pattern 35](/patterns/pattern35.png)|![Pattern 35 Tiled](/patterns/pattern35_tiled.png)|
 |36|![Pattern 36](/patterns/pattern36.png)|![Pattern 36 Tiled](/patterns/pattern36_tiled.png)|
 |37|![Pattern 37](/patterns/pattern37.png)|![Pattern 37 Tiled](/patterns/pattern37_tiled.png)|
+
+# Reference
+
+## Constants
+```python-raw
+brush.LINEAR
+brush.RADIAL
+```
+
+## Static Methods
+```python-raw
+brush.image(img: image) -> brush
+brush.image(img: image, transform: mat3) -> brush
+brush.gradient(type: int, x1: int|float, y1: int|float, x2: int|float, y2: int|float, stops: list, transform: mat3=None) -> brush
+brush.pattern(c1: color, c2: color, index: int) -> brush
+brush.pattern(c1: color, c2: color, pattern: tuple) -> brush
+brush.blur(radius: int) -> brush
+brush.pixelate(size: int) -> brush
+brush.lighten(amount: int) -> brush
+brush.darken(amount: int) -> brush
+```
