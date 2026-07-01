@@ -116,21 +116,21 @@ Save, eject, and run the app again.
 
 Each time you press the **Up** button, the badge cycles through the messages. We've also added some code that centres the text on screen.
 
-- **`messages = ["Hello, world!", "Badgeware rocks!", "Press a button!"]`**: A list containing several text options that we want to show.
+- **`messages = ["Hello, world!", "Badgeware rocks!", "Press a button!"]`** - A list containing several text options that we want to show.
   
-- **`current = 0`**: Starts on the first message in the list (which is 0).
+- **`current = 0`** - Starts on the first message in the list (which is number 0).
   
-- **`global current`**: Lets us update `current` from inside the `update()` function.
+- **`global current`** - Lets us update the `current` variable from within the `update()` function.
 
-- **`if badge.pressed(BUTTON_UP):`**: Checks whether the **Up** button is currently pressed.
+- **`if badge.pressed(BUTTON_UP):`** - Checks whether the **Up** button is currently pressed.
 
-- **`current = (current + 1) % len(messages)`**: Moves to the next message. `% len(messages)` wraps back to `0` at the end of the list, so `current` always stays within range.
+- **`current = (current + 1) % len(messages)`** - Moves to the next message. `% len(messages)` wraps back to `0` when the end of the list is reached, so `current` always stays within range.
 
-- **`text = messages[current]`**: Picks the message at the current position.
+- **`text = messages[current]`** - Picks the message at the current position.
 
-- **`width, _ = screen.measure_text(text)`**: Measures how wide that message will be on screen.
+- **`width, _ = screen.measure_text(text)`** - Measures how wide that message will be on screen.
 
-- **`x = (screen.width / 2) - (width / 2)`**: Calculates an x position that centres the text.
+- **`x = (screen.width / 2) - (width / 2)`** - Calculates an `x` position that centres the text.
 
 # Add Some Colour
 
