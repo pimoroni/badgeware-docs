@@ -5,9 +5,9 @@ icon: image
 publish: true
 ---
 # Introduction
-The `image` type is the core graphics primitive in Badgeware. Images are true colour (RGBA) pixel buffers that support drawing shapes, text, and blitting sprites.
+The `image` type is the core graphics primitive in Badgeware: a true colour (RGBA) pixel buffer you can draw shapes, text, and sprites onto.
 
-A global image instance called `screen` represents the device framebuffer. All rendering to the display is done by drawing to `screen` — whether using primitives like `screen.circle()`, rendering text with `screen.text()`, or compositing sprites with `screen.blit()`.
+The display is itself an image — a global instance called `screen` that maps to the device framebuffer, so anything you draw to `screen` appears on the badge. You can also create your own images to hold loaded artwork and sprites, or to render off-screen before compositing the result onto the display.
 
 # Creating images
 
