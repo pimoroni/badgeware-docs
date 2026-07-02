@@ -1,6 +1,7 @@
 ---
 title: Welcome to Badgeware!
 summary: An introduction to Badgeware and the Badgeware SDK
+hide_toc: true
 ---
 
 # Welcome to Badgeware!
