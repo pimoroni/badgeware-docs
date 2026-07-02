@@ -18,28 +18,15 @@ New here? Head straight to **[Getting started](/introduction/getting-started.md)
 
 There are three badges in the family, each with its own kind of display — but they all run the same Badgeware API, so code you write for one will mostly work on the others. Where they differ is resolution, colour, and how the screen refreshes.
 
-| | Tufty | Badger | Blinky |
-|---|---|---|---|
-| |![Tufty badge](/assets/tufty_web_front.png)|![Badger badge](/assets/badger_web_front.png)|![Blinky badge](/assets/blinky_web_front.png)|
-| **Display** | Full-colour IPS LCD | E-paper | LED matrix (greyscale) |
-| **Resolution** | 320×240 (or 160×120) | 264×176 | 39×26 |
-| **Colour** | Full RGB | Black, white + 2 greys | Bright, white LEDs |
-| **Refresh** | Continuous | On demand, sleeps between | Continuous |
-| **Best for** | Games, animation, rich UIs | Name badges, dashboards, e-readers | Scrolling text, pixel art, notifications |
-
-Read on for a closer look at each.
-
-## Tufty
-
-A full-colour IPS LCD badge with a 320x240 display (or 160x120 in low-res mode for extra performance). Tufty is the most versatile of the three — its high refresh rate and RGB colour make it ideal for graphics-heavy apps, games, animations, and rich user interfaces. The screen redraws continuously, so your `update()` function runs as fast as your code allows. If you want smooth movement and vibrant visuals, Tufty is the one to reach for.
-
-## Badger
-
-An e-paper badge with a 264x176 display in black, white, and two shades of grey. E-paper only draws power when the screen updates, so Badger is designed around that — it sleeps between updates and wakes on a button press or RTC alarm. This makes it perfect for things that don't need to change often: name badges, conference schedules, dashboards, to-do lists, and e-readers. A single charge can last up to 100 days in standby. The trade-off is speed — full screen refreshes take a moment, though a fast-update mode is available for more responsive interfaces.
-
-## Blinky
-
-A 39x26 LED matrix badge with 255 levels of brightness per pixel, making it essentially a greyscale display you can wear. Blinky is compact, eye-catching, and great for scrolling text, pixel art, simple animations, and notification displays. Like Tufty, it refreshes continuously so animations run smoothly. The matrix has cutouts for case corners and buttons — anything drawn into those pixels is automatically ignored, so you don't need to worry about them in your code.
+| Tufty | Badger | Blinky |
+|---|---|---|
+|![Tufty badge](/assets/tufty_web_front.png)|![Badger badge](/assets/badger_web_front.png)|![Blinky badge](/assets/blinky_web_front.png)|
+| *The versatile all-rounder — smooth, vivid, and up for anything graphical.* | *The low-power one — sips battery and idles for up to 100 days.* | *The little showpiece — tiny, bright, and made to be worn.* |
+| Full-colour IPS LCD | E-paper display | Greyscale LED matrix |
+| 320×240 (or 160×120) | 264×176 | 39×26 |
+| Full RGB colour | Black, white + 2 greys | Bright white LEDs |
+| Redraws continuously | Updates on demand, sleeps between | Redraws continuously |
+| Great for games, animation, and rich UIs | Great for name badges, dashboards, and e-readers | Great for scrolling text, pixel art, and notifications |
 
 # Shared hardware
 
