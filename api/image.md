@@ -486,14 +486,13 @@ def update():
 run(update)
 ```
 
-## blit_vspan()
-Blit (copy) a vertical span from source into this image. This is a low-level helper mainly used for scaled or warped texture rendering, where an image is drawn one column at a time.
-
-The span is sampled from the source image using UV texture coordinates.
+## blit_vspan() / blit_hspan()
+Blit (copy) a single span from a source image into this image, sampling along the way using UV texture coordinates. These are low-level helpers mainly used for scaled or warped texture rendering, where an image is drawn one line at a time — `blit_vspan()` draws a vertical span (column), `blit_hspan()` a horizontal one (row).
 
 ### Usage
 ```python-raw
 .blit_vspan(source, x, y, c, u0, v0, u1, v1)
+.blit_hspan(source, x, y, c, u0, v0, u1, v1)
 ```
 
 | Parameter | Type | Description |
@@ -534,24 +533,6 @@ def update():
 run(update)
 ```
 
-## blit_hspan()
-Functionally identical to `blit_vspan()`, but renders a horizontal span (one row at a time) instead of a vertical one. Like `blit_vspan()`, it's a low-level helper for scaled or warped texture rendering, sampling the source image using UV texture coordinates.
-
-### Usage
-```python-raw
-.blit_hspan(source, x, y, c, u0, v0, u1, v1)
-```
-
-| Parameter | Type | Description |
-|---|---|---|
-| `source` | `image` | The source image to blit |
-| `x`, `y` | `int` | Coordinates of the top-left corner of the destination |
-| `c` | `int` | The length of the span (number of pixels) to draw |
-| `u0`, `v0` | `float` | The start UV coordinate for sampling |
-| `u1`, `v1` | `float` | The end UV coordinate for sampling |
-
-See `blit_vspan()` above for full details on UV coordinates and texture wrapping.
-
 # Other
 
 ## window()
@@ -583,54 +564,3 @@ A bytearray that references the start of the image’s backing buffer (advanced/
 - Values are premultiplied alpha (i.e. R/G/B have already been multiplied by A)
 
 > Note: Accessing pixels via the `raw` buffer from MicroPython can be slow. If you need per-pixel work, consider MicroPython’s @micropython.viper or @micropython.native decorators for a substantial speed boost. 🚀
-
-# Reference
-
-## Constructor
-```python-raw
-image(w: int, h: int) -> image
-```
-
-## Properties
-```python-raw
-alpha: int
-antialias: image.OFF | image.X2 | image.X4
-clip: rect
-font: pixel_font | vector_font
-height: int
-pen: color | brush
-width: int
-```
-
-## Methods
-```python-raw
-image.blit(source: image, x: int, y: int) -> None
-image.blit(source: image, p: vec2) -> None
-image.blit(source: image, rect: rect) -> None
-image.blit(source: image, source_rect: rect, dest_rect: rect) -> None
-image.blit_hspan(source: image, x: int, y: int, c: int, u0: float, v0: float, u1: float, v1: float) -> None
-image.blit_vspan(source: image, x: int, y: int, c: int, u0: float, v0: float, u1: float, v1: float) -> None
-image.blur(radius: int) -> None
-image.circle(point: vec2, radius: int) -> None
-image.circle(x: int|float, y: int|float, radius: int) -> None
-image.clear() -> None
-image.dither() -> None
-image.get(x: int, y: int) -> color
-image.line(start: vec2, end: vec2) -> None
-image.line(x0: int|float, y0: int|float, x1: int|float, y1: int|float) -> None
-image.load(path: string) -> None
-image.measure_text(message: string) -> tuple
-image.monochrome() -> None
-image.onebit() -> None
-image.put(x: int, y: int) -> None
-image.raw() -> bytearray
-image.rectangle(x: int|float, y: int|float, w: int|float, h: int|float) -> None
-image.rectangle(rect: rect) -> None
-image.shape(s: shape) -> None
-image.text(message: string, p: vec2) -> None
-image.text(message: string, x: int|float, y: int|float) -> None
-image.triangle(p0: vec2, p1: vec2, p2: vec2) -> None
-image.triangle(: int|float, y0: int|float, x1: int|float, y1: int|float, x2: int|float, y2: int|float) -> None
-image.window(r: rect) -> image
-image.window(x: int|float, y: int|float, w: int|float, h: int|float) -> image
-```
