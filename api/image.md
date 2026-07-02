@@ -41,7 +41,6 @@ image.load(path)
 ### Returns
 An `image` object the dimensions of the file.
 
-### Example
 ```python
 sprite = image.load("/system/assets/skull.png")
 
@@ -70,8 +69,6 @@ All drawing operations use the currently selected brush/colour unless otherwise 
 
 ## clear()
 Fills the entire image or drawing surface with the current brush.
-
-### Example
 
 ```python
 def update():
@@ -113,7 +110,6 @@ Draws a single pixel using the current brush.
 ### Returns
 `None`
 
-### Example
 ```python
 import random
 
@@ -150,8 +146,6 @@ Draws a filled rectangle using the current brush.
 ### Returns
 `None`
 
-### Example
-
 ```python
 def update():
   # using full coordinates
@@ -184,7 +178,6 @@ Draws a filled circle using the current brush.
 ### Returns
 `None`
 
-### Example
 ```python
 def update():
   # using full coordinates
@@ -219,7 +212,6 @@ Draws a straight line between two points.
 ### Returns
 `None`
 
-### Example
 ```python
 def update():
   # using full coordinates
@@ -256,7 +248,6 @@ Draws a filled triangle defined by three vertices.
 ### Returns
 `None`
 
-### Example
 ```python
 def update():
   # using full coordinates
@@ -293,7 +284,6 @@ Draws a vector shape (see `shape`) to the image using the current brush and anti
 ### Returns
 `None`
 
-### Example
 ```python
 def update():
   screen.antialias = image.X4
@@ -314,7 +304,9 @@ run(update)
 ```
 
 ## Antialiasing
-The `antialias` property sets the antialiasing level applied to vector drawing — compare `image.OFF`, `image.X2`, and `image.X4`:
+The `antialias` property sets the antialiasing level applied to vector drawing. It also applies to text drawn with vector fonts, but has no effect on the raster primitives or pixel fonts.
+
+Compare `image.OFF`, `image.X2`, and `image.X4`:
 
 ```python
 def update():
@@ -358,7 +350,6 @@ The `text()` method can be called in two forms: by passing a `vec2` that defines
 ### Returns
 `None`
 
-### Example
 ```python
 def update():
   screen.pen = color.yellow
@@ -385,7 +376,6 @@ Returns a tuple containing the width and height of the given text, when rendered
 ### Returns
 A `tuple` containing x and y dimensions in pixels
 
-### Example
 ```python
 def update():
   screen.pen = color.yellow
@@ -418,7 +408,6 @@ Blurs the contents of the image.
 ### Returns
 `None`
 
-### Example
 ```python
 import math
 
@@ -435,7 +424,6 @@ run(update)
 ## dither()
 Performs an ordered dither on the image.
 
-### Example
 ```python
 sprite = image.load("/system/assets/skull.png")
 
@@ -450,7 +438,6 @@ run(update)
 ## onebit()
 Reduces the image to black and white.
 
-### Example
 ```python
 sprite = image.load("/system/assets/skull.png")
 
@@ -465,7 +452,6 @@ run(update)
 ## monochrome()
 Reduces the image to greyscale.
 
-### Example
 ```python
 sprite = image.load("/system/assets/skull.png")
 
@@ -511,7 +497,6 @@ Depending on the parameters provided, `blit` can:
 ### Returns
 `None`
 
-### Example
 ```python
 sprite = image.load("/system/assets/skull.png")
 
@@ -559,7 +544,6 @@ UV coordinates may fall outside the 0..1 range. If they do, the source texture w
 ### Returns
 `None`
 
-### Example
 ```python
 import math
 
