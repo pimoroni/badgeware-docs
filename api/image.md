@@ -15,9 +15,7 @@ The display is itself an image — a global instance called `screen` that maps t
 Returns an `image` with the specified width and height.
 
 ### Usage
-```python-raw
-image(w, h)
-```
+`image(w, h)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -30,9 +28,7 @@ image(w, h)
 Loads an image from the specified file path and returns it as a new `image` object.
 
 ### Usage
-```python-raw
-image.load(path)
-```
+`image.load(path)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -84,9 +80,7 @@ run(update)
 Returns the `color` of a single pixel.
 
 ### Usage
-```python-raw
-.get(x, y)
-```
+`.get(x, y)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -99,9 +93,7 @@ A `color` representing the pixel.
 Draws a single pixel using the current brush.
 
 ### Usage
-```python-raw
-.put(x, y)
-```
+`.put(x, y)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -129,10 +121,8 @@ run(update)
 Draws a filled rectangle using the current brush.
 
 ### Usage
-```python-raw
-.rectangle(x, y, w, h)
-.rectangle(rect)
-```
+`.rectangle(x, y, w, h)` \
+`.rectangle(rect)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -158,10 +148,8 @@ run(update)
 Draws a filled circle using the current brush.
 
 ### Usage
-```python-raw
-.circle(x, y, radius)
-.circle(point, radius)
-```
+`.circle(x, y, radius)` \
+`.circle(point, radius)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -189,10 +177,8 @@ Draws a straight line between two points.
 `line` can be called in two ways: by passing a start and end `vec2` or by specifying the positions as individual values.
 
 ### Usage
-```python-raw
-.line(x0, y0, x1, y1)
-.line(start, end)
-```
+`.line(x0, y0, x1, y1)` \
+`.line(start, end)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -221,10 +207,8 @@ Draws a filled triangle defined by three vertices.
 `triangle` can be called in two ways: by passing three `vec2` values or by specifying the positions as individual values.
 
 ### Usage
-```python-raw
-.triangle(x0, y0, x1, y1, x2, y2)
-.triangle(p0, p1, p2)
-```
+`.triangle(x0, y0, x1, y1, x2, y2)` \
+`.triangle(p0, p1, p2)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -258,9 +242,7 @@ Vector drawing uses the currently selected brush for both stroke and fill unless
 Draws a vector shape (see `shape`) to the image using the current brush and antialiasing settings.
 
 ### Usage
-```python-raw
-.shape(s)
-```
+`.shape(s)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -317,10 +299,8 @@ Writes text to the image using the current font and brush at the specified posit
 The `text()` method can be called in two forms: by passing a `vec2` that defines the position, or by specifying the position as individual `x` and `y` values.
 
 ### Usage
-```python-raw
-.text(message, x, y, size)
-.text(message, p, size)
-```
+`.text(message, x, y, size)` \
+`.text(message, p, size)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -343,9 +323,7 @@ run(update)
 Returns a tuple containing the width and height of the given text, when rendered using the current font.
 
 ### Usage
-```python-raw
-.measure_text(message, size)
-```
+`.measure_text(message, size)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -376,9 +354,7 @@ Filters are applied to an entire image's clipping area.
 Blurs the contents of the image.
 
 ### Usage
-```python-raw
-.blur(radius)
-```
+`.blur(radius)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -452,12 +428,10 @@ Depending on the parameters provided, `blit` can:
 - or crop from a source rectangle and scale into a destination rectangle
 
 ### Usage
-```python-raw
-.blit(source, x, y)
-.blit(source, p)
-.blit(source, rect)
-.blit(source, source_rect, dest_rect)
-```
+`.blit(source, x, y)` \
+`.blit(source, p)` \
+`.blit(source, rect)` \
+`.blit(source, source_rect, dest_rect)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -490,10 +464,8 @@ run(update)
 Blit (copy) a single span from a source image into this image, sampling along the way using UV texture coordinates. These are low-level helpers mainly used for scaled or warped texture rendering, where an image is drawn one line at a time — `blit_vspan()` draws a vertical span (column), `blit_hspan()` a horizontal one (row).
 
 ### Usage
-```python-raw
-.blit_vspan(source, x, y, c, u0, v0, u1, v1)
-.blit_hspan(source, x, y, c, u0, v0, u1, v1)
-```
+`.blit_vspan(source, x, y, c, u0, v0, u1, v1)` \
+`.blit_hspan(source, x, y, c, u0, v0, u1, v1)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -541,10 +513,8 @@ Returns an `image` which is a view onto a rectangular subsection of the image.
 The returned image shares its underlying data with the original image. All drawing operations performed on the window are clipped to the specified area, and the window’s origin `(0, 0)` is relative to its top-left corner, not the original image.
 
 ### Usage
-```python-raw
-.window(x, y, w, h)
-.window(rect)
-```
+`.window(x, y, w, h)` \
+`.window(rect)`
 
 | Parameter | Type | Description |
 |---|---|---|
