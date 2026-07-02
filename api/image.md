@@ -16,7 +16,7 @@ Returns an `image` with the specified width and height.
 
 ### Usage
 ```python-raw
-image_name = image(w, h)
+image(w, h)
 ```
 
 | Parameter | Type | Description |
@@ -31,7 +31,7 @@ Loads an image from the specified file path and returns it as a new `image` obje
 
 ### Usage
 ```python-raw
-image_name = image.load(path)
+image.load(path)
 ```
 
 | Parameter | Type | Description |
@@ -181,7 +181,7 @@ Returns the `color` of a single pixel.
 
 ### Usage
 ```python-raw
-image_name.get(x, y)
+.get(x, y)
 ```
 
 | Parameter | Type | Description |
@@ -196,7 +196,7 @@ Draws a single pixel using the current brush.
 
 ### Usage
 ```python-raw
-image_name.put(x, y)
+.put(x, y)
 ```
 
 | Parameter | Type | Description |
@@ -230,8 +230,8 @@ Draws a filled rectangle using the current brush.
 
 ### Usage
 ```python-raw
-image_name.rectangle(x, y, w, h)
-image_name.rectangle(rect)
+.rectangle(x, y, w, h)
+.rectangle(rect)
 ```
 
 | Parameter | Type | Description |
@@ -264,8 +264,8 @@ Draws a filled circle using the current brush.
 
 ### Usage
 ```python-raw
-image_name.circle(x, y, radius)
-image_name.circle(point, radius)
+.circle(x, y, radius)
+.circle(point, radius)
 ```
 
 | Parameter | Type | Description |
@@ -299,8 +299,8 @@ Draws a straight line between two points.
 
 ### Usage
 ```python-raw
-image_name.line(x0, y0, x1, y1)
-image_name.line(start, end)
+.line(x0, y0, x1, y1)
+.line(start, end)
 ```
 
 | Parameter | Type | Description |
@@ -335,8 +335,8 @@ Draws a filled triangle defined by three vertices.
 
 ### Usage
 ```python-raw
-image_name.triangle(x0, y0, x1, y1, x2, y2)
-image_name.triangle(p0, p1, p2)
+.triangle(x0, y0, x1, y1, x2, y2)
+.triangle(p0, p1, p2)
 ```
 
 | Parameter | Type | Description |
@@ -373,7 +373,7 @@ Vector shapes are created using one of the predefined helper methods on the shap
 
 ### Usage
 ```python-raw
-image_name.shape(s)
+.shape(s)
 ```
 
 | Parameter | Type | Description |
@@ -415,8 +415,8 @@ The `text()` method can be called in two forms: by passing a `vec2` that defines
 
 ### Usage
 ```python-raw
-image_name.text(message, x, y, size)
-image_name.text(message, p, size)
+.text(message, x, y, size)
+.text(message, p, size)
 ```
 
 | Parameter | Type | Description |
@@ -445,7 +445,7 @@ Returns a tuple containing the width and height of the given text, when rendered
 
 ### Usage
 ```python-raw
-image_name.measure_text(message, size)
+.measure_text(message, size)
 ```
 
 | Parameter | Type | Description |
@@ -479,7 +479,7 @@ Blurs the contents of the image.
 
 ### Usage
 ```python-raw
-image_name.blur(radius)
+.blur(radius)
 ```
 
 | Parameter | Type | Description |
@@ -562,10 +562,10 @@ Depending on the parameters provided, `blit` can:
 
 ### Usage
 ```python-raw
-image_name.blit(source, x, y)
-image_name.blit(source, p)
-image_name.blit(source, rect)
-image_name.blit(source, source_rect, dest_rect)
+.blit(source, x, y)
+.blit(source, p)
+.blit(source, rect)
+.blit(source, source_rect, dest_rect)
 ```
 
 | Parameter | Type | Description |
@@ -606,7 +606,7 @@ The span is sampled from the source image using UV texture coordinates.
 
 ### Usage
 ```python-raw
-image_name.blit_vspan(source, x, y, c, u0, v0, u1, v1)
+.blit_vspan(source, x, y, c, u0, v0, u1, v1)
 ```
 
 | Parameter | Type | Description |
@@ -665,8 +665,8 @@ The returned image shares its underlying data with the original image. All drawi
 
 ### Usage
 ```python-raw
-window_name = image_name.window(x, y, w, h)
-window_name = image_name.window(r)
+.window(x, y, w, h)
+.window(r)
 ```
 
 | Parameter | Type | Description |
