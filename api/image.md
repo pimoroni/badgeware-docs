@@ -15,8 +15,13 @@ A global image instance called `screen` represents the device framebuffer. All r
 Returns an `image` with the specified width and height.
 
 ### Usage
-- `image_name = image(w, h)`
-    - `w, h`: Width and height of the image to create.
+```python-raw
+image_name = image(w, h)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `w`, `h` | `int` | Width and height of the image to create |
 
 ### Returns
 `image`
@@ -25,8 +30,13 @@ Returns an `image` with the specified width and height.
 Loads an image from the specified file path and returns it as a new `image` object.
 
 ### Usage
-- `image_name = image.load(path)`
-    - `path`: Path to the image file to load
+```python-raw
+image_name = image.load(path)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `path` | `string` | Path to the image file to load |
 
 ### Returns
 An `image` object the dimensions of the file.
@@ -170,8 +180,13 @@ run(update)
 Returns the `color` of a single pixel.
 
 ### Usage
-- `image_name.get(x, y)`
-    - `x, y` — Pixel coordinate
+```python-raw
+image_name.get(x, y)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `x`, `y` | `int` | Pixel coordinate |
 
 ### Returns
 A `color` representing the pixel.
@@ -180,8 +195,13 @@ A `color` representing the pixel.
 Draws a single pixel using the current brush.
 
 ### Usage
-- `image_name.put(x, y)`
-    - `x, y` — Pixel coordinate
+```python-raw
+image_name.put(x, y)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `x`, `y` | `int` | Pixel coordinate |
 
 ### Returns
 `None`
@@ -209,11 +229,16 @@ run(update)
 Draws a filled rectangle using the current brush.
 
 ### Usage
-- `image_name.rectangle(x, y, w, h)`
-    - `x, y` — Coordinates of the top-left corner
-    - `w, h` — Width and height
-- `image_name.rectangle(rect)`
-    - `rect` - A `rect` object
+```python-raw
+image_name.rectangle(x, y, w, h)
+image_name.rectangle(rect)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `x`, `y` | `int` | Coordinates of the top-left corner |
+| `w`, `h` | `int` | Width and height |
+| `rect` | `rect` | A rectangle object |
 
 ### Returns
 `None`
@@ -238,12 +263,16 @@ run(update)
 Draws a filled circle using the current brush.
 
 ### Usage
-- `image_name.circle(point, radius)`
-  - `point` — A `vec2` object containing the centre point
-  - `radius` - Radius in pixels
-- `image_name.circle(x, y, radius)`
-  - `x, y` — Coordinates of the centre point
-  - `radius` - Radius in pixels
+```python-raw
+image_name.circle(x, y, radius)
+image_name.circle(point, radius)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `x`, `y` | `int` | Coordinates of the centre point |
+| `point` | `vec2` | Centre point |
+| `radius` | `int` | Radius in pixels |
 
 ### Returns
 `None`
@@ -269,11 +298,16 @@ Draws a straight line between two points.
 `line` can be called in two ways: by passing a start and end `vec2` or by specifying the positions as individual values.
 
 ### Usage
-- `image_name.line(start, end)`
-    - `start, end` — Start and end points (`vec2`) of the line
-- `image_name.line(x0, y0, x1, y1)`
-    - `x0, y0` — Start point of the line
-    - `x1, y1` — End point of the line
+```python-raw
+image_name.line(x0, y0, x1, y1)
+image_name.line(start, end)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `x0`, `y0` | `int` | Start point of the line |
+| `x1`, `y1` | `int` | End point of the line |
+| `start`, `end` | `vec2` | Start and end points of the line |
 
 ### Returns
 `None`
@@ -300,12 +334,17 @@ Draws a filled triangle defined by three vertices.
 `triangle` can be called in two ways: by passing three `vec2` values or by specifying the positions as individual values.
 
 ### Usage
-- `image_name.triangle(p0, p1, p2)`
-    - `p0, p1, p2` — Coordinates of the triangle vertices
-- `image_name.triangle(x0, y0, x1, y1, x2, y2)`
-    - `x0, y0` — First vertex of the triangle
-    - `x1, y1` — Second vertex of the triangle
-    - `x2, y2` — Third vertex of the triangle
+```python-raw
+image_name.triangle(x0, y0, x1, y1, x2, y2)
+image_name.triangle(p0, p1, p2)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `x0`, `y0` | `int` | First vertex of the triangle |
+| `x1`, `y1` | `int` | Second vertex of the triangle |
+| `x2`, `y2` | `int` | Third vertex of the triangle |
+| `p0`, `p1`, `p2` | `vec2` | Coordinates of the triangle vertices |
 
 ### Returns
 `None`
@@ -333,8 +372,13 @@ Draws a vector shape (see `shape`) to the image using the current brush and anti
 Vector shapes are created using one of the predefined helper methods on the shape type, or by constructing your own custom shapes manually. Unlike the raster drawing above, vector shapes can be dimensioned and positioned with subpixel accuracy at a slight speed cost.
 
 ### Usage
-- `image_name.shape(s)`
-    - `s`: The shape to draw
+```python-raw
+image_name.shape(s)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `s` | `shape` | The shape to draw |
 
 ### Returns
 `None`
@@ -370,14 +414,17 @@ Writes text to the image using the current font and brush at the specified posit
 The `text()` method can be called in two forms: by passing a `vec2` that defines the position, or by specifying the position as individual `x` and `y` values.
 
 ### Usage
-- `image_name.text(message, p, size)`
-    - `message`: The text to write
-    - `p`: Position of the top-left corner of the text as a `vec2`
-    - `size` (Optional) - the size of the text for vector fonts. Using this parameter with pixel fonts will cause an error.
-- `image_name.text(message, x, y, size)`
-    - `message`: The text to write
-    - `x, y`: Position of the top-left corner of the text
-    - `size` (Optional) - the size of the text for vector fonts. Using this parameter with pixel fonts will cause an error.
+```python-raw
+image_name.text(message, x, y, size)
+image_name.text(message, p, size)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `message` | `string` | The text to write |
+| `x`, `y` | `int` | Position of the top-left corner of the text |
+| `p` | `vec2` | Position of the top-left corner of the text |
+| `size` | `int` | *Optional.* The size of the text for vector fonts. Using this parameter with pixel fonts will cause an error. |
 
 ### Returns
 `None`
@@ -397,9 +444,14 @@ run(update)
 Returns a tuple containing the width and height of the given text, when rendered using the current font.
 
 ### Usage
-- `image_name.measure_text(message, size)`
-    - `message`: The text to measure
-    - `size` (Optional): The font size, if the current font is a vector font.
+```python-raw
+image_name.measure_text(message, size)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `message` | `string` | The text to measure |
+| `size` | `int` | *Optional.* The font size, if the current font is a vector font |
 
 ### Returns
 A `tuple` containing x and y dimensions in pixels
@@ -426,8 +478,13 @@ Filters are applied to an entire image's clipping area.
 Blurs the contents of the image.
 
 ### Usage
-- `image_name.blur(radius)`
-    - `radius`: The radius of the blur filter (higher = stronger)
+```python-raw
+image_name.blur(radius)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `radius` | `int` | The radius of the blur filter (higher = stronger) |
 
 ### Returns
 `None`
@@ -504,19 +561,21 @@ Depending on the parameters provided, `blit` can:
 - or crop from a source rectangle and scale into a destination rectangle
 
 ### Usage
-- `image_name.blit(source, x, y)`
-    - `source`: The source `image` to blit
-    - `x, y`: Coordinates of the top-left corner of the destination
-- `image_name.blit(source, p)`
-    - `source`: The source `image` to blit
-    - `p`: `vec2` containing the coordinates of the top-left corner of the destination
-- `image_name.blit(source, rect)`
-    - `source`: The source `image` to blit
-    - `rect`: Destination rectangle to blit into - the source image is scaled to fit rect
-- `image_name.blit(source, source_rect, dest_rect)`
-    - `source`: The source `image` to blit
-    - `source_rect`: Source rectangle to blit from (crop region)
-    - `dest_rect`: Destination rectangle to blit into - if dest_rect is a different size to source_rect, the blit is scaled
+```python-raw
+image_name.blit(source, x, y)
+image_name.blit(source, p)
+image_name.blit(source, rect)
+image_name.blit(source, source_rect, dest_rect)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `source` | `image` | The source image to blit |
+| `x`, `y` | `int` | Coordinates of the top-left corner of the destination |
+| `p` | `vec2` | Coordinates of the top-left corner of the destination |
+| `rect` | `rect` | Destination rectangle to blit into — the source image is scaled to fit |
+| `source_rect` | `rect` | Source rectangle to blit from (crop region) |
+| `dest_rect` | `rect` | Destination rectangle to blit into — if a different size to `source_rect`, the blit is scaled |
 
 > Note: If the width and height of the destination rectangle are negative then the blit will flip vertically and/or horizontally!
 
@@ -546,12 +605,17 @@ Blit (copy) a vertical span from source into this image. This is a low-level hel
 The span is sampled from the source image using UV texture coordinates.
 
 ### Usage
-- `image_name.blit_vspan(source, x, y, c, u0, v0, u1, v1)`
-    - `source`: The source `image` to blit
-    - `x, y`: Coordinates of the top-left corner of the destination
-    - `c`: The length of the span (number of pixels) to draw
-    - `u0`, `v0`: The start UV coordinate for sampling.
-    - `u1`, `v1`: The end UV coordinate for sampling.
+```python-raw
+image_name.blit_vspan(source, x, y, c, u0, v0, u1, v1)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `source` | `image` | The source image to blit |
+| `x`, `y` | `int` | Coordinates of the top-left corner of the destination |
+| `c` | `int` | The length of the span (number of pixels) to draw |
+| `u0`, `v0` | `float` | The start UV coordinate for sampling |
+| `u1`, `v1` | `float` | The end UV coordinate for sampling |
 
 UV coordinates are expressed in the range 0..1 across the width/height of the source image.
 
@@ -600,11 +664,16 @@ Returns an `image` which is a view onto a rectangular subsection of the image.
 The returned image shares its underlying data with the original image. All drawing operations performed on the window are clipped to the specified area, and the window’s origin `(0, 0)` is relative to its top-left corner, not the original image.
 
 ### Usage
-- `window_name = image_name.window(r)`
-    - `r` — A `rect` defining the position and size of the window
-- `window_name = image.window(x, y, w, h)`
-    - `x, y` — Coordinates of the top-left corner
-    - `w, h` — Width and height of the window
+```python-raw
+window_name = image_name.window(x, y, w, h)
+window_name = image_name.window(r)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `x`, `y` | `int` | Coordinates of the top-left corner |
+| `w`, `h` | `int` | Width and height of the window |
+| `r` | `rect` | A rectangle defining the position and size of the window |
 
 ### Returns
 An `image` object representing the contents of the window.
