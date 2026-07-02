@@ -107,9 +107,6 @@ Draws a single pixel using the current brush.
 |---|---|---|
 | `x`, `y` | `int` | Pixel coordinate |
 
-### Returns
-`None`
-
 ```python
 import random
 
@@ -143,9 +140,6 @@ Draws a filled rectangle using the current brush.
 | `w`, `h` | `int` | Width and height |
 | `rect` | `rect` | A rectangle object |
 
-### Returns
-`None`
-
 ```python
 def update():
   # using full coordinates
@@ -174,9 +168,6 @@ Draws a filled circle using the current brush.
 | `x`, `y` | `int` | Coordinates of the centre point |
 | `point` | `vec2` | Centre point |
 | `radius` | `int` | Radius in pixels |
-
-### Returns
-`None`
 
 ```python
 def update():
@@ -208,9 +199,6 @@ Draws a straight line between two points.
 | `x0`, `y0` | `int` | Start point of the line |
 | `x1`, `y1` | `int` | End point of the line |
 | `start`, `end` | `vec2` | Start and end points of the line |
-
-### Returns
-`None`
 
 ```python
 def update():
@@ -245,9 +233,6 @@ Draws a filled triangle defined by three vertices.
 | `x2`, `y2` | `int` | Third vertex of the triangle |
 | `p0`, `p1`, `p2` | `vec2` | Coordinates of the triangle vertices |
 
-### Returns
-`None`
-
 ```python
 def update():
   # using full coordinates
@@ -280,9 +265,6 @@ Draws a vector shape (see `shape`) to the image using the current brush and anti
 | Parameter | Type | Description |
 |---|---|---|
 | `s` | `shape` | The shape to draw |
-
-### Returns
-`None`
 
 ```python
 def update():
@@ -347,9 +329,6 @@ The `text()` method can be called in two forms: by passing a `vec2` that defines
 | `p` | `vec2` | Position of the top-left corner of the text |
 | `size` | `int` | *Optional.* The size of the text for vector fonts. Using this parameter with pixel fonts will cause an error. |
 
-### Returns
-`None`
-
 ```python
 def update():
   screen.pen = color.yellow
@@ -404,9 +383,6 @@ Blurs the contents of the image.
 | Parameter | Type | Description |
 |---|---|---|
 | `radius` | `int` | The radius of the blur filter (higher = stronger) |
-
-### Returns
-`None`
 
 ```python
 import math
@@ -494,9 +470,6 @@ Depending on the parameters provided, `blit` can:
 
 > Note: If the width and height of the destination rectangle are negative then the blit will flip vertically and/or horizontally!
 
-### Returns
-`None`
-
 ```python
 sprite = image.load("/system/assets/skull.png")
 
@@ -541,9 +514,6 @@ For example:
 
 UV coordinates may fall outside the 0..1 range. If they do, the source texture will wrap around automatically, making this useful for tiled textures or repeating patterns.
 
-### Returns
-`None`
-
 ```python
 import math
 
@@ -565,9 +535,22 @@ run(update)
 ```
 
 ## blit_hspan()
-Functionally identical to `blit_vspan()`, but renders a horizontal span of pixels instead of a vertical one.
+Functionally identical to `blit_vspan()`, but renders a horizontal span (one row at a time) instead of a vertical one. Like `blit_vspan()`, it's a low-level helper for scaled or warped texture rendering, sampling the source image using UV texture coordinates.
 
-See `blit_vspan()` above for full parameter and coordinate details.
+### Usage
+```python-raw
+.blit_hspan(source, x, y, c, u0, v0, u1, v1)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `source` | `image` | The source image to blit |
+| `x`, `y` | `int` | Coordinates of the top-left corner of the destination |
+| `c` | `int` | The length of the span (number of pixels) to draw |
+| `u0`, `v0` | `float` | The start UV coordinate for sampling |
+| `u1`, `v1` | `float` | The end UV coordinate for sampling |
+
+See `blit_vspan()` above for full details on UV coordinates and texture wrapping.
 
 # Other
 
