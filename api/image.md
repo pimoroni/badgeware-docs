@@ -64,29 +64,9 @@ run(update)
 | `font` | `pixel_font` \| `vector_font` | Font used for drawing text |
 
 # Drawing
-The drawing API provides a collection of fast, low-level primitives for rendering simple shapes directly into an image’s pixel buffer. These methods are designed for speed and simplicity, making them suitable for real-time graphics, UI elements, and procedural drawing. These methods round position and dimension values to the nearest pixel for speed.
+The drawing API provides a collection of fast, low-level primitives for rendering simple shapes directly into an image’s pixel buffer. These methods are designed for speed and simplicity, making them suitable for real-time graphics, UI elements, and procedural drawing. They round position and dimension values to the nearest pixel for speed, and are not antialiased.
 
-You can also render vector shapes using the `shape()` method. Vector shapes support sub-pixel positioning. Vector drawing supports antialiasing, controlled by the current antialiasing setting, and uses the currently selected brush for stroke and fill operations unless otherwise stated.
-
-All drawing operations use the currently selected brush/colour unless otherwise stated.
-
-The `antialias` property sets the antialiasing level for vector drawing — compare `image.OFF`, `image.X2`, and `image.X4`:
-
-```python
-def update():
-  screen.pen = color.red
-
-  screen.antialias = image.OFF
-  screen.shape(shape.circle(30, 60, 20))
-
-  screen.antialias = image.X2
-  screen.shape(shape.circle(80, 60, 20))
-
-  screen.antialias = image.X4
-  screen.shape(shape.circle(130, 60, 20))
-
-run(update)
-```
+All drawing operations use the currently selected brush/colour unless otherwise stated. For smooth shapes with sub-pixel positioning and antialiasing, see [Vector drawing](#vector-drawing) below.
 
 ## clear()
 Fills the entire image or drawing surface with the current brush.
@@ -293,10 +273,13 @@ def update():
 run(update)
 ```
 
+# Vector drawing
+Unlike the raster primitives above, vector shapes can be positioned and dimensioned with sub-pixel accuracy and are antialiased, at a slight speed cost. A shape is created with one of the helper methods on the `shape` type (or built manually), then rendered with `shape()`.
+
+Vector drawing uses the currently selected brush for both stroke and fill unless otherwise stated.
+
 ## shape()
 Draws a vector shape (see `shape`) to the image using the current brush and antialiasing settings.
-
-Vector shapes are created using one of the predefined helper methods on the shape type, or by constructing your own custom shapes manually. Unlike the raster drawing above, vector shapes can be dimensioned and positioned with subpixel accuracy at a slight speed cost.
 
 ### Usage
 ```python-raw
@@ -326,6 +309,25 @@ def update():
   screen.pen = color.red
   arc = shape.arc(80, 70, 30, 40, 130, 260)
   screen.shape(arc)
+
+run(update)
+```
+
+## Antialiasing
+The `antialias` property sets the antialiasing level applied to vector drawing — compare `image.OFF`, `image.X2`, and `image.X4`:
+
+```python
+def update():
+  screen.pen = color.red
+
+  screen.antialias = image.OFF
+  screen.shape(shape.circle(30, 60, 20))
+
+  screen.antialias = image.X2
+  screen.shape(shape.circle(80, 60, 20))
+
+  screen.antialias = image.X4
+  screen.shape(shape.circle(130, 60, 20))
 
 run(update)
 ```
