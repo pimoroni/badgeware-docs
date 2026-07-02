@@ -156,7 +156,7 @@ The patterns built in to Badgeware, selectable by index with `brush.pattern()`.
     background-repeat: repeat; image-rendering: pixelated;
     opacity: 0; transition: opacity 0.5s ease;
   }
-  #pattern-page-bg.active { opacity: 0.12; }
+  #pattern-page-bg.active { opacity: 0.03; }
   .pattern-grid figure { cursor: pointer; }
 </style>
 <script>
