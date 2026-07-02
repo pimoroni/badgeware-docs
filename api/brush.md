@@ -11,14 +11,18 @@ Brushes are a powerful tool when drawing vector shapes on Badgeware. Instead of 
 One use of brushes is to fill a shape with an image rather than with a flat colour. The image should be loaded in as a variable as usual, then passed into `brush.image()`. You can also pass in a transformation matrix as a `mat3` to determine the size, translation and rotation of the image. This image will tile infinitely if its size is smaller than the shape it is filling.
 
 ### Usage
-- `brush.image(image, matrix)`
-    - `image` - the image to use as the brush.
-    - `matrix` - a `mat3` representing the transformation of the image.
+```python-raw
+brush.image(image, matrix)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `image` | `image` | The image to use as the brush |
+| `matrix` | `mat3` | A transformation matrix representing the size, translation and rotation of the image |
 
 ### Returns
-A `brush` representing the brush, which then can be used to set an `image`'s pen.
+A `brush` which can then be used to set an `image`'s pen.
 
-### Example
 ```python
 import math
 
@@ -38,14 +42,18 @@ run(update)
 A pattern brush works similarly to an image brush, but instead of a picture a pattern of lit pixels is used. You can pass in the foreground and background colours of the pattern. Patterns can either be picked from the built in range in Badgeware, or you can specify a custom pattern by inputting it yourself as a tuple. These patterns remain static and are pixel scaled, so they cannot have a transformation matrix applied to them like an image brush can.
 
 ### Usage
-- `brush.pattern(col1, col2, pattern)`
-    - `col1, col2` - the foreground and background `color`s of the pattern.
-    - `pattern` - the pattern itself. Note that this can be an integer representing one of the built-in patterns, or a tuple of binary numbers representing a custom pattern.
+```python-raw
+brush.pattern(col1, col2, pattern)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `col1`, `col2` | `color` | The foreground and background colours of the pattern |
+| `pattern` | `int` \| `tuple` | The pattern itself — either an integer selecting one of the built-in patterns, or a tuple of binary numbers representing a custom pattern |
 
 ### Returns
-A `brush` representing the brush, which then can be used to set an `image`'s pen.
+A `brush` which can then be used to set an `image`'s pen.
 
-### Example
 ```python
 import math
 

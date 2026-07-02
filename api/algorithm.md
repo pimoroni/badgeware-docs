@@ -18,13 +18,16 @@ By comparing these crossing distances, it determines which neighbouring cell the
 
 Returns a list of tuples, each representing where the ray crosses a grid-cell edge.
 
-### Parameters
+### Usage
+```python-raw
+algorithm.dda(point, angle, depth)
+```
 
-`dda(point, angle, depth)`
-
-- `point` (vec2): Starting point of the ray (in grid coordinates).
-- `angle`: Ray angle in radians.
-- `depth`: Maximum distance along the ray to traverse.
+| Parameter | Type | Description |
+|---|---|---|
+| `point` | `vec2` | Starting point of the ray (in grid coordinates) |
+| `angle` | `float` | Ray angle in radians |
+| `depth` | `float` | Maximum distance along the ray to traverse |
 
 ### Returns
 
@@ -34,8 +37,6 @@ A list of 5-element tuples containing:
 -	`int`: Which edge was crossed (0 = Top, 1 = Right, 2 = Bottom, 3 = Left).
 -	`float`: The offset along the crossed edge where the intersection occurred.
 -	`float`: The distance along the ray where the intersection occurred.
-
-### Example
 
 Here's an example that casts a short ray and prints all of the intersections:
 

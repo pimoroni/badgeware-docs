@@ -15,24 +15,41 @@ The following methods operate on matrices and return new matrices with the reque
 ## mat3()
 Creates a new identity matrix.
 
+### Usage
+```python-raw
+mat3()
+```
+
+### Returns
+A `mat3` identity matrix.
+
 ## translate()
 Returns a new matrix with a translation applied to the current matrix.
 
 ### Usage
-- `matrix_name.translate(x, y)`
-    - `x, y`: Amount to translate by.
+```python-raw
+.translate(x, y)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `x`, `y` | `int` \| `float` | Amount to translate by |
 
 ### Returns
 A `mat3` representing the translated matrix.
 
-## rotate()
-Returns a new matrix with a rotation applied to the current matrix. The rotation angle is specified in degrees. To work in radians, use `rotate_radians` instead.
+## rotate() / rotate_radians()
+Returns a new matrix with a rotation applied to the current matrix. The angle is specified in degrees for `rotate()`; to work in radians, use `rotate_radians()`.
 
 ### Usage
-- `matrix_name.rotate(angle)`
-    - `angle`: Rotation angle in degrees
-- `matrix_name.rotate_radians(angle)`
-    - `angle`: Rotation angle in radians
+```python-raw
+.rotate(angle)
+.rotate_radians(angle)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `angle` | `int` \| `float` | Rotation angle, in degrees for `rotate()` or radians for `rotate_radians()` |
 
 ### Returns
 A `mat3` representing the rotated matrix.
@@ -41,8 +58,13 @@ A `mat3` representing the rotated matrix.
 Returns a new matrix with a scale applied to the current matrix.
 
 ### Usage
-- `matrix_name.scale(x, y)`
-    - `x, y`: Scale factors for the x and y axes
+```python-raw
+.scale(x, y)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `x`, `y` | `int` \| `float` | Scale factors for the x and y axes |
 
 ### Returns
 A `mat3` representing the scaled matrix.
@@ -51,8 +73,13 @@ A `mat3` representing the scaled matrix.
 Returns a new matrix with another matrix multiplied with the current matrix.
 
 ### Usage
-- `matrix_name.multiply(m)`
-    - `m`: The matrix to multiply with
+```python-raw
+.multiply(m)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `m` | `mat3` | The matrix to multiply with |
 
 ### Returns
 A `mat3` representing the multiplied matrices.
@@ -60,19 +87,10 @@ A `mat3` representing the multiplied matrices.
 ## inverse()
 Returns a new matrix that is the inverse of the current matrix. If the matrix is not invertible, the result is undefined.
 
-# Reference
-
-## Constructor
+### Usage
 ```python-raw
-mat3() -> mat3
+.inverse()
 ```
 
-## Methods
-```python-raw
-mat3.inverse() -> mat3
-mat3.multiply(m: mat3) -> mat3
-mat3.rotate(angle: int|float) -> mat3
-mat3.rotate_radians(angle: int|float) -> mat3
-mat3.scale(x: int|float, y: int|float) -> mat3
-mat3.translate(x: int|float, y: int|float) -> mat3
-```
+### Returns
+A `mat3` that is the inverse of the current matrix.

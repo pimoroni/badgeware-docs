@@ -12,7 +12,19 @@ Text is drawn using the currently selected brush, allowing for alpha blending an
 
 # Loading vector fonts
 ## load()
-Font files can be loaded into variables. This is accomplished with `font.load(path)`, where `path` is the full path of the font file.
+Loads a vector font from the specified file path and returns it for use when rendering text.
+
+### Usage
+```python-raw
+font.load(path)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `path` | `string` | Full path of the font file to load |
+
+### Returns
+A `vector_font` object.
 
 # Finding vector fonts
 Vector fonts are stored in the Alright Font (.af) format. This converts the complex structure of .ttf and .otf fonts into simpler glyphs that can be stored in less space. There are three .af fonts preloaded on the badge, but you can find more, and make your own, at [the Alright Fonts GitHub repository](https://github.com/lowfatcode/alright-fonts).

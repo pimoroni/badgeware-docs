@@ -10,20 +10,13 @@ The `badge` class offers access to the badge's hardware. Using this class you ca
 
 # Properties
 
-## ticks
-The number of ticks (milliseconds) since the badge was powered on when `update()` was called.
-
-## ticks_delta
-The number of ticks (milliseconds) since the previous time `update()` was called. Useful for timing animations where the framerate isn't completely stable.
-
-## uid
-Provides a unique ID for the badge.
-
-## resolution
-The display resolution of the badge as a tuple containing pixel width and height as ints.
-
-## update
-Allows you to set and switch between custom methods for the badge to replace `update()`. This allows you to, for example, easily flip between multiple screens, using a different method to draw each one.
+| Property | Type | Description |
+|---|---|---|
+| `ticks` | `int` | The number of ticks (milliseconds) since the badge was powered on when `update()` was called |
+| `ticks_delta` | `int` | The number of ticks (milliseconds) since the previous time `update()` was called. Useful for timing animations where the framerate isn't completely stable |
+| `uid` | `hex` | A unique ID for the badge |
+| `resolution` | `tuple` | The display resolution of the badge as a tuple containing pixel width and height as ints |
+| `update` | `function` | Allows you to set and switch between custom methods for the badge to replace `update()`. This allows you to, for example, easily flip between multiple screens, using a different method to draw each one |
 
 # Buttons
 There are two main ways to handle button input.
@@ -46,9 +39,14 @@ Buttons are addressed one by one using the following constants:
 Returns a list of buttons pressed during the current frame - that is, buttons that switched from not pressed last frame to pressed this frame - or tests a single button.
 
 ### Usage
-- `.pressed()` - Returns a list of pressed buttons.
-- `.pressed(button)` - Returns a boolean representing the pressed status of the button
-        - `button` - Button constant.
+```python-raw
+.pressed()
+.pressed(button)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `button` | `input` | Button constant |
 
 ### Returns
 A list of button constants if no parameter was specified, otherwise a boolean.
@@ -57,9 +55,14 @@ A list of button constants if no parameter was specified, otherwise a boolean.
 Returns a list of buttons released during the current frame - that is, buttons that switched from pressed last frame to not pressed this frame - or tests a single button.
 
 ### Usage
-- `.released()` - Returns a list of released buttons.
-- `.released(button)` - Returns a boolean representing the released status of the button
-        - `button` - Button constant.
+```python-raw
+.released()
+.released(button)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `button` | `input` | Button constant |
 
 ### Returns
 A list of button constants if no parameter was specified, otherwise a boolean.
@@ -68,9 +71,14 @@ A list of button constants if no parameter was specified, otherwise a boolean.
 Returns a list of all buttons that are currently held down, or tests a single button.
 
 ### Usage
-- `.held()` - Returns a list of held buttons.
-- `.held(button)` - Returns a boolean representing the held status of the button
-        - `button` - Button constant.
+```python-raw
+.held()
+.held(button)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `button` | `input` | Button constant |
 
 ### Returns
 A list of button constants if no parameter was specified, otherwise a boolean.
@@ -79,14 +87,18 @@ A list of button constants if no parameter was specified, otherwise a boolean.
 Returns a list of all buttons whose state changed between the last frame and the current frame, or tests a single button.
 
 ### Usage
-- `.changed()` - Returns a list of changed buttons.
-- `.changed(button)` - Returns a boolean representing the changed status of the button
-        - `button` - Button constant.
+```python-raw
+.changed()
+.changed(button)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `button` | `input` | Button constant |
 
 ### Returns
 A list of button constants if no parameter was specified, otherwise a boolean.
 
-### Example
 > Note: Click on the emulator to allow it to capture input. Use the arrow keys and space on your keyboard to try the example out.
 
 ```python
@@ -125,26 +137,14 @@ The functions in this section are for use if you're 'rolling your own' software 
 ## screen.update()
 This method is on the `screen` image rather than in `badge`, but is listed here for completeness. This will take the current contents of the `screen` image, and update the physical display. Used if you are creating your own program loop without using the `update()` ecosystem and instead creating your own program loop - if you're working within the Badgeware menu system, `screen.update()` is called automatically every update and you don't need to use this.
 
-### Returns
-None
-
 ## clear()
 This resets the framebuffer, clearing the `screen` image to the colour specified by `badge.default_clear()` and setting `screen.pen` to the colour specified in `badge.default_pen()`. If the former is set to `None` the screen will not be cleared.
-
-### Returns
-None
 
 ## poll()
 If you are creating your own program without the use of the Badgeware menu and app system, you will need to poll the badge using this method to get updated status on the buttons and other features. If you're working within the Badgeware menu system, `badge.poll()` is called automatically every update and you don't need to use this.
 
-### Returns
-None
-
 ## update()
 This is a convenient method which simply runs `screen.update()`, `badge.clear()` and `badge.poll()` together.
-
-### Returns
-None
 
 # Battery status
 Badgeware includes several methods to allow you to monitor the battery.
@@ -173,27 +173,38 @@ The default colour that `screen.pen` will be set to at the start of every `updat
 Changes the display mode of the badge. You can apply more than one mode at once, where applicable, by using the pipe symbol, e.g. `badge.mode(HIRES | VSYNC)`.
 
 ### Usage
-- `.mode(modes)`
-    - `LORES` (Tufty only) - puts the badge into 160x120 low resolution mode.
-    - `HIRES` (Tufty only) - puts the badge into 320x240 high resolution mode.
-    - `VSYNC` (Tufty only) - enables vertical sync, preventing screen tearing.
-    - `FAST_UPDATE` (Badger only) - sets the badge to update quickly at the cost of slight ghosting
-    - `FULL_UPDATE` (Badger only) - sets the badge to update fully each time at the cost of speed.
-    - `MEDIUM_UPDATE` (Badger only) - a middle ground between the above two.
-    - `DITHER` - applies an ordered dither to the framebuffer before writing to the screen, equivalent to running [dither()](/api/image.md#dither) after every update. Available on all models, but most useful for Badger.
+```python-raw
+.mode(modes)
+```
 
-### Returns
-`None`
+| Parameter | Type | Description |
+|---|---|---|
+| `modes` | `binary` | One or more display mode constants, combined with the pipe symbol |
+
+The available modes are:
+- `LORES` (Tufty only) - puts the badge into 160x120 low resolution mode.
+- `HIRES` (Tufty only) - puts the badge into 320x240 high resolution mode.
+- `VSYNC` (Tufty only) - enables vertical sync, preventing screen tearing.
+- `FAST_UPDATE` (Badger only) - sets the badge to update quickly at the cost of slight ghosting
+- `FULL_UPDATE` (Badger only) - sets the badge to update fully each time at the cost of speed.
+- `MEDIUM_UPDATE` (Badger only) - a middle ground between the above two.
+- `DITHER` - applies an ordered dither to the framebuffer before writing to the screen, equivalent to running [dither()](/api/image.md#dither) after every update. Available on all models, but most useful for Badger.
 
 # Memory
 These methods monitor the badge's flash space and RAM, so you can check how full your Badge is with software and assets.
 
 ## disk_free()
+Returns a tuple containing total flash size, used flash and free flash in bytes.
+
 ### Usage
-- `.disk_free()`
-    - Returns a tuple containing total flash size, used flash and free flash in bytes.
-- `.disk_free(mountpoint)`
-    - Returns as above, but for the specified mountpoint.
+```python-raw
+.disk_free()
+.disk_free(mountpoint)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `mountpoint` | `string` | *Optional.* The mountpoint to report on |
 
 ### Returns
 A tuple containing three ints.
@@ -210,11 +221,16 @@ Badgeware is fitted with four onboard white LEDs on the back of the board. These
 Gets and sets the brightness value for the rear lighting on the badge.
 
 ### Usage
-- `.caselights()` - Returns the current level of the rear LEDs as a tuple.
-- `.caselights(level)`
-        - `level` - Brightness to set on all rear LEDs (0-1)
-- `.caselights(level1, level2, level3, level4)`
-        - `level1`, `level2`, `level3`, `level4` - Brightness to set for each rear LED individually (0-1)
+```python-raw
+.caselights()
+.caselights(level)
+.caselights(level1, level2, level3, level4)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `level` | `float` | Brightness to set on all rear LEDs (0-1) |
+| `level1`, `level2`, `level3`, `level4` | `float` | Brightness to set for each rear LED individually (0-1) |
 
 ### Returns
 `None`, or a tuple if no parameter specified.
@@ -229,67 +245,17 @@ Badgeware has the ability to go into a very low power mode, conserving battery p
 Forces the badge into sleep mode. This will lose data contained in RAM, and will act as a reset on wakeup, restarting main.py and, on the default firmware, returning the user to the menu.
 
 ### Usage
-- `.sleep()`
-    - Puts the badge into sleep mode indefinitely.
-- `.sleep(duration)`
-    - Puts the badge into sleep mode, to awaken after `duration` seconds.
+```python-raw
+.sleep()
+.sleep(duration)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `duration` | `int` | *Optional.* Number of seconds to sleep for. If omitted, sleeps indefinitely |
 
 ## woken_by_button()
 Returns True if the badge was woken up by a button being pressed, False otherwise.
 
 ## woken_by_reset()
 Returns True if the badge was woken by being reset, False otherwise.
-
-# Reference
-
-## Constants
-```python-raw
-BUTTON_A: input
-BUTTON_B: input
-BUTTON_C: input
-BUTTON_UP: input
-BUTTON_DOWN: input
-BUTTON_HOME: input
-LORES: binary
-HIRES: binary
-VSYNC: binary
-FAST_UPDATE: binary
-FULL_UPDATE: binary
-MEDIUM_UPDATE: binary
-DITHER: binary
-```
-
-## Properties
-```python-raw
-badge.default_clear: color | None
-badge.default_pen: color
-badge.resolution: tuple
-badge.ticks: int
-badge.ticks_delta: int
-badge.uid: hex
-badge.update: function
-```
-
-## Methods
-```python-raw
-badge.battery_level() -> int
-badge.battery_voltage() -> float
-badge.changed() -> tuple
-badge.changed(button: input) -> bool
-badge.caselights([light1: float, light2: float, light3: float, light4: float]) -> None | tuple
-badge.disk_free(mountpoint: string="/") -> int
-badge.held() -> tuple
-badge.held(button: input) -> bool
-badge.is_charging() -> bool
-badge.light_level() -> int
-badge.mode(modes: binary) -> None
-badge.poll() -> None
-badge.pressed() -> tuple
-badge.pressed(button: input) -> bool
-badge.released() -> tuple
-badge.released(button: input) -> bool
-badge.sleep(duration: int=None) -> None
-badge.usb_connected() -> bool
-badge.woken_by_button() -> bool
-badge.woken_by_reset() -> bool
-```

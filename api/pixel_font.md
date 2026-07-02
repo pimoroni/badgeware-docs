@@ -14,18 +14,29 @@ Badgeware includes over thirty high-quality, licensed pixel fonts created by [so
 
 # Properties
 
-## height
-The height, in pixels, of the font's glyph bounding box.
-
-## name
-The name of the pixel font.
+| Property | Type | Description |
+|---|---|---|
+| `height` | `int` | Height in pixels of the font's glyph bounding box (read-only) |
+| `name` | `string` | The name of the pixel font (read-only) |
 
 # Methods
 ## ROM fonts
 There are many pixel fonts preloaded onto your badge. These can be used with `rom_font` along with the name of the font.
 
 ## load()
-If not using a ROM font, individual font files can be loaded into variables. This is accomplished with `pixel_font.load(path)`, where `path` is the full path of the font file.
+If not using a ROM font, individual font files can be loaded into variables using `pixel_font.load(path)`, which returns the font as a new `pixel_font` object.
+
+### Usage
+```python-raw
+pixel_font.load(path)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `path` | `string` | Full path of the font file to load |
+
+### Returns
+A `pixel_font` object.
 
 # Font gallery
 Text wouldn’t be nearly as engaging without a great selection of fonts. When we came across [Ivano's](https://somepx.itch.io) extensive collection of pixel fonts, we knew they were a perfect match for Badgeware.

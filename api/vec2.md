@@ -12,20 +12,26 @@ Although x and y are stored as floating-point values, they represent pixel coord
 # Constructor
 
 ## vec2()
+Returns a `vec2` containing the specified coordinates.
+
 ### Usage
-- `point_name = vec2(x, y)`
-        - `x, y` - The pixel coordinates.
+```python-raw
+vec2(x, y)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `x`, `y` | `float` | The pixel coordinates |
 
 ### Returns
 A `vec2` containing the specified coordinates.
 
 # Properties
 
-## x
-The x coordinate measured in pixels.
-
-## y
-The y coordinate measured in pixels.
+| Property | Type | Description |
+|---|---|---|
+| `x` | `float` | The x coordinate measured in pixels |
+| `y` | `float` | The y coordinate measured in pixels |
 
 # Methods
 
@@ -33,23 +39,13 @@ The y coordinate measured in pixels.
 Returns a new `vec2` with the specified matrix transformation applied.
 
 ### Usage
-- `point_name.transform(m)`
-    - `m`: A transformation matrix
-
-# Reference
-
-## Constructor
 ```python-raw
-vec2(x: int|float, y: int|float) -> vec2
+.transform(m)
 ```
 
-## Properties
-```python-raw
-vec2.x -> float
-vec2.y -> float
-```
+| Parameter | Type | Description |
+|---|---|---|
+| `m` | `mat3` | A transformation matrix |
 
-## Methods
-```python-raw
-vec2.transform(m: mat3) -> vec2
-```
+### Returns
+A new `vec2` with the transformation applied.

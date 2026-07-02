@@ -13,24 +13,29 @@ Regardless of how a colour is constructed, it is stored internally as a premulti
 
 # Properties
 
-## p
-The premultiplied RGBA color as a 32 bit unsigned integer.
+| Property | Type | Description |
+|---|---|---|
+| `p` | `int` | The premultiplied RGBA colour as a 32-bit unsigned integer |
 
 # Static Methods
 The following static methods create new `color` objects from different colour representations.
 
-## rgb
+## rgb()
 Creates a new `color` object from red, green, blue, and optional alpha values.
 
 ### Usage
-- `rgb(r, g, b[, a])`
-    - `r, g, b`: Colour component values from 0 to 255
-    - `a`: Optional alpha value from 0 to 255
+```python-raw
+color.rgb(r, g, b, a)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `r`, `g`, `b` | `int` | Colour component values, 0–255 |
+| `a` | `int` | *Optional.* Alpha value, 0–255 |
 
 ### Returns
-`color`
+A new `color`.
 
-### Example
 ```python
 def update():
   # draw a gradient from cyan to magenta
@@ -42,22 +47,26 @@ def update():
 run(update)
 ```
 
-## hsv
+## hsv()
 Creates a new `color` object from hue, saturation, value, and optional alpha values.
 
 HSV is not perceptually uniform, so equal changes in its values do not correspond to equal perceived colour changes. This can lead to uneven gradients and unintuitive results when adjusting saturation or brightness.
 
 ### Usage
-- `hsv(h, s, v[, a])`
-    - `h`: Hue from 0 to 255
-    - `s`: Saturation from 0 to 255
-    - `v`: Value (brightness) from 0 to 255
-    - `a`: Optional alpha value from 0 to 255
+```python-raw
+color.hsv(h, s, v, a)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `h` | `int` | Hue, 0–255 |
+| `s` | `int` | Saturation, 0–255 |
+| `v` | `int` | Value (brightness), 0–255 |
+| `a` | `int` | *Optional.* Alpha value, 0–255 |
 
 ### Returns
-`color`
+A new `color`.
 
-### Example
 ```python
 def update():
   # draw a hue gradient
@@ -71,22 +80,26 @@ def update():
 run(update)
 ```
 
-## oklch
+## oklch()
 Creates a new `color` object from OKLCH parameters and an optional alpha value.
 
 OKLCH is a perceptually uniform colour space, meaning equal changes in its values produce more consistent visual changes. This makes it better suited for colour adjustment and interpolation than HSV, which can produce uneven or unexpected results.
 
 ### Usage
-- `oklch(l, c, h[, a])`
-    - `l`: Lightness from 0 to 255
-    - `c`: Chroma (saturation) from 0 to 255
-    - `h`: Hue from 0 to 255
-    - `a`: Optional alpha value from 0 to 255
+```python-raw
+color.oklch(l, c, h, a)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `l` | `int` | Lightness, 0–255 |
+| `c` | `int` | Chroma (saturation), 0–255 |
+| `h` | `int` | Hue, 0–255 |
+| `a` | `int` | *Optional.* Alpha value, 0–255 |
 
 ### Returns
-`color`
+A new `color`.
 
-### Example
 ```python
 def update():
   for x in range(0, 160):

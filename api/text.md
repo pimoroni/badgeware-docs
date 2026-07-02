@@ -14,18 +14,19 @@ In its simplest form, text can be drawn to the screen at a specific location and
 This method will write text into a specified area, wrapping onto new lines if it reaches the boundary of that area. It will accept the output of `tokenise()` as its text, meaning that inline code can be executed using glyph renderers as described below.
 
 ### Usage
-- `text.draw(image, text, bounds, line_spacing, word_spacing, size)`
-	- `image` - The `image` to draw the text onto.
-    - `text` - The text to draw. This can be the output of `tokenise()`, or a simple string.
-    - `bounds` (Optional) - A `rect` describing the area in which the text is to be drawn. Defaults to None.
-    - `line_spacing` (Optional) - The spacing between lines. Defaults to 1.
-    - `word_spacing` (Optional) - The spacing between words. Defaults to 1.
-    - `size` (Optional) - The height to render the text when using a vector font. Defaults to 24px.
+```python-raw
+text.draw(image, text, bounds, line_spacing, word_spacing, size)
+```
 
-### Returns
-`None`.
+| Parameter | Type | Description |
+|---|---|---|
+| `image` | `image` | The `image` to draw the text onto |
+| `text` | `list` \| `string` | The text to draw. This can be the output of `tokenise()`, or a simple string |
+| `bounds` | `rect` | *Optional.* A rectangle describing the area in which the text is to be drawn. Defaults to None |
+| `line_spacing` | `int` | *Optional.* The spacing between lines. Defaults to 1 |
+| `word_spacing` | `int` | *Optional.* The spacing between words. Defaults to 1 |
+| `size` | `int` | *Optional.* The height to render the text when using a vector font. Defaults to 24px |
 
-### Example
 ```python
 screen.font = rom_font.sins
 screen.pen = color.rgb(0, 0, 255)
@@ -44,16 +45,20 @@ This method breaks down a string into its component parts, allowing the `draw()`
 `tokenise()` returns a list of tokens.
 
 ### Usage
-- `text.tokenise(image, text, glyph_renderers, size)`
-    - `image` -
-    - `text` - The string to be tokenised.
-    - `glyph_renderers` (Optional) - a dictionary of glyph renderers (see below) to be applied to the text.
-    - `size` (Optional) - the text size to render, if you're using a vector font.
+```python-raw
+text.tokenise(image, text, glyph_renderers, size)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `image` | `image` | The `image` the tokenised text will be drawn onto |
+| `text` | `string` | The string to be tokenised |
+| `glyph_renderers` | `dict` | *Optional.* A dictionary of glyph renderers (see below) to be applied to the text |
+| `size` | `int` | *Optional.* The text size to render, if you're using a vector font |
 
 ### Returns
 A `list` containing the individual text tokens.
 
-### Example
 ```python
 screen.font = rom_font.sins
 screen.pen = color.rgb(0, 0, 255)
@@ -159,19 +164,20 @@ This generates a closure, a function which you can call every `update()` to scro
 The text will always be drawn scrolling between both edges of the target image, so if you want to position the scrolling text within a larger image, you'll want to use `image.window()` to make a window onto that image in the appropriate place, and use that as your target image.
 
 ### Usage
-- `text.scroll(text, font_face, font_size, target, speed, gap, align)`
-    - `text` - The text to scroll.
-    - `font_face` (Optional) - The font to use for the scrolling text. Default is `rom_font.sins`.
-    - `font_size` (Optional) - The font size if you are using a vector font. Default is `None`.
-    - `target` (Optional) - the image the scrolling text should be drawn to. Default is `screen`.
-    - `speed` (Optional) - The speed at which to scroll the text, in pixels per second. Default is `25`.
-    - `gap` (Optional) - The space between each repetition of the scrolling text, in pixels. `None` means the next repetition will appear as the previous one leaves the image. Default is `None`.
-    - `align` (Optional) - The vertical alignment of the text on the target. Options are `top`, `middle`, `bottom` or a y-coordinate. Default is `middle`.
+```python-raw
+text.scroll(text, font_face, font_size, target, speed, gap, align)
+```
 
-### Returns
-`None`.
+| Parameter | Type | Description |
+|---|---|---|
+| `text` | `string` | The text to scroll |
+| `font_face` | `pixel_font` \| `vector_font` | *Optional.* The font to use for the scrolling text. Default is `rom_font.sins` |
+| `font_size` | `int` | *Optional.* The font size if you are using a vector font. Default is `None` |
+| `target` | `image` | *Optional.* The image the scrolling text should be drawn to. Default is `screen` |
+| `speed` | `int` | *Optional.* The speed at which to scroll the text, in pixels per second. Default is `25` |
+| `gap` | `int` | *Optional.* The space between each repetition of the scrolling text, in pixels. `None` means the next repetition will appear as the previous one leaves the image. Default is `None` |
+| `align` | `string` \| `int` | *Optional.* The vertical alignment of the text on the target. Options are `top`, `middle`, `bottom` or a y-coordinate. Default is `middle` |
 
-### Example
 ```python
 my_text = "Hello world! Once again, this is a long piece of text which is supposed to scroll outside its area! Whoop whoop!"
 
