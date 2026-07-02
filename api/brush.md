@@ -83,15 +83,63 @@ run(update)
 
 > Note: The `0b` at the beginning of the numbers in the custom pattern signify that the number is binary. The 1s and 0s following it are each row of the pattern.
 
-| | | | |
-|-|-|-|-|
-| **0**<br>![Pattern 0](/patterns/pattern0.png) | **1**<br>![Pattern 1](/patterns/pattern1.png) | **2**<br>![Pattern 2](/patterns/pattern2.png) | **3**<br>![Pattern 3](/patterns/pattern3.png) |
-| **4**<br>![Pattern 4](/patterns/pattern4.png) | **5**<br>![Pattern 5](/patterns/pattern5.png) | **6**<br>![Pattern 6](/patterns/pattern6.png) | **7**<br>![Pattern 7](/patterns/pattern7.png) |
-| **8**<br>![Pattern 8](/patterns/pattern8.png) | **9**<br>![Pattern 9](/patterns/pattern9.png) | **10**<br>![Pattern 10](/patterns/pattern10.png) | **11**<br>![Pattern 11](/patterns/pattern11.png) |
-| **12**<br>![Pattern 12](/patterns/pattern12.png) | **13**<br>![Pattern 13](/patterns/pattern13.png) | **14**<br>![Pattern 14](/patterns/pattern14.png) | **15**<br>![Pattern 15](/patterns/pattern15.png) |
-| **16**<br>![Pattern 16](/patterns/pattern16.png) | **17**<br>![Pattern 17](/patterns/pattern17.png) | **18**<br>![Pattern 18](/patterns/pattern18.png) | **19**<br>![Pattern 19](/patterns/pattern19.png) |
-| **20**<br>![Pattern 20](/patterns/pattern20.png) | **21**<br>![Pattern 21](/patterns/pattern21.png) | **22**<br>![Pattern 22](/patterns/pattern22.png) | **23**<br>![Pattern 23](/patterns/pattern23.png) |
-| **24**<br>![Pattern 24](/patterns/pattern24.png) | **25**<br>![Pattern 25](/patterns/pattern25.png) | **26**<br>![Pattern 26](/patterns/pattern26.png) | **27**<br>![Pattern 27](/patterns/pattern27.png) |
-| **28**<br>![Pattern 28](/patterns/pattern28.png) | **29**<br>![Pattern 29](/patterns/pattern29.png) | **30**<br>![Pattern 30](/patterns/pattern30.png) | **31**<br>![Pattern 31](/patterns/pattern31.png) |
-| **32**<br>![Pattern 32](/patterns/pattern32.png) | **33**<br>![Pattern 33](/patterns/pattern33.png) | **34**<br>![Pattern 34](/patterns/pattern34.png) | **35**<br>![Pattern 35](/patterns/pattern35.png) |
-| **36**<br>![Pattern 36](/patterns/pattern36.png) | **37**<br>![Pattern 37](/patterns/pattern37.png) |  |  |
+## Built-in patterns
+The patterns built in to Badgeware, selectable by index with `brush.pattern()`.
+
+<style>
+  .pattern-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(4rem, 1fr));
+    gap: 0.75rem;
+    margin: 1rem 0;
+  }
+  .pattern-grid figure { margin: 0; text-align: center; }
+  .pattern-grid img {
+    width: 100%; display: block; border-radius: 0.25rem;
+    image-rendering: pixelated;
+  }
+  .pattern-grid figcaption {
+    font-size: 0.8rem; color: var(--faint); margin-top: 0.3rem;
+  }
+</style>
+
+<div class="pattern-grid">
+<figure><img src="/docs/patterns/pattern0.png"><figcaption>0</figcaption></figure>
+<figure><img src="/docs/patterns/pattern1.png"><figcaption>1</figcaption></figure>
+<figure><img src="/docs/patterns/pattern2.png"><figcaption>2</figcaption></figure>
+<figure><img src="/docs/patterns/pattern3.png"><figcaption>3</figcaption></figure>
+<figure><img src="/docs/patterns/pattern4.png"><figcaption>4</figcaption></figure>
+<figure><img src="/docs/patterns/pattern5.png"><figcaption>5</figcaption></figure>
+<figure><img src="/docs/patterns/pattern6.png"><figcaption>6</figcaption></figure>
+<figure><img src="/docs/patterns/pattern7.png"><figcaption>7</figcaption></figure>
+<figure><img src="/docs/patterns/pattern8.png"><figcaption>8</figcaption></figure>
+<figure><img src="/docs/patterns/pattern9.png"><figcaption>9</figcaption></figure>
+<figure><img src="/docs/patterns/pattern10.png"><figcaption>10</figcaption></figure>
+<figure><img src="/docs/patterns/pattern11.png"><figcaption>11</figcaption></figure>
+<figure><img src="/docs/patterns/pattern12.png"><figcaption>12</figcaption></figure>
+<figure><img src="/docs/patterns/pattern13.png"><figcaption>13</figcaption></figure>
+<figure><img src="/docs/patterns/pattern14.png"><figcaption>14</figcaption></figure>
+<figure><img src="/docs/patterns/pattern15.png"><figcaption>15</figcaption></figure>
+<figure><img src="/docs/patterns/pattern16.png"><figcaption>16</figcaption></figure>
+<figure><img src="/docs/patterns/pattern17.png"><figcaption>17</figcaption></figure>
+<figure><img src="/docs/patterns/pattern18.png"><figcaption>18</figcaption></figure>
+<figure><img src="/docs/patterns/pattern19.png"><figcaption>19</figcaption></figure>
+<figure><img src="/docs/patterns/pattern20.png"><figcaption>20</figcaption></figure>
+<figure><img src="/docs/patterns/pattern21.png"><figcaption>21</figcaption></figure>
+<figure><img src="/docs/patterns/pattern22.png"><figcaption>22</figcaption></figure>
+<figure><img src="/docs/patterns/pattern23.png"><figcaption>23</figcaption></figure>
+<figure><img src="/docs/patterns/pattern24.png"><figcaption>24</figcaption></figure>
+<figure><img src="/docs/patterns/pattern25.png"><figcaption>25</figcaption></figure>
+<figure><img src="/docs/patterns/pattern26.png"><figcaption>26</figcaption></figure>
+<figure><img src="/docs/patterns/pattern27.png"><figcaption>27</figcaption></figure>
+<figure><img src="/docs/patterns/pattern28.png"><figcaption>28</figcaption></figure>
+<figure><img src="/docs/patterns/pattern29.png"><figcaption>29</figcaption></figure>
+<figure><img src="/docs/patterns/pattern30.png"><figcaption>30</figcaption></figure>
+<figure><img src="/docs/patterns/pattern31.png"><figcaption>31</figcaption></figure>
+<figure><img src="/docs/patterns/pattern32.png"><figcaption>32</figcaption></figure>
+<figure><img src="/docs/patterns/pattern33.png"><figcaption>33</figcaption></figure>
+<figure><img src="/docs/patterns/pattern34.png"><figcaption>34</figcaption></figure>
+<figure><img src="/docs/patterns/pattern35.png"><figcaption>35</figcaption></figure>
+<figure><img src="/docs/patterns/pattern36.png"><figcaption>36</figcaption></figure>
+<figure><img src="/docs/patterns/pattern37.png"><figcaption>37</figcaption></figure>
+</div>
