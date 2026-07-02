@@ -147,3 +147,34 @@ The patterns built in to Badgeware, selectable by index with `brush.pattern()`.
 <figure><img src="/docs/patterns/pattern36.png"><figcaption>36</figcaption></figure>
 <figure><img src="/docs/patterns/pattern37.png"><figcaption>37</figcaption></figure>
 </div>
+
+<style>
+  /* a full-page layer that sits behind the content (above the gradient) and
+     fades in a tiled pattern while a swatch above is hovered */
+  #pattern-page-bg {
+    position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background-repeat: repeat; image-rendering: pixelated;
+    opacity: 0; transition: opacity 0.5s ease;
+  }
+  #pattern-page-bg.active { opacity: 0.12; }
+  .pattern-grid figure { cursor: pointer; }
+</style>
+<script>
+  (function () {
+    var bg = document.createElement("div");
+    bg.id = "pattern-page-bg";
+    document.body.appendChild(bg);
+
+    document.querySelectorAll(".pattern-grid figure").forEach(function (fig) {
+      var img = fig.querySelector("img");
+      if (!img) return;
+      fig.addEventListener("mouseenter", function () {
+        bg.style.backgroundImage = "url('" + img.src + "')";
+        bg.classList.add("active");
+      });
+      fig.addEventListener("mouseleave", function () {
+        bg.classList.remove("active");
+      });
+    });
+  })();
+</script>

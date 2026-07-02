@@ -121,7 +121,7 @@ These constants provide a convenient starting point for UI elements, sprites, an
 
 <style>
   #palette_grid {
-    display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr; grid-gap: 0.25rem;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(5rem, 1fr)); grid-gap: 0.25rem;
 
     >div {
       aspect-ratio: 1; font-size: 0.9rem; font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace; display: flex; align-items: center; justify-content: center;
