@@ -53,17 +53,15 @@ run(update)
 
 # Properties
 
-| Property | Type | Access | Description |
-|---|---|---|---|
-| `width` | `int` | read-only | Width of the image in pixels |
-| `height` | `int` | read-only | Height of the image in pixels |
-| `clip` | `rect` | read/write | Clipping rectangle — all drawing is restricted to its bounds |
-| `antialias` | `image.OFF` \| `image.X2` \| `image.X4` | read/write | Antialiasing level for vector drawing |
-| `alpha` | `int` (0–255) | read/write | Global alpha for drawing (0 = transparent, 255 = opaque) |
-| `pen` | `color` \| `brush` | read/write | Colour or brush used for drawing operations |
-| `font` | `pixel_font` \| `vector_font` | read/write | Font used for drawing text |
-
-> Note: Badgeware comes with thirty pre-loaded fonts, check out the `pixel_font` article for a full list!
+| Property | Type | Description |
+|---|---|---|
+| `width` | `int` | Width of the image in pixels (read-only) |
+| `height` | `int` | Height of the image in pixels (read-only) |
+| `clip` | `rect` | Clipping rectangle — all drawing is restricted to its bounds |
+| `antialias` | `int` | Antialiasing level for vector drawing. One of `image.OFF`, `image.X2`, or `image.X4` |
+| `alpha` | `int` | Global alpha for drawing, 0–255 (0 = transparent, 255 = opaque) |
+| `pen` | `color` \| `brush` | Colour or brush used for drawing operations |
+| `font` | `pixel_font` \| `vector_font` | Font used for drawing text |
 
 # Drawing
 The drawing API provides a collection of fast, low-level primitives for rendering simple shapes directly into an image’s pixel buffer. These methods are designed for speed and simplicity, making them suitable for real-time graphics, UI elements, and procedural drawing. These methods round position and dimension values to the nearest pixel for speed.
