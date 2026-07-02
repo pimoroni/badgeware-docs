@@ -58,7 +58,9 @@ A `brush` which can then be used to set an `image`'s pen.
 import math
 
 def update():
-  custom_pattern = brush.pattern(color.rgb(255, 100, 100, 100), color.rgb(0, 0, 0, 0), (
+  # a custom pattern: each 0b number is one binary row, where the 1s and 0s
+  # are the lit and unlit pixels of the pattern
+  custom_pattern = brush.pattern(color.red, color.rgb(0, 0, 0, 0), (
     0b00000000,
     0b01111110,
     0b01000010,
@@ -70,18 +72,16 @@ def update():
   screen.pen = custom_pattern
   screen.shape(shape.circle(80 + math.cos(badge.ticks / 500) * 30, 60 + math.sin(badge.ticks / 1000) * 30, 30))
 
-  built_in_pattern = brush.pattern(color.rgb(100, 255, 100, 100), color.rgb(0, 0, 0, 0), 11)
+  built_in_pattern = brush.pattern(color.lime, color.rgb(0, 0, 0, 0), 11)
   screen.pen = built_in_pattern
   screen.shape(shape.circle(80 + math.sin(badge.ticks / 250) * 60, 60 + math.cos(badge.ticks / 500) * 60, 30))
 
-  built_in_pattern = brush.pattern(color.rgb(100, 100, 255, 100), color.rgb(0, 0, 0, 0), 8)
+  built_in_pattern = brush.pattern(color.blue, color.rgb(0, 0, 0, 0), 8)
   screen.pen = built_in_pattern
   screen.shape(shape.circle(80 + math.cos(badge.ticks / 250) * 60, 60 + math.sin(badge.ticks / 500) * 60, 30))
 
 run(update)
 ```
-
-> Note: The `0b` at the beginning of the numbers in the custom pattern signify that the number is binary. The 1s and 0s following it are each row of the pattern.
 
 ## Built-in patterns
 The patterns built in to Badgeware, selectable by index with `brush.pattern()`.
