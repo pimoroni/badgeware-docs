@@ -20,6 +20,7 @@ There are three badges in the family, each with its own kind of display — but 
 
 | | Tufty | Badger | Blinky |
 |---|---|---|---|
+| | ![Tufty badge](/assets/tufty_web_front.png) | | |
 | **Display** | Full-colour IPS LCD | E-paper | LED matrix (greyscale) |
 | **Resolution** | 320×240 (or 160×120) | 264×176 | 39×26 |
 | **Colour** | Full RGB | Black, white + 2 greys | Bright, white LEDs |
@@ -30,7 +31,7 @@ Read on for a closer look at each.
 
 ## Tufty
 
-![Tufty badge](/assets/tufty_web_front.png)
+
 
 A full-colour IPS LCD badge with a 320x240 display (or 160x120 in low-res mode for extra performance). Tufty is the most versatile of the three — its high refresh rate and RGB colour make it ideal for graphics-heavy apps, games, animations, and rich user interfaces. The screen redraws continuously, so your `update()` function runs as fast as your code allows. If you want smooth movement and vibrant visuals, Tufty is the one to reach for.
 
