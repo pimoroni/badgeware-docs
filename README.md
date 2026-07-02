@@ -11,34 +11,54 @@ Your badge comes preloaded with a set of apps, but the real fun starts when you 
 
 This site is your guide. You'll find step-by-step tutorials to get you up and running, feature guides that go deeper on topics like sprites, text, and vector shapes, and a full API reference for when you need the details. Whether you're building a name badge for a conference, a tiny game to pass the time, or a dashboard that pulls live data over WiFi — it all starts here.
 
+New here? Head straight to **[Getting started](/introduction/getting-started.md)** to write your first app in minutes.
+
 # Meet the badges
 
-Each badge runs the same API, so code you write for one model will mostly work on the others. The main differences are screen resolution, colour, and refresh behaviour — see [Coding for the different badges](/introduction/badge-differences.md) for the full details.
+There are three badges in the family, each with its own kind of display — but they all run the same Badgeware API, so code you write for one will mostly work on the others. Where they differ is resolution, colour, and how the screen refreshes.
+
+| | Tufty | Badger | Blinky |
+|---|---|---|---|
+| **Display** | Full-colour IPS LCD | E-paper | LED matrix (greyscale) |
+| **Resolution** | 320×240 (or 160×120) | 264×176 | 39×26 |
+| **Colour** | Full RGB | Black, white + 2 greys | Bright, white LEDs |
+| **Refresh** | Continuous | On demand, sleeps between | Continuous |
+| **Best for** | Games, animation, rich UIs | Name badges, dashboards, e-readers | Scrolling text, pixel art, notifications |
+
+Read on for a closer look at each.
 
 ## Tufty
+
+![Tufty badge](/assets/tufty_web_front.png)
 
 A full-colour IPS LCD badge with a 320x240 display (or 160x120 in low-res mode for extra performance). Tufty is the most versatile of the three — its high refresh rate and RGB colour make it ideal for graphics-heavy apps, games, animations, and rich user interfaces. The screen redraws continuously, so your `update()` function runs as fast as your code allows. If you want smooth movement and vibrant visuals, Tufty is the one to reach for.
 
 ## Badger
 
+![Badger badge](/assets/badger_web_front.png)
+
 An e-paper badge with a 264x176 display in black, white, and two shades of grey. E-paper only draws power when the screen updates, so Badger is designed around that — it sleeps between updates and wakes on a button press or RTC alarm. This makes it perfect for things that don't need to change often: name badges, conference schedules, dashboards, to-do lists, and e-readers. A single charge can last up to 100 days in standby. The trade-off is speed — full screen refreshes take a moment, though a fast-update mode is available for more responsive interfaces.
 
 ## Blinky
 
+![Blinky badge](/assets/blinky_web_front.png)
+
 A 39x26 LED matrix badge with 255 levels of brightness per pixel, making it essentially a greyscale display you can wear. Blinky is compact, eye-catching, and great for scrolling text, pixel art, simple animations, and notification displays. Like Tufty, it refreshes continuously so animations run smoothly. The matrix has cutouts for case corners and buttons — anything drawn into those pixels is automatically ignored, so you don't need to worry about them in your code.
 
-## Features
+# Shared hardware
 
 Despite their different displays, all three badges share the same core hardware and software platform:
 
-- **Processor** — RP2350 dual-core ARM Cortex-M33 @ 200MHz with hardware floating point
-- **Memory** — 16MB flash for firmware, code, and assets plus 8MB PSRAM for runtime use
-- **Connectivity** — 2.4GHz WiFi and Bluetooth 5 for downloading data, syncing, or communicating between badges
-- **Power** — 1000mAh rechargeable battery with USB-C charging
-- **Expansion** — Qw/ST port for connecting breakout accessories, SWD port for debugging
-- **Inputs** — five front-facing buttons, plus RESET and BOOTSEL on the back
-- **Software** — the same Badgeware MicroPython API, so code written for one badge runs on the others with minimal changes
-- **Disk Mode** — double-tap RESET to mount the badge as a USB drive, drag your files on, eject, and go
+| | |
+|---|---|
+| **Processor** | RP2350 dual-core ARM Cortex-M33 @ 200MHz with hardware floating point |
+| **Memory** | 16MB flash for firmware, code, and assets, plus 8MB PSRAM for runtime use |
+| **Connectivity** | 2.4GHz WiFi and Bluetooth 5 for downloading data, syncing, or communicating between badges |
+| **Power** | 1000mAh rechargeable battery with USB-C charging |
+| **Expansion** | Qw/ST port for connecting breakout accessories, SWD port for debugging |
+| **Inputs** | Five front-facing buttons, plus RESET and BOOTSEL on the back |
+| **Software** | The same Badgeware MicroPython API, so code written for one badge runs on the others with minimal changes |
+| **Disk Mode** | Double-tap RESET to mount the badge as a USB drive, drag your files on, eject, and go |
 
 # A taste of Badgeware
 
@@ -48,9 +68,7 @@ Every app is built around a single `update()` function that the badge calls once
 x, y = 80, 60
 dx, dy = 2, 1
 
-def update():
-    global x, y, dx, dy
-
+while True:
     x, y = x + dx, y + dy
     if x < 5 or x > screen.width - 5:  dx = -dx
     if y < 5 or y > screen.height - 5: dy = -dy
@@ -64,8 +82,16 @@ def update():
     screen.pen = color.white
     screen.font = rom_font.smart
     screen.text("Hello, Badgeware!", 24, 50)
-
-run(update)
 ```
 
 That's a complete, runnable app — copy it onto your badge and it just works. Everything else is building on these ideas: drawing to the screen, reading buttons, and letting `update()` do its thing.
+
+# Where to next
+
+- **[Getting started](/introduction/getting-started.md)** — plug in and run your first app in minutes.
+- **[Creating your first app](/introduction/your-first-app.md)** — the full app structure, including `init()` and `on_exit()`.
+- **[Coding for the different badges](/introduction/badge-differences.md)** — how Tufty, Badger, and Blinky differ, and how to write code that runs on all three.
+- **[Guides](/README.md#guides)** — go deeper on sprites, text, vector shapes, animation, and more.
+- **[API reference](/README.md#api)** — the details, for when you need them.
+
+Happy hacking!
