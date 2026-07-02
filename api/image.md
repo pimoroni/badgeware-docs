@@ -53,17 +53,26 @@ run(update)
 
 # Properties
 
-## width
-The width of the image, measured in pixels. This property is read-only and returns an integer value.
+| Property | Type | Access | Description |
+|---|---|---|---|
+| `width` | `int` | read-only | Width of the image in pixels |
+| `height` | `int` | read-only | Height of the image in pixels |
+| `clip` | `rect` | read/write | Clipping rectangle — all drawing is restricted to its bounds |
+| `antialias` | `image.OFF` \| `image.X2` \| `image.X4` | read/write | Antialiasing level for vector drawing |
+| `alpha` | `int` (0–255) | read/write | Global alpha for drawing (0 = transparent, 255 = opaque) |
+| `pen` | `color` \| `brush` | read/write | Colour or brush used for drawing operations |
+| `font` | `pixel_font` \| `vector_font` | read/write | Font used for drawing text |
 
-## height
-The height of the image, measured in pixels. This property is read-only and returns an integer value.
+> Note: Badgeware comes with thirty pre-loaded fonts, check out the `pixel_font` article for a full list!
 
-## clip
-The current clipping rectangle for this image. Once set, all subsequent drawing operations are clipped to the bounds of the rectangle. This property is of type `rect`.
+# Drawing
+The drawing API provides a collection of fast, low-level primitives for rendering simple shapes directly into an image’s pixel buffer. These methods are designed for speed and simplicity, making them suitable for real-time graphics, UI elements, and procedural drawing. These methods round position and dimension values to the nearest pixel for speed.
 
-## antialias
-The current antialiasing level for vector drawing operations performed on this image. Valid values are `image.OFF`, `image.X2`, and `image.X4`.
+You can also render vector shapes using the `shape()` method. Vector shapes support sub-pixel positioning. Vector drawing supports antialiasing, controlled by the current antialiasing setting, and uses the currently selected brush for stroke and fill operations unless otherwise stated.
+
+All drawing operations use the currently selected brush/colour unless otherwise stated.
+
+The `antialias` property sets the antialiasing level for vector drawing — compare `image.OFF`, `image.X2`, and `image.X4`:
 
 ```python
 def update():
@@ -80,86 +89,6 @@ def update():
 
 run(update)
 ```
-
-## alpha
-A global alpha blending value used for all drawing operations. When set on an image (or the screen), future drawing operations will be alpha blended using this value.
-
-Valid values are 0–255, where 0 is fully transparent and 255 is fully opaque.
-
-```python
-import math
-
-sprite = image.load("/system/assets/skull.png")
-
-def update():
-  # set global alpha for drawing operations to the screen
-  screen.alpha = 127
-
-  # draw ten ghostly (ghastly?!) skulls
-  for i in range(0, 10):
-    # swirling animation
-    step = (badge.ticks + i * 250) / 500
-    x = math.sin(step) * (i * 5)
-    y = math.cos(step) * (i * 5)
-
-    # centre on screen
-    x += screen.width / 2 - sprite.width / 2
-    y += screen.height / 2 - sprite.height / 2
-
-    # blit the sprite
-    screen.blit(sprite, x, y)
-
-run(update)
-```
-
-## pen
-The color or brush used for drawing operations. This can be set to a `brush` or `color` object.
-
-```python
-def update():
-  screen.pen = color.taupe
-  screen.circle(40, 60, 30)
-
-  screen.pen = color.brown
-  screen.circle(80, 60, 30)
-
-  screen.pen = color.grape
-  screen.circle(120, 60, 30)
-
-run(update)
-```
-
-## font
-The font used for drawing text. This can be either a `pixel_font` or a `vector_font`.
-
-```python
-import math
-
-# load a built in font - see pixel_font for list
-screen.font = rom_font.nope
-
-def update():
-  # use width of the text to centre on the screen
-  w, _ = screen.measure_text("hey badgeware!")
-  x = (screen.width / 2) - (w / 2)
-
-  # create a side to side bounce offset
-  x += math.sin(badge.ticks / 250) * 20
-
-  # draw the text
-  screen.text("hey badgeware!", x, 55)
-
-run(update)
-```
-
-> Note: Badgeware comes with thirty pre-loaded fonts, check out the `pixel_font` article for a full list!
-
-# Drawing
-The drawing API provides a collection of fast, low-level primitives for rendering simple shapes directly into an image’s pixel buffer. These methods are designed for speed and simplicity, making them suitable for real-time graphics, UI elements, and procedural drawing. These methods round position and dimension values to the nearest pixel for speed.
-
-You can also render vector shapes using the `shape()` method. Vector shapes support sub-pixel positioning. Vector drawing supports antialiasing, controlled by the current antialiasing setting, and uses the currently selected brush for stroke and fill operations unless otherwise stated.
-
-All drawing operations use the currently selected brush/colour unless otherwise stated.
 
 ## clear()
 Fills the entire image or drawing surface with the current brush.
@@ -666,14 +595,14 @@ The returned image shares its underlying data with the original image. All drawi
 ### Usage
 ```python-raw
 .window(x, y, w, h)
-.window(r)
+.window(rect)
 ```
 
 | Parameter | Type | Description |
 |---|---|---|
 | `x`, `y` | `int` | Coordinates of the top-left corner |
 | `w`, `h` | `int` | Width and height of the window |
-| `r` | `rect` | A rectangle defining the position and size of the window |
+| `rect` | `rect` | A rectangle defining the position and size of the window |
 
 ### Returns
 An `image` object representing the contents of the window.
