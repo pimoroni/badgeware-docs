@@ -24,9 +24,7 @@ The following static methods create new `color` objects from different colour re
 Creates a new `color` object from red, green, blue, and optional alpha values.
 
 ### Usage
-```python-raw
-color.rgb(r, g, b, a)
-```
+`color.rgb(r, g, b, a)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -53,9 +51,7 @@ Creates a new `color` object from hue, saturation, value, and optional alpha val
 HSV is not perceptually uniform, so equal changes in its values do not correspond to equal perceived colour changes. This can lead to uneven gradients and unintuitive results when adjusting saturation or brightness.
 
 ### Usage
-```python-raw
-color.hsv(h, s, v, a)
-```
+`color.hsv(h, s, v, a)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -86,9 +82,7 @@ Creates a new `color` object from OKLCH parameters and an optional alpha value.
 OKLCH is a perceptually uniform colour space, meaning equal changes in its values produce more consistent visual changes. This makes it better suited for colour adjustment and interpolation than HSV, which can produce uneven or unexpected results.
 
 ### Usage
-```python-raw
-color.oklch(l, c, h, a)
-```
+`color.oklch(l, c, h, a)`
 
 | Parameter | Type | Description |
 |---|---|---|

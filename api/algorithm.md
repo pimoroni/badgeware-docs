@@ -19,9 +19,7 @@ By comparing these crossing distances, it determines which neighbouring cell the
 Returns a list of tuples, each representing where the ray crosses a grid-cell edge.
 
 ### Usage
-```python-raw
-algorithm.dda(point, angle, depth)
-```
+`algorithm.dda(point, angle, depth)`
 
 | Parameter | Type | Description |
 |---|---|---|

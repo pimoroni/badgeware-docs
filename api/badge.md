@@ -39,10 +39,8 @@ Buttons are addressed one by one using the following constants:
 Returns a list of buttons pressed during the current frame - that is, buttons that switched from not pressed last frame to pressed this frame - or tests a single button.
 
 ### Usage
-```python-raw
-.pressed()
-.pressed(button)
-```
+`.pressed()` \
+`.pressed(button)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -55,10 +53,8 @@ A list of button constants if no parameter was specified, otherwise a boolean.
 Returns a list of buttons released during the current frame - that is, buttons that switched from pressed last frame to not pressed this frame - or tests a single button.
 
 ### Usage
-```python-raw
-.released()
-.released(button)
-```
+`.released()` \
+`.released(button)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -71,10 +67,8 @@ A list of button constants if no parameter was specified, otherwise a boolean.
 Returns a list of all buttons that are currently held down, or tests a single button.
 
 ### Usage
-```python-raw
-.held()
-.held(button)
-```
+`.held()` \
+`.held(button)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -87,10 +81,8 @@ A list of button constants if no parameter was specified, otherwise a boolean.
 Returns a list of all buttons whose state changed between the last frame and the current frame, or tests a single button.
 
 ### Usage
-```python-raw
-.changed()
-.changed(button)
-```
+`.changed()` \
+`.changed(button)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -173,9 +165,7 @@ The default colour that `screen.pen` will be set to at the start of every `updat
 Changes the display mode of the badge. You can apply more than one mode at once, where applicable, by using the pipe symbol, e.g. `badge.mode(HIRES | VSYNC)`.
 
 ### Usage
-```python-raw
-.mode(modes)
-```
+`.mode(modes)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -197,10 +187,8 @@ These methods monitor the badge's flash space and RAM, so you can check how full
 Returns a tuple containing total flash size, used flash and free flash in bytes.
 
 ### Usage
-```python-raw
-.disk_free()
-.disk_free(mountpoint)
-```
+`.disk_free()` \
+`.disk_free(mountpoint)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -221,11 +209,9 @@ Badgeware is fitted with four onboard white LEDs on the back of the board. These
 Gets and sets the brightness value for the rear lighting on the badge.
 
 ### Usage
-```python-raw
-.caselights()
-.caselights(level)
-.caselights(level1, level2, level3, level4)
-```
+`.caselights()` \
+`.caselights(level)` \
+`.caselights(level1, level2, level3, level4)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -245,10 +231,8 @@ Badgeware has the ability to go into a very low power mode, conserving battery p
 Forces the badge into sleep mode. This will lose data contained in RAM, and will act as a reset on wakeup, restarting main.py and, on the default firmware, returning the user to the menu.
 
 ### Usage
-```python-raw
-.sleep()
-.sleep(duration)
-```
+`.sleep()` \
+`.sleep(duration)`
 
 | Parameter | Type | Description |
 |---|---|---|

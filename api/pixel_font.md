@@ -27,9 +27,7 @@ There are many pixel fonts preloaded onto your badge. These can be used with `ro
 If not using a ROM font, individual font files can be loaded into variables using `pixel_font.load(path)`, which returns the font as a new `pixel_font` object.
 
 ### Usage
-```python-raw
-pixel_font.load(path)
-```
+`pixel_font.load(path)`
 
 | Parameter | Type | Description |
 |---|---|---|

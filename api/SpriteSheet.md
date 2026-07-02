@@ -17,9 +17,7 @@ The `SpriteSheet` class is loaded along with a definition of how many rows and c
 This is the basic constructor, returning an instance of the `SpriteSheet` class.
 
 ### Usage
-```python-raw
-SpriteSheet(image, columns, rows)
-```
+`SpriteSheet(image, columns, rows)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -31,9 +29,7 @@ SpriteSheet(image, columns, rows)
 This function is the main way to get a sprite from the spritesheet. It returns an `image` which you can blit like any other `image`.
 
 ### Usage
-```python-raw
-.sprite(column, row)
-```
+`.sprite(column, row)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -47,9 +43,7 @@ An `image` representing the selected sprite.
 This function returns an `AnimatedSprite` object, as described below. It takes in a starting cell on the `SpriteSheet`, and then makes an `AnimatedSprite` using that cell and a number of cells either to its right or below it as specified.
 
 ### Usage
-```python-raw
-.animation(x, y, count, horizontal)
-```
+`.animation(x, y, count, horizontal)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -67,9 +61,7 @@ A normal sprite pulled from a spritesheet is a simple `image` object. You can do
 The basic constructor of the `AnimatedSprite` class, returning an instance of `AnimatedSprite`. Note that this would probably more usually be done via `SpriteSheet.animation()`, and the parameters for creation are almost the same. This also takes a starting cell in a `SpriteSheet`, and then makes an animation sequence from a specified number of sprites to the right or below.
 
 ### Usage
-```python-raw
-AnimatedSprite(spritesheet, x, y, count, horizontal)
-```
+`AnimatedSprite(spritesheet, x, y, count, horizontal)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -91,9 +83,7 @@ An `AnimatedSprite` containing the selected frames.
 Returns a single frame from the animation as an `image` object, just like getting a static sprite from a spritesheet.
 
 ### Usage
-```python-raw
-.frame(frame_index)
-```
+`.frame(frame_index)`
 
 | Parameter | Type | Description |
 |---|---|---|

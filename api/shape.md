@@ -19,10 +19,8 @@ The following static methods all return new `shape` objects.
 Creates a new `shape` representing a circle.
 
 ### Usage
-```python-raw
-shape.circle(x, y, radius)
-shape.circle(centre, radius)
-```
+`shape.circle(x, y, radius)` \
+`shape.circle(centre, radius)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -46,9 +44,7 @@ run(update)
 Creates a new `shape` representing a rectangle.
 
 ### Usage
-```python-raw
-shape.rectangle(x, y, width, height)
-```
+`shape.rectangle(x, y, width, height)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -71,9 +67,7 @@ run(update)
 Creates a new shape representing a regular polygon — a closed shape with evenly spaced sides and equal angles (for example: triangles, squares, pentagons, and so on).
 
 ### Usage
-```python-raw
-shape.regular_polygon(x, y, radius, sides)
-```
+`shape.regular_polygon(x, y, radius, sides)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -104,10 +98,8 @@ Rounded rectangles are especially useful for modern UI elements such as buttons,
 You can specify either a single corner radius for all corners, or provide individual radii to create asymmetric shapes.
 
 ### Usage
-```python-raw
-shape.rounded_rectangle(x, y, width, height, radius)
-shape.rounded_rectangle(x, y, width, height, r1, r2, r3, r4)
-```
+`shape.rounded_rectangle(x, y, width, height, radius)` \
+`shape.rounded_rectangle(x, y, width, height, r1, r2, r3, r4)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -140,9 +132,7 @@ Squircles are useful for UI elements like icons and buttons, producing corners t
 The optional squareness factor controls the shape: lower values are more circular, higher values more square-like.
 
 ### Usage
-```python-raw
-shape.squircle(x, y, s, n)
-```
+`shape.squircle(x, y, s, n)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -168,9 +158,7 @@ Arcs are useful for gauges, progress indicators, rings, and other circular UI el
 Angles are measured in degrees, where 0° points straight up, and values increase clockwise.
 
 ### Usage
-```python-raw
-shape.arc(x, y, inner, outer, from, to)
-```
+`shape.arc(x, y, inner, outer, from, to)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -199,9 +187,7 @@ The slice is defined by an inner and outer radius.
 Angles are measured in degrees, where 0° points straight up, and values increase clockwise.
 
 ### Usage
-```python-raw
-shape.pie(x, y, r, f, t)
-```
+`shape.pie(x, y, r, f, t)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -227,9 +213,7 @@ run(update)
 Creates a new shape representing a star.
 
 ### Usage
-```python-raw
-shape.star(x, y, s, ro, ri)
-```
+`shape.star(x, y, s, ro, ri)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -254,9 +238,7 @@ run(update)
 Creates a new `shape` representing a line segment.
 
 ### Usage
-```python-raw
-shape.line(x1, y1, x2, y2, w)
-```
+`shape.line(x1, y1, x2, y2, w)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -299,9 +281,7 @@ The supplied thickness controls where the outline is placed:
 This makes it possible to create both outer borders and inset outlines depending on the effect you want.
 
 ### Usage
-```python-raw
-.stroke(thickness)
-```
+`.stroke(thickness)`
 
 | Parameter | Type | Description |
 |---|---|---|

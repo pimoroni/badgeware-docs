@@ -21,10 +21,8 @@ Disables the alarm interrupts, clears the alarm flag and unsets the alarm.
 Gets or sets the current date and time. This is stored as a tuple of form `(year, month, day, hour, minute, second, dow)`.
 
 ### Usage
-```python-raw
-rtc.datetime()
-rtc.datetime(dt)
-```
+`rtc.datetime()` \
+`rtc.datetime(dt)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -43,9 +41,7 @@ Copies the RTC date and time to the badge's local date and time.
 Sets an alarm to trigger after the desired hours, minutes and seconds. These parameters are all optional, but at least one must be present.
 
 ### Usage
-```python-raw
-rtc.set_alarm(hours, minutes, seconds)
-```
+`rtc.set_alarm(hours, minutes, seconds)`
 
 | Parameter | Type | Description |
 |---|---|---|

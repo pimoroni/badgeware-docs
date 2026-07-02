@@ -15,9 +15,7 @@ Text is drawn using the currently selected brush, allowing for alpha blending an
 Loads a vector font from the specified file path and returns it for use when rendering text.
 
 ### Usage
-```python-raw
-font.load(path)
-```
+`font.load(path)`
 
 | Parameter | Type | Description |
 |---|---|---|

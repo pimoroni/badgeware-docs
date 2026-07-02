@@ -14,9 +14,7 @@ In its simplest form, text can be drawn to the screen at a specific location and
 This method will write text into a specified area, wrapping onto new lines if it reaches the boundary of that area. It will accept the output of `tokenise()` as its text, meaning that inline code can be executed using glyph renderers as described below.
 
 ### Usage
-```python-raw
-text.draw(image, text, bounds, line_spacing, word_spacing, size)
-```
+`text.draw(image, text, bounds, line_spacing, word_spacing, size)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -45,9 +43,7 @@ This method breaks down a string into its component parts, allowing the `draw()`
 `tokenise()` returns a list of tokens.
 
 ### Usage
-```python-raw
-text.tokenise(image, text, glyph_renderers, size)
-```
+`text.tokenise(image, text, glyph_renderers, size)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -164,9 +160,7 @@ This generates a closure, a function which you can call every `update()` to scro
 The text will always be drawn scrolling between both edges of the target image, so if you want to position the scrolling text within a larger image, you'll want to use `image.window()` to make a window onto that image in the appropriate place, and use that as your target image.
 
 ### Usage
-```python-raw
-text.scroll(text, font_face, font_size, target, speed, gap, align)
-```
+`text.scroll(text, font_face, font_size, target, speed, gap, align)`
 
 | Parameter | Type | Description |
 |---|---|---|

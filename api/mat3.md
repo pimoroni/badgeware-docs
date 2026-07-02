@@ -16,9 +16,7 @@ The following methods operate on matrices and return new matrices with the reque
 Creates a new identity matrix.
 
 ### Usage
-```python-raw
-mat3()
-```
+`mat3()`
 
 ### Returns
 A `mat3` identity matrix.
@@ -27,9 +25,7 @@ A `mat3` identity matrix.
 Returns a new matrix with a translation applied to the current matrix.
 
 ### Usage
-```python-raw
-.translate(x, y)
-```
+`.translate(x, y)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -42,10 +38,8 @@ A `mat3` representing the translated matrix.
 Returns a new matrix with a rotation applied to the current matrix. The angle is specified in degrees for `rotate()`; to work in radians, use `rotate_radians()`.
 
 ### Usage
-```python-raw
-.rotate(angle)
-.rotate_radians(angle)
-```
+`.rotate(angle)` \
+`.rotate_radians(angle)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -58,9 +52,7 @@ A `mat3` representing the rotated matrix.
 Returns a new matrix with a scale applied to the current matrix.
 
 ### Usage
-```python-raw
-.scale(x, y)
-```
+`.scale(x, y)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -73,9 +65,7 @@ A `mat3` representing the scaled matrix.
 Returns a new matrix with another matrix multiplied with the current matrix.
 
 ### Usage
-```python-raw
-.multiply(m)
-```
+`.multiply(m)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -88,9 +78,7 @@ A `mat3` representing the multiplied matrices.
 Returns a new matrix that is the inverse of the current matrix. If the matrix is not invertible, the result is undefined.
 
 ### Usage
-```python-raw
-.inverse()
-```
+`.inverse()`
 
 ### Returns
 A `mat3` that is the inverse of the current matrix.

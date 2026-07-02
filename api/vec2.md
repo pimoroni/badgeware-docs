@@ -15,9 +15,7 @@ Although x and y are stored as floating-point values, they represent pixel coord
 Returns a `vec2` containing the specified coordinates.
 
 ### Usage
-```python-raw
-vec2(x, y)
-```
+`vec2(x, y)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -39,9 +37,7 @@ A `vec2` containing the specified coordinates.
 Returns a new `vec2` with the specified matrix transformation applied.
 
 ### Usage
-```python-raw
-.transform(m)
-```
+`.transform(m)`
 
 | Parameter | Type | Description |
 |---|---|---|

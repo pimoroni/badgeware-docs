@@ -15,9 +15,7 @@ Although `x`, `y`, `w`, and `h` are stored as floating-point values, they repres
 Returns a `rect` with the specified dimensions and position.
 
 ### Usage
-```python-raw
-rect(x, y, w, h)
-```
+`rect(x, y, w, h)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -46,9 +44,7 @@ rect(x, y, w, h)
 Returns a new rectangle offset by the specified amount.
 
 ### Usage
-```python-raw
-.offset(x, y)
-```
+`.offset(x, y)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -61,10 +57,8 @@ A `rect` representing the offset rectangle.
 Returns a new rectangle with its area reduced in size.
 
 ### Usage
-```python-raw
-.deflate(a)
-.deflate(t, r, b, l)
-```
+`.deflate(a)` \
+`.deflate(t, r, b, l)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -78,10 +72,8 @@ A `rect` representing the smaller rectangle.
 Returns a new rectangle with its area increased in size.
 
 ### Usage
-```python-raw
-.inflate(a)
-.inflate(t, r, b, l)
-```
+`.inflate(a)` \
+`.inflate(t, r, b, l)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -96,9 +88,7 @@ Returns a new rectangle representing the overlapping area between this rectangle
 If the rectangles do not overlap, `None` is returned.
 
 ### Usage
-```python-raw
-.intersection(other)
-```
+`.intersection(other)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -111,9 +101,7 @@ A `rect` representing the intersection of the two operands.
 Returns `True` if this rectangle overlaps with another rectangle, otherwise `False`.
 
 ### Usage
-```python-raw
-.intersects(other)
-```
+`.intersects(other)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -126,9 +114,7 @@ Returns `True` if this rectangle overlaps with another rectangle, otherwise `Fal
 Returns `True` if this rectangle fully contains another rectangle, otherwise `False`.
 
 ### Usage
-```python-raw
-.contains(other)
-```
+`.contains(other)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -141,9 +127,7 @@ Returns `True` if this rectangle fully contains another rectangle, otherwise `Fa
 Returns `True` if this rectangle has a width or height of zero, otherwise `False`.
 
 ### Usage
-```python-raw
-.empty()
-```
+`.empty()`
 
 ### Returns
 `bool`
