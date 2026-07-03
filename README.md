@@ -20,7 +20,7 @@ There are three badges in the family, each with its own kind of display — but 
 
 | Tufty | Badger | Blinky |
 |---|---|---|
-|![Tufty badge](/assets/tufty_web_front.png)|![Badger badge](/assets/badger_web_front.png)|![Blinky badge](/assets/blinky_web_front.png)|
+|<tufty-model environment="neutral" shadow-intensity="1" camera-orbit="0deg 78deg 85%" loading="lazy" style="display:block;width:100%;aspect-ratio:1/1" alt="Tufty badge"></tufty-model>|<badger-model environment="neutral" shadow-intensity="1" camera-orbit="0deg 78deg 85%" loading="lazy" style="display:block;width:100%;aspect-ratio:1/1" alt="Badger badge"></badger-model>|<blinky-model environment="neutral" shadow-intensity="1" camera-orbit="0deg 78deg 85%" loading="lazy" style="display:block;width:100%;aspect-ratio:1/1" alt="Blinky badge"></blinky-model>|
 | *The versatile all-rounder — smooth, vivid, and up for anything graphical.* | *The low-power one — sips battery and idles for up to 100 days.* | *The little showpiece — tiny, bright, and made to be worn.* |
 | Full-colour IPS LCD | E-paper display | Greyscale LED matrix |
 | 320×240 (or 160×120) | 264×176 | 39×26 |
