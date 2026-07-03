@@ -1,165 +1,115 @@
 ---
-title: Getting started
-summary: Get up and running with your first Badgeware app in minutes.
+title: Introduction
+summary: Meet your Badgeware badge — a quick tour of what's inside and what it can do.
 icon: rocket
 publish: true
 sort: 1
 ---
-# Introduction
+# Meet your badge
 
-Just got your badge? Let's get something on that screen. This quick guide will walk you through creating your very first app — from plugging in to seeing your code running. No prior experience with Badgeware is needed, just a basic familiarity with editing text files.
+Before you write a line of code, let's take a tour of the hardware — what every part does, and why it's there.
 
-# What you'll need
+# Display
 
-- Your Badgeware badge (Tufty, Badger, or Blinky)
-- A USB-C cable
-- A computer (any OS)
-- A text editor — anything from Notepad to VS Code will do
+Every badge is built around its display — and it's the one feature that really sets the three apart. Each has a completely different kind of screen, so the badge you choose shapes how your apps look and feel. The good news: you draw to all of them with the same commands, so code written for one mostly runs on the others — see **[Coding for the different badges](/introduction/badge-differences.md)** for more specific information on how to deal with their differences.
 
-# Step by step
+| Tufty | Badger | Blinky |
+|---|---|---|
+| <tufty-model float disable-default-lighting exposure="0.8" environment="neutral" shadow-intensity="1" camera-target="0m 0.004m 0m" camera-orbit="-12deg 80deg 80%" loading="lazy" style="display:block;width:100%;aspect-ratio:1/1"></tufty-model> | <badger-model float disable-default-lighting exposure="0.8" environment="neutral" shadow-intensity="1" camera-target="0m 0.004m 0m" camera-orbit="-12deg 80deg 80%" loading="lazy" style="display:block;width:100%;aspect-ratio:1/1"></badger-model> | <blinky-model float disable-default-lighting exposure="0.8" environment="neutral" shadow-intensity="1" camera-target="0m 0.004m 0m" camera-orbit="-12deg 80deg 80%" loading="lazy" style="display:block;width:100%;aspect-ratio:1/1"></blinky-model> |
+| Full-colour IPS LCD | E Ink display | Greyscale LED matrix |
+| 320 × 240 | 264 × 176 | 39 × 26 |
+| Full RGB colour | Black, white + 2 greys | Bright white greyscale |
+| Redraws continuously | Updates on demand, sleeps between | Redraws continuously |
+| Games, animation, and rich UIs | Name badges, dashboards, and e-readers | Scrolling text, pixel art, and notifications |
 
-## Connect your badge
+In short: reach for **Tufty** when you want colour, motion, and rich graphics; **Badger** when you want low power and always-on, glare-free text; and **Blinky** when you want a bright, bold display that makes you stand out in a crowd. 😎
 
-Plug your badge into your computer with the USB-C cable. To copy files onto it, you'll need to put it into Disk Mode:
+# Buttons
 
-- Press the **RESET** button on the back **twice** quickly
-- The screen will show that it's in USB Disk Mode
-- Your badge should appear as a drive on your computer (named BADGER, TUFTY, or BLINKY)
+<figure class="feature-callout">
+<div class="callout-media">
+<tufty-model hotspots="user-buttons" float disable-default-lighting exposure="0.8" environment="neutral" shadow-intensity="1" camera-target="0.014m 0.004m 0m" camera-orbit="28deg 80deg 90%"></tufty-model>
+</div>
+<figcaption>Five soft-touch buttons — everything your apps need to feel interactive.</figcaption>
+</figure>
 
-Open the drive and you'll see an `/apps` folder — this is where your code will live.
+Five tactile buttons on the front — **A**, **B**, **C**, **UP**, and **DOWN** — are how people talk to your apps: scroll a menu, flip a page, fire a shot, cast a vote.
 
-## Create your app folder
+On the back sit two more buttons — **RESET** and **HOME**. Look closely and each carries smaller secondary labels: RESET also reads **DISK** and **SLEEP**, and HOME also reads **BOOT**. That's because the function depends on how you press them.
 
-Inside `/apps`, create a new folder called `hello`. This folder name becomes your app's name in the menu, so it will show up as "Hello".
+| Action | What it does |
+|---|---|
+| Tap HOME | Returns to the main menu |
+| Tap RESET | Reboots the badge |
+| Double-tap RESET | Enters Disk Mode — mounts as a USB drive |
+| Press and hold RESET | Enters battery-saving deep sleep (any front button wakes it) |
+| Hold HOME, then tap RESET | Enters the RP2350 firmware bootloader for updates |
 
-Your app needs a minimum of two things:
+# USB-C
 
-- `__init__.py` — your code
-- `icon.png` — a 24x24 pixel PNG icon for the menu
+<figure class="feature-callout">
+<div class="callout-media">
+<tufty-model hotspots="usb-c" float disable-default-lighting exposure="0.8" environment="neutral" shadow-intensity="1" camera-target="-0.014m 0.004m 0.002m" camera-orbit="-46deg 80deg 90%"></tufty-model>
+</div>
+<figcaption>USB-C — the badge's one connection for power, charging, and moving your code and files.</figcaption>
+</figure>
 
-For now, you can grab a copy of `icon.png` from one of the other app folders on the badge. We'll focus on the code.
+A single USB-C port on the left-hand edge does it all: it powers the badge, tops up the battery, and carries your code across from your computer.
 
-## Write your first app
+It keeps a built-in **1,000mAh rechargeable LiPo battery** charged, so your badge carries on running for hours after you unplug it — and for days at a time on Badger's ultra-low-power E Ink display.
 
-Create a file called `__init__.py` inside your `hello` folder and open it in your text editor. Type in the following:
+Double-tap **RESET** and the badge mounts as an ordinary USB drive — just drag your files on and eject. No toolchains, no drivers, no fuss.
 
-```python
-def update():
-    screen.pen = color.navy
-    screen.clear()
+Prefer a live workflow? You can also use an editor like **VS Code** (with the [MicroPico](https://github.com/paulober/MicroPico) extension) or **[Thonny](https://thonny.org)** to write, run, and debug code on your badge in real time. Thonny is especially beginner-friendly and a great way to get started.
 
-    screen.pen = color.white
-    screen.font = rom_font.smart
-    screen.text("Hello, world!", 10, 50)
+# Wearable
 
-run(update)
-```
+The lanyard slot and mounting holes are part of the PCB itself, which extends up beyond the top of the clear polycarbonate case — a rugged, secure fixing point rather than a flimsy moulded tab, so your badge is ready to wear from the moment you power it on.
 
-Save the file. That's it — that's a complete Badgeware app!
+But it doesn't have to hang around your neck. The shape of the case also lets Badgeware stand upright on any flat surface — ideal for turning it into a tiny internet-connected display for your desk.
 
-## Run it!
+# Wi-Fi & Bluetooth
 
-Eject the badge drive safely from your computer. Your badge will reboot back to the menu. Navigate to your new "Hello" app and select it.
+Built-in **2.4GHz WiFi** and **Bluetooth 5.2** mean your badge is connected from the moment it powers on. Pull live data over the air, sync your details, show announcements, or have badges talk to each other — perfect for networking games, shared experiences, and dashboards that keep themselves up to date.
 
-You should see a navy blue screen with "Hello, world!" written on it in white. Congratulations, you've just made your first app!
+# Expansion & debugging
 
-# What Just Happened?
+<figure class="feature-callout">
+<div class="callout-media">
+<tufty-model hotspots="qwst-swd" float disable-default-lighting exposure="0.8" environment="neutral" shadow-intensity="1" camera-target="0m 0.004m 0m" camera-orbit="224deg 76deg 88%"></tufty-model>
+</div>
+</figure>
 
-Let's break down what that code does:
+The **Qw/ST connector** is a standard I2C port — plug in sensors and breakouts with a single cable, no soldering required. Right beside it, the **SWD port** gives you full hardware debugging for when you want to dig deep.
 
-- **`def update():`** — This is the heart of every Badgeware app. The badge calls this method over and over in a loop, once per frame. Everything you want to draw goes in here.
+Our **STEM kit** plugs straight into the Qw/ST port and turns your badge into a pocket science lab. It pairs a **sensor stick** — light and proximity, temperature, humidity, pressure, plus a motion-sensing accelerometer and gyroscope — with a **gamepad** add-on of directional, action, and system buttons and four indicator LEDs, so you can measure the world around you or build your own handheld games.
 
-- **`screen.pen = color.navy`** — Sets the drawing colour. Think of it like picking up a pen.
+# Under the hood
 
-- **`screen.clear()`** — Fills the entire screen with the current pen colour.
+There's a surprising amount packed into that slim case:
 
-- **`screen.pen = color.white`** — Switches to a new colour for the text.
+- **Processor** — a Raspberry Pi **RP2350** dual-core Cortex-M33 running at 200MHz, with 16MB of flash for your code and assets and 8MB of PSRAM for runtime use.
+- **Real-time clock** — keeps accurate time even in deep sleep, so schedules and alarms survive between wake-ups.
 
-- **`screen.font = rom_font.smart`** — Picks one of the 30+ built-in pixel fonts to write with.
+# Backlights
 
-- **`screen.text("Hello, world!", 10, 50)`** — Draws text at position x=10, y=50 on the screen.
+<figure class="feature-callout">
+<div class="callout-media">
+<tufty-model backlight float disable-default-lighting exposure="0.8" environment="neutral" shadow-intensity="1" camera-target="0m 0.004m 0m" camera-orbit="190deg 80deg 90%"></tufty-model>
+</div>
+<figcaption>Four bright white LEDs glow through the back of the case.</figcaption>
+</figure>
 
-- **`run(update)`** — This sits at the very end and tells the badge to start running your `update()` loop.
+Four bright white LEDs around the back of the board glow through the translucent case — status lights, notifications, or ambient effects. Drive each zone independently and animate them however you like.
 
-# Make It Interactive
+# Ready to build something?
 
-Now let's add a button press. We'll make the text change when you press a button:
+Now you've met the hardware, it's time to make it do something.
 
-```python
-messages = ["Hello, world!", "Badgeware rocks!", "Press a button!"]
-current = 0
+- **[Creating your first app](/introduction/your-first-app.md)** — write a complete app in a few lines of Python, from plugging in to seeing it run.
+- **[Coding for the different badges](/introduction/badge-differences.md)** — how Tufty, Badger, and Blinky differ, and how to write code that runs on all three.
+- **[Update your firmware](/introduction/update-your-firmware.md)** — make sure your badge is running the latest and greatest.
 
-def update():
-    global current
-
-    if badge.pressed(BUTTON_UP):
-        current = (current + 1) % len(messages)
-
-    screen.pen = color.navy
-    screen.clear()
-
-    screen.pen = color.white
-    screen.font = rom_font.smart
-
-    text = messages[current]
-    width, _ = screen.measure_text(text)
-    x = (screen.width / 2) - (width / 2)
-
-    screen.text(text, x, 50)
-
-run(update)
-```
-
-Save, eject, and run the app again. Each time you press the **Up** button, the message will cycle through the list. We're also centring the text on screen now by measuring its width first.
-
-# Add Some Colour
-
-Let's make things a bit more visual by adding a coloured rectangle behind the text:
-
-```python
-messages = ["Hello, world!", "Badgeware rocks!", "Press a button!"]
-current = 0
-
-def update():
-    global current
-
-    if badge.pressed(BUTTON_UP):
-        current = (current + 1) % len(messages)
-
-    screen.pen = color.navy
-    screen.clear()
-
-    # draw a lighter rectangle as a banner
-    screen.pen = color.rgb(60, 80, 120)
-    screen.rectangle(rect(5, 40, screen.width - 10, 30))
-
-    # draw the text centred inside the banner
-    screen.pen = color.white
-    screen.font = rom_font.smart
-
-    text = messages[current]
-    width, _ = screen.measure_text(text)
-    x = (screen.width / 2) - (width / 2)
-
-    screen.text(text, x, 45)
-
-run(update)
-```
-
-Now your app has a banner with centred, cycling text — all in about 20 lines of code.
-
-# Where To Go From Here
-
-You've got the basics down. Here are some good next steps:
-
-- **[Update Your Firmware](/introduction/update-your-firmware.md)** — Make sure your badge is running the latest firmware! 
-- **[Creating an App](/introduction/your-first-app.md)** — Learn about the full app structure, including `init()` and `on_exit()` methods.
-- **[Badge Differences](/introduction/badge-differences.md)** — Understand how Tufty, Badger, and Blinky differ and how to code for each.
-- **[Tutorial 1: A Simple Badge](/tutorials/creating_a_simple_badge.md)** — A longer, guided project that adds images, more text, and deeper interaction
-
-Once you're comfortable, dive into the **[Guides](/README.md#guides)** for features like sprites, vector shapes, animation, and more — or browse the **[API reference](/README.md#api)** when you need the details. You can also find some related guides on our Learn portal:
-
-- **[Alternative Badgeware Workflows](https://learn.pimoroni.com/article/alternative-badgeware-workflows)** - How to program Badgeware with Thonny or `mpremote`.
-- **[Remote Controlled LEDs with Badgeware and MQTT](https://learn.pimoroni.com/article/mqtt-remote-control)** - Use Badgeware to wirelessly control another RP2350 device.
+Once you're comfortable, dive into the **[Guides](/README.md#guides)** for sprites, text, vector shapes, and animation — or reach for the **[API reference](/README.md#api)** when you need the details.
 
 Happy hacking!
