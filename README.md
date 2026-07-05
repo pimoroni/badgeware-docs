@@ -12,7 +12,7 @@ Your badge comes preloaded with a set of apps, but the real fun starts when you 
 
 This site is your guide. You'll find step-by-step tutorials to get you up and running, feature guides that go deeper on topics like sprites, text, and vector shapes, and a full API reference for when you need the details. Whether you're building a name badge for a conference, a tiny game to pass the time, or a dashboard that pulls live data over WiFi — it all starts here.
 
-New here? Head straight to **[Getting started](/introduction/getting-started.md)** to write your first app in minutes.
+New here? Head straight to **[Meet your badge](/introduction/meet-your-badge.md)** to get acquainted with the hardware.
 
 # Meet the badges
 
@@ -71,9 +71,9 @@ That's a complete, runnable app — copy it onto your badge and it just works. E
 
 # Where to next
 
-- **[Getting started](/introduction/getting-started.md)** — plug in and run your first app in minutes.
+- **[Meet your badge](/introduction/meet-your-badge.md)** — a quick tour of the hardware and what it can do.
 - **[Creating your first app](/introduction/your-first-app.md)** — the full app structure, including `init()` and `on_exit()`.
-- **[Coding for the different badges](/introduction/badge-differences.md)** — how Tufty, Badger, and Blinky differ, and how to write code that runs on all three.
+- **[Coding for the different badges](/guides/badge-differences.md)** — how Tufty, Badger, and Blinky differ, and how to write code that runs on all three.
 - **[Guides](/README.md#guides)** — go deeper on sprites, text, vector shapes, animation, and more.
 - **[API reference](/README.md#api)** — the details, for when you need them.
 

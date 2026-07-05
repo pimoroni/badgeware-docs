@@ -1,52 +1,50 @@
 ---
-title: Updating firmware
+title: Firmware updates
 summary: Keep your badge up to date with the latest Badgeware firmware.
 icon: save
 publish: true
 ---
 
-# Update Your Firmware
+# Update your firmware
 
-Before you start coding, make sure your badge is running the latest firmware. New releases include bug fixes, performance improvements, and new features — if something isn't working the way the docs describe, an outdated firmware is often the reason.
+Before you start coding, it's worth making sure your badge is running the latest firmware. New releases bring bug fixes, performance improvements and new features — so if something isn't behaving the way the docs describe, out-of-date firmware is a common culprit.
 
-## Latest Release: v2.0.2 (10th April 2026)
+# Latest firmware
 
-- v2.0.1 fixes FAT filesystem corruption, vector rendering clipping, image blitting overflow, and power consumption during sleep mode. It also introduces the new `badge` module which replaces the previous `io` module with expanded functionality.
-- v2.0.2 is a maintenance release to fix some bugs and quirks in PicoVector. Tufty gets some updated graphics, and a new ISS app!
+Grab the build for your badge below — these links come straight from our GitHub releases, so they're always the current version:
 
-> **If you're upgrading from an old (v1) version of the firmware you should back up your code! Recent builds will rebuild the filesystem on your badge!**
+```firmware
+```
 
-Download the correct firmware for your badge:
+> **Back up your code first!** Updating the firmware resets the badge's filesystem, so anything stored on it will be wiped — save a copy of any code you want to keep before you start.
 
-- **Badger:** [badger-v2.0.2-micropython-with-filesystem.uf2](https://github.com/pimoroni/badger2350/releases/download/v2.0.2/badger-v2.0.2-micropython-with-filesystem.uf2)
-- **Tufty:** [tufty-v2.0.2-micropython-with-filesystem.uf2](https://github.com/pimoroni/tufty2350/releases/download/v2.0.2/tufty-v2.0.2-micropython-with-filesystem.uf2)
-- **Blinky:** [blinky-v2.0.2-micropython-with-filesystem.uf2](https://github.com/pimoroni/blinky2350/releases/download/v2.0.2/blinky-v2.0.2-micropython-with-filesystem.uf2)
+# How to update
 
-## How to Update
+### 1. Back up your code
 
-### Step 1: Back Up Your Code
+The update resets the filesystem, so everything on the badge will be erased. Put the badge into disk mode (double-tap **RESET**) and copy out any of *your own* apps or files that you want to keep. No need to save the built-in apps — the update ships fresh versions of those, so grabbing the whole `/apps` folder would only overwrite them with older copies later.
 
-Since the firmware update rebuilds the filesystem, any apps or files on your badge will be erased. Put your badge into Disk Mode (double-tap **RESET**), then copy your `/apps` folder to your computer.
+### 2. Enter bootloader mode
 
-### Step 2: Enter Bootloader Mode
+- Connect the badge to your computer with a USB-C cable.
+- Hold down the **BOOT** button on the back of the badge.
+- Keeping **BOOT** held, tap **RESET**, then release **BOOT**.
+- The badge appears as a drive called **RP2350**.
 
-- Connect your badge to your computer with a USB-C cable
-- Hold down the **BOOT** button on the back of the badge
-- While holding **BOOT**, tap the **RESET** button
-- Release **BOOT** — your badge should appear as a drive called **RP2350**
+### 3. Flash the firmware
 
-### Step 3: Flash the Firmware
+- Drag the `.uf2` file you downloaded onto the **RP2350** drive.
+- The badge flashes it and reboots into the new firmware automatically.
 
-- Drag and drop the `.uf2` file you downloaded onto the **RP2350** drive
-- Your badge will automatically reboot into the new firmware
+The whole thing takes a couple of minutes.
 
-The whole process takes a couple of minutes.
+### 4. Restore your code
 
-### Step 4: Restore Your Code
+Once it's rebooted, go back into disk mode (double-tap **RESET**) and copy your own apps and files back into `/apps`.
 
-Once the badge has rebooted, go back into Disk Mode (double-tap **RESET**) and copy your apps back onto the badge.
+> If one of your apps misbehaves after updating, it may be leaning on something that changed in the new firmware. Have a look at the release notes above and tweak your code to match.
 
-## Troubleshooting
+# Troubleshooting
 
-- **The RP2350 drive doesn't appear?** Make sure you're holding **BOOT** before you tap **RESET**. Hold BOOT first, then tap RESET, then release BOOT.
-- **Badge isn't responding at all?** Try a different USB-C cable. Some cables are charge-only and don't carry data.
+- **No RP2350 drive?** Make sure you hold **BOOT** *before* tapping **RESET** — hold BOOT, tap RESET, then release BOOT.
+- **Badge not responding at all?** Try a different USB-C cable; some are charge-only and don't carry data.

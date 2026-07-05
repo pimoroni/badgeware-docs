@@ -25,14 +25,6 @@ If you pass these methods a button constant as a parameter, they will return a b
 
 > For the **pressed** and **released** lists, buttons are only included on the first frame in which the event occurs.
 
-# Reset button
-**RESET** is a special button which is used to put Badgeware into different modes and cannot be used within applications.
-
-- **Tap**: Resets Badgeware and boots back into the launcher.
-- **Double tap**: Puts Badgeware into Disk Mode which it will appear as a disk on any computer it is plugged into.
-- **Long press**: Puts Badgeware into deep sleep. In this mode your badge will conserve battery but can be woken at any time by pressing any of the front buttons or scheduling an alarm.
-- **Tap while holding down HOME**: Resets Badgeware and enters the RP2350 DFU bootloader, useful for updating the Badgeware firmware.
-
 # Detecting button state
 
 There are two main ways to handle button input:
@@ -45,32 +37,36 @@ By testing whether a button appears in the pressed, held, released, or changed l
 > Note: Click on the emulator to allow it to capture input. Use the arrow keys and space on your keyboard to try the example out!
 
 ```python
-last_event = None
+# a readable name for each button constant
+BUTTON_NAMES = {
+  BUTTON_A: "A",
+  BUTTON_B: "B",
+  BUTTON_C: "C",
+  BUTTON_UP: "UP",
+  BUTTON_DOWN: "DOWN",
+}
 
-def update():
-  global last_event
+log = []
 
-  # true only when button A is newly pressed this frame
-  if badge.pressed(BUTTON_A):
-    last_event = "BUTTON A PRESSED!"
+while True:
+  # check each button for every kind of event, logging whatever happened
+  for button, name in BUTTON_NAMES.items():
+    if badge.pressed(button):
+      log.append(name + " pressed")
+    if badge.released(button):
+      log.append(name + " released")
+    if badge.held(button):
+      log.append(name + " held")
 
-  # true continuously while button B is being held
-  if badge.held(BUTTON_B):
-    last_event = "BUTTON B HELD!"
+  # keep just the ten most recent events — older ones scroll off the top
+  log = log[-10:]
 
-  # true only if button C has been released this frame
-  if badge.released(BUTTON_C):
-    last_event = "BUTTON C RELEASED!"
+  # draw the log, oldest at the top and newest at the bottom
+  screen.pen = color.white
+  for i in range(len(log)):
+    screen.text(log[i], 10, 10 + i * 20)
 
-  # true only if button UP has changed state this frame
-  if badge.changed(BUTTON_UP):
-    last_event = "BUTTON UP CHANGED!"
-
-  if last_event:
-    screen.pen = color.white
-    screen.text(last_event, 10, 10)
-
-run(update)
+  badge.update()
 ```
 
 # Examples

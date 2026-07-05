@@ -1,5 +1,5 @@
 ---
-title: Introduction
+title: Meet your badge
 summary: Meet your Badgeware badge — a quick tour of what's inside and what it can do.
 icon: rocket
 publish: true
@@ -11,11 +11,11 @@ Before you write a line of code, let's take a tour of the hardware — what ever
 
 # Display
 
-Every badge is built around its display — and it's the one feature that really sets the three apart. Each has a completely different kind of screen, so the badge you choose shapes how your apps look and feel. The good news: you draw to all of them with the same commands, so code written for one mostly runs on the others — see **[Coding for the different badges](/introduction/badge-differences.md)** for more specific information on how to deal with their differences.
+Every badge is built around its display — and it's the one feature that really sets the three apart. Each has a completely different kind of screen, so the badge you choose shapes how your apps look and feel. The good news: you draw to all of them with the same commands, so code written for one mostly runs on the others — see **[Coding for the different badges](/guides/badge-differences.md)** for more specific information on how to deal with their differences.
 
 | Tufty | Badger | Blinky |
 |---|---|---|
-| <tufty-model float disable-default-lighting exposure="0.8" environment="neutral" shadow-intensity="1" camera-target="0m 0.004m 0m" camera-orbit="-12deg 80deg 80%" loading="lazy" style="display:block;width:100%;aspect-ratio:1/1"></tufty-model> | <badger-model float disable-default-lighting exposure="0.8" environment="neutral" shadow-intensity="1" camera-target="0m 0.004m 0m" camera-orbit="-12deg 80deg 80%" loading="lazy" style="display:block;width:100%;aspect-ratio:1/1"></badger-model> | <blinky-model float disable-default-lighting exposure="0.8" environment="neutral" shadow-intensity="1" camera-target="0m 0.004m 0m" camera-orbit="-12deg 80deg 80%" loading="lazy" style="display:block;width:100%;aspect-ratio:1/1"></blinky-model> |
+| <tufty-model float disable-default-lighting exposure="1.2" environment="none" ambient="5" shadow-intensity="1" camera-target="0m 0.002m 0m" camera-orbit="-8deg 82deg 70%" loading="lazy" style="display:block;width:100%;aspect-ratio:4/3"></tufty-model> | <badger-model float disable-default-lighting exposure="1.2" environment="none" ambient="5" shadow-intensity="1" camera-target="0m 0.002m 0m" camera-orbit="-8deg 82deg 70%" loading="lazy" style="display:block;width:100%;aspect-ratio:4/3"></badger-model> | <blinky-model float disable-default-lighting exposure="1.2" environment="none" ambient="5" shadow-intensity="1" camera-target="0m 0.002m 0m" camera-orbit="-8deg 82deg 70%" loading="lazy" style="display:block;width:100%;aspect-ratio:4/3"></blinky-model> |
 | Full-colour IPS LCD | E Ink display | Greyscale LED matrix |
 | 320 × 240 | 264 × 176 | 39 × 26 |
 | Full RGB colour | Black, white + 2 greys | Bright white greyscale |
@@ -28,12 +28,18 @@ In short: reach for **Tufty** when you want colour, motion, and rich graphics; *
 
 <figure class="feature-callout">
 <div class="callout-media">
-<tufty-model hotspots="user-buttons" float disable-default-lighting exposure="0.8" environment="neutral" shadow-intensity="1" camera-target="0.014m 0.004m 0m" camera-orbit="28deg 80deg 90%"></tufty-model>
+<tufty-model hotspots="user-buttons" float disable-default-lighting exposure="1.2" environment="none" ambient="5" shadow-intensity="1" camera-target="0.014m 0.004m 0m" camera-orbit="28deg 80deg 90%"></tufty-model>
 </div>
 <figcaption>Five soft-touch buttons — everything your apps need to feel interactive.</figcaption>
 </figure>
 
 Five tactile buttons on the front — **A**, **B**, **C**, **UP**, and **DOWN** — are how people talk to your apps: scroll a menu, flip a page, fire a shot, cast a vote.
+
+<figure class="feature-callout">
+<div class="callout-media">
+<tufty-model hotspots="system-buttons" float disable-default-lighting exposure="1.2" environment="none" ambient="5" shadow-intensity="1" camera-target="0m 0.004m 0m" camera-orbit="210deg 77deg 90%"></tufty-model>
+</div>
+</figure>
 
 On the back sit two more buttons — **RESET** and **HOME**. Look closely and each carries smaller secondary labels: RESET also reads **DISK** and **SLEEP**, and HOME also reads **BOOT**. That's because the function depends on how you press them.
 
@@ -49,7 +55,7 @@ On the back sit two more buttons — **RESET** and **HOME**. Look closely and ea
 
 <figure class="feature-callout">
 <div class="callout-media">
-<tufty-model hotspots="usb-c" float disable-default-lighting exposure="0.8" environment="neutral" shadow-intensity="1" camera-target="-0.014m 0.004m 0.002m" camera-orbit="-46deg 80deg 90%"></tufty-model>
+<tufty-model hotspots="usb-c" float disable-default-lighting exposure="1.2" environment="none" ambient="5" shadow-intensity="1" camera-target="-0.014m 0.004m 0.002m" camera-orbit="-46deg 80deg 90%"></tufty-model>
 </div>
 <figcaption>USB-C — the badge's one connection for power, charging, and moving your code and files.</figcaption>
 </figure>
@@ -60,7 +66,7 @@ It keeps a built-in **1,000mAh rechargeable LiPo battery** charged, so your badg
 
 Double-tap **RESET** and the badge mounts as an ordinary USB drive — just drag your files on and eject. No toolchains, no drivers, no fuss.
 
-Prefer a live workflow? You can also use an editor like **VS Code** (with the [MicroPico](https://github.com/paulober/MicroPico) extension) or **[Thonny](https://thonny.org)** to write, run, and debug code on your badge in real time. Thonny is especially beginner-friendly and a great way to get started.
+Prefer a live workflow? You can also use an editor like **VS Code** (with the [MicroPico](https://github.com/paulober/MicroPico) extension) or [Thonny](https://thonny.org) to write, run, and debug code on your badge in real time. Thonny is especially beginner-friendly and a great way to get started.
 
 # Wearable
 
@@ -76,7 +82,7 @@ Built-in **2.4GHz WiFi** and **Bluetooth 5.2** mean your badge is connected from
 
 <figure class="feature-callout">
 <div class="callout-media">
-<tufty-model hotspots="qwst-swd" float disable-default-lighting exposure="0.8" environment="neutral" shadow-intensity="1" camera-target="0m 0.004m 0m" camera-orbit="224deg 76deg 88%"></tufty-model>
+<tufty-model hotspots="qwst-swd" float disable-default-lighting exposure="1.2" environment="none" ambient="5" shadow-intensity="1" camera-target="0m 0.004m 0m" camera-orbit="224deg 76deg 88%"></tufty-model>
 </div>
 </figure>
 
@@ -84,32 +90,31 @@ The **Qw/ST connector** is a standard I2C port — plug in sensors and breakouts
 
 Our **STEM kit** plugs straight into the Qw/ST port and turns your badge into a pocket science lab. It pairs a **sensor stick** — light and proximity, temperature, humidity, pressure, plus a motion-sensing accelerometer and gyroscope — with a **gamepad** add-on of directional, action, and system buttons and four indicator LEDs, so you can measure the world around you or build your own handheld games.
 
-# Under the hood
-
-There's a surprising amount packed into that slim case:
-
-- **Processor** — a Raspberry Pi **RP2350** dual-core Cortex-M33 running at 200MHz, with 16MB of flash for your code and assets and 8MB of PSRAM for runtime use.
-- **Real-time clock** — keeps accurate time even in deep sleep, so schedules and alarms survive between wake-ups.
-
 # Backlights
 
 <figure class="feature-callout">
 <div class="callout-media">
-<tufty-model backlight float disable-default-lighting exposure="0.8" environment="neutral" shadow-intensity="1" camera-target="0m 0.004m 0m" camera-orbit="190deg 80deg 90%"></tufty-model>
+<tufty-model backlight float disable-default-lighting exposure="1.2" environment="none" ambient="5" shadow-intensity="1" camera-target="0m 0.004m 0m" camera-orbit="190deg 80deg 90%"></tufty-model>
 </div>
 <figcaption>Four bright white LEDs glow through the back of the case.</figcaption>
 </figure>
 
 Four bright white LEDs around the back of the board glow through the translucent case — status lights, notifications, or ambient effects. Drive each zone independently and animate them however you like.
 
-# Ready to build something?
+# Other features
 
-Now you've met the hardware, it's time to make it do something.
+We've covered the headlines — the display, buttons, ports, and wireless. Here's the rest of what's packed into that slim case, from the processor to the little details that make everyday use nicer:
 
-- **[Creating your first app](/introduction/your-first-app.md)** — write a complete app in a few lines of Python, from plugging in to seeing it run.
-- **[Coding for the different badges](/introduction/badge-differences.md)** — how Tufty, Badger, and Blinky differ, and how to write code that runs on all three.
-- **[Update your firmware](/introduction/update-your-firmware.md)** — make sure your badge is running the latest and greatest.
+- **Processor** — a Raspberry Pi **RP2350B**: a dual-core Arm Cortex-M33 running at 250MHz with 520KB of SRAM — plenty of grunt for smooth animation.
+- **Flash** — 16MB of QSPI flash with execute-in-place (XiP), leaving lots of room for your code and assets.
+- **PSRAM** — 8MB of it, so you can code freely without having to sweat every byte.
+- **Light sensor** — a phototransistor (Tufty only) that automatically adjusts the screen backlight to suit your surroundings.
+- **Real-time clock** — a PCF85063A that keeps accurate time even in deep sleep, so alarms and schedules survive between wake-ups.
+- **Case** — a clear polycarbonate shell with a badge-specific colourway on the back to keep everything protected.
+- **MicroPython** — programmed in MicroPython; no compilers or toolchains to install.
+- **Ready to run** — arrives fully assembled with a matching two-clip lanyard, no soldering required.
+- **Dimensions** — 84 × 76 × 20mm with the case on.
 
-Once you're comfortable, dive into the **[Guides](/README.md#guides)** for sprites, text, vector shapes, and animation — or reach for the **[API reference](/README.md#api)** when you need the details.
+# That's your badge
 
-Happy hacking!
+And that's the whole thing — a bright display, a handful of buttons, wireless, expansion ports, and a genuinely capable computer, all in a case that's ready to wear or stand on your desk. It's rugged, it's hackable, and every part of it is yours to play with. Now you know your way around the hardware, let's write some code and bring it to life.

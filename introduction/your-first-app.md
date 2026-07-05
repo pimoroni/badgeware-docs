@@ -1,85 +1,103 @@
 ---
 title: Creating your first app
-summary: Learn how to build a Badgeware app
+summary: Turn the app you just wrote into a proper Badgeware app — installed on your badge, in the menu, with its own icon.
 icon: shapes
+publish: true
 sort: 3
 ---
 
 # Creating your first app
 
-Badgeware's default menu system makes it easy to create a new app. Each app is contained in its own folder. If you're using disk mode to copy files to Badgeware, that folder will be inside `/apps`. If you're connecting via Thonny or other IDEs, you'll find it under `/system/apps`, but we recommend using disk mode.
+In the last guide you wrote some code and ran it straight from your editor — great for tinkering, but it lives on your computer. To turn it into a real Badgeware app — one that installs onto your badge, appears in the menu with its own icon, and launches like anything else — you just need to give it the right shape and copy it across. The code itself barely changes.
+
+# What makes an app
+
+An app is simply a **folder** inside `/apps`. Give it the right pieces and the badge finds it and adds it to the home menu automatically:
 
 ```bash
 /apps
-  /my_application
-    icon.png
+  /my_first_app
     __init__.py
+    icon.png
     /assets
-      ...
 ```
 
-The home menu will detect each folder inside `/apps` as an app, as long as it has the minimum structure detailed below. If it does, it will automatically appear in the menu. The name given to it in the menu is the folder name, with automatic capitalisation and with underscores changed to spaces. For example, the app in the folder `my_application` would show up in the menu as "My Application".
+- **`__init__.py`** — your code; it runs when the app launches.
+- **`icon.png`** — a 24×24 PNG shown next to the app in the menu.
+- **`assets/`** — an optional folder for images, fonts and anything else the app needs.
 
-Each application has a simple minimum structure:
+The menu name comes from the folder name — underscores become spaces and each word is capitalised — so `my_first_app` becomes **My First App**.
 
-- `icon.png` is the icon shown for your app in the main menu. It should be a 24x24 PNG image.
-- `__init__.py` is the entry point of your app. It will run when your app is started from the menu and contains the main program loop of your app.
-- `assets/` is a folder which will contain any assets such as image files that your app uses.
+Let's build one, straight onto the badge.
 
-## Anatomy of __init__.py
+# 1. Enter disk mode
 
-There are certain things your `__init__.py` will need to work, and certain things which will be optional depending on what you wish to include in your app.
+Plug your badge in over USB and **double-tap RESET**. It mounts on your computer as a USB drive named **TUFTY**, **BLINKY** or **BADGER** — that's the badge's filesystem, and it's where apps live.
 
-First you'll need to import relevant modules as in any Python program. Badgeware takes care of all the importing of system modules, and changes your working directory to your app's directory. Changing the working directory means that you can now import assets and other python files using paths relative to `__init__.py`, like so:
+Open it up and find the `/apps` folder.
 
-```python-raw
-import my_module
+# 2. Create your app folder
 
-my_image = image.load("assets/my_image.png")
+Inside `/apps`, make a new folder called `my_first_app`. Everything your app needs will live in here — which is also what makes an app easy to back up, move between badges, or zip up to share.
+
+Remember, the folder name becomes the menu name, so this one will show up as **My First App**.
+
+# 3. Add your code
+
+Inside that folder, save your program as `__init__.py` — that exact name, because it's the file Badgeware runs when the app launches. It's the same script from the last guide, unchanged:
+
+```python {static}
+import time
+
+screen.pen = color.white
+screen.font = rom_font.smart
+
+def loading_screen():
+  screen.text("MY BADGE", 10, 40)
+  screen.text("starting up...", 10, 70)
+  badge.update()
+  time.sleep(1.5)
+
+def menu(items):
+  selected = 0
+  while True:
+    for i in range(len(items)):
+      marker = "> " if i == selected else "  "
+      screen.text(marker + items[i], 10, 30 + i * 20)
+    badge.update()
+
+    if badge.pressed(BUTTON_UP):
+      selected = (selected - 1) % len(items)
+    if badge.pressed(BUTTON_DOWN):
+      selected = (selected + 1) % len(items)
+    if badge.pressed(BUTTON_A):
+      return selected
+
+def show_item(selected):
+  while not badge.pressed(BUTTON_B):
+    if selected == 0:
+      screen.text("Hello there!", 10, 40)
+    elif selected == 1:
+      screen.text("Zzz... counting sheep", 10, 40)
+    else:
+      screen.text("My Badgeware badge", 10, 40)
+    screen.text("B to go back", 10, 90)
+    badge.update()
+
+loading_screen()
+
+items = ["Say hello", "Count sheep", "About"]
+while True:
+  choice = menu(items)
+  show_item(choice)
 ```
 
-That way you can keep all of your app's files in one folder, and easily move that folder from unit to unit or zip it if you want to share it.
+# 4. Add an icon
 
-The first optional element of your app is the `init()` method. This will run once automatically when your app is launched.
+Finally, drop an `icon.png` in next to `__init__.py`. The home menu is a grid of these icons — your icon *is* your app on screen, with the highlighted app's name shown in an overlay along the bottom. It's a **24×24 PNG**, so keep it bold and simple — one clear shape or a couple of letters reads far better than fine detail. Any image editor will do.
 
-Anything you want to set up, such as loading in a saved state or setting initial conditions for the app, is performed here.
+# 5. Launch it
 
-Next up is your `update()` method. This one forms the main program loop. `update()` will loop endlessly, until the program is ended either by pressing the `HOME` button to return to the menu or by resetting the unit. This is paired with `run(update)` at the very end of the code - this will start the loop when your app starts.
+Eject the drive and reset the badge. Your app is now in the home menu, icon and all — select it to launch, and press **HOME** to come back.
 
-NOTE: Badger uses `update()` in a slightly different way. This is explained [here](/introduction/badge-differences.md).
-
-Another optional method is `on_exit()`. This will be called when you leave the app by pressing the `HOME` button, and is the last thing that the program will do before closing, so it is useful for things like saving the program's state and so forth. Note that a power loss, like resetting the unit, going into disk mode or running out of battery, won't fire this method and data won't be saved.
-
-```python
-# example __init__.py for an application
-import math
-
-# select a font to use
-screen.font = rom_font.nope
-
-# called once when your app launches (optional)
-def init():
-  pass
-
-# called every frame, do all your stuff here! (required!)
-def update():
-  # clear the framebuffer
-  screen.pen = color.rgb(20, 40, 60)
-  screen.clear()
-
-  # calculate and draw an animated sine wave
-  y = (math.sin(badge.ticks / 100) * 20) + 80
-  screen.pen = color.rgb(0, 255, 0)
-  for x in range(160):
-    screen.rectangle(x, y, 1, 1)
-
-  # write a message
-  screen.pen = color.rgb(255, 255, 255)
-  screen.text("hello badge!", 10, 10)
-
-# called before returning to the menu to allow you to save state (optional)
-def on_exit():
-  pass
-
-run(update)
-```
+That's it — you've gone from a snippet in an editor to a real app living on your badge. 🎉
