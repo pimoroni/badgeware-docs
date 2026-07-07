@@ -15,7 +15,7 @@ Every badge is built around its display — and it's the one feature that really
 
 | Tufty | Badger | Blinky |
 |---|---|---|
-| <tufty-model float disable-default-lighting exposure="1.2" environment="none" ambient="5" shadow-intensity="1" camera-target="0m 0.002m 0m" camera-orbit="-8deg 82deg 70%" loading="lazy" style="display:block;width:100%;aspect-ratio:4/3"></tufty-model> | <badger-model float disable-default-lighting exposure="1.2" environment="none" ambient="5" shadow-intensity="1" camera-target="0m 0.002m 0m" camera-orbit="-8deg 82deg 70%" loading="lazy" style="display:block;width:100%;aspect-ratio:4/3"></badger-model> | <blinky-model float disable-default-lighting exposure="1.2" environment="none" ambient="5" shadow-intensity="1" camera-target="0m 0.002m 0m" camera-orbit="-8deg 82deg 70%" loading="lazy" style="display:block;width:100%;aspect-ratio:4/3"></blinky-model> |
+| <tufty-model shadow lighting="150" position="-3 30 0" model-offset="-0.002m 0m 0m" camera="0deg 90deg 45%" style="aspect-ratio:1 / 1"></tufty-model> | <badger-model shadow lighting="150" position="-3 30 0" model-offset="-0.002m 0m 0m" camera="0deg 90deg 45%" style="aspect-ratio:1 / 1"></badger-model> | <blinky-model shadow lighting="150" position="-3 30 0" model-offset="-0.002m 0m 0m" camera="0deg 90deg 45%" style="aspect-ratio:1 / 1"></blinky-model> |
 | Full-colour IPS LCD | E Ink display | Greyscale LED matrix |
 | 320 × 240 | 264 × 176 | 39 × 26 |
 | Full RGB colour | Black, white + 2 greys | Bright white greyscale |
@@ -28,7 +28,7 @@ In short: reach for **Tufty** when you want colour, motion, and rich graphics; *
 
 <figure class="feature-callout">
 <div class="callout-media">
-<tufty-model hotspots="user-buttons" float disable-default-lighting exposure="1.2" environment="none" ambient="5" shadow-intensity="1" camera-target="0.014m 0.004m 0m" camera-orbit="28deg 80deg 90%"></tufty-model>
+<tufty-model hotspots="user-buttons" float shadow camera-target="0.014m 0.004m 0m" camera="28deg 80deg 90%"></tufty-model>
 </div>
 <figcaption>Five soft-touch buttons — everything your apps need to feel interactive.</figcaption>
 </figure>
@@ -37,7 +37,7 @@ Five tactile buttons on the front — **A**, **B**, **C**, **UP**, and **DOWN** 
 
 <figure class="feature-callout">
 <div class="callout-media">
-<tufty-model hotspots="system-buttons" float disable-default-lighting exposure="1.2" environment="none" ambient="5" shadow-intensity="1" camera-target="0m 0.004m 0m" camera-orbit="210deg 77deg 90%"></tufty-model>
+<tufty-model hotspots="system-buttons" float shadow camera-target="0m 0.004m 0m" camera="210deg 77deg 90%"></tufty-model>
 </div>
 </figure>
 
@@ -55,7 +55,7 @@ On the back sit two more buttons — **RESET** and **HOME**. Look closely and ea
 
 <figure class="feature-callout">
 <div class="callout-media">
-<tufty-model hotspots="usb-c" float disable-default-lighting exposure="1.2" environment="none" ambient="5" shadow-intensity="1" camera-target="-0.014m 0.004m 0.002m" camera-orbit="-46deg 80deg 90%"></tufty-model>
+<tufty-model hotspots="usb-c" float shadow camera-target="-0.014m 0.004m 0.002m" camera="-46deg 80deg 90%"></tufty-model>
 </div>
 <figcaption>USB-C — the badge's one connection for power, charging, and moving your code and files.</figcaption>
 </figure>
@@ -82,7 +82,7 @@ Built-in **2.4GHz WiFi** and **Bluetooth 5.2** mean your badge is connected from
 
 <figure class="feature-callout">
 <div class="callout-media">
-<tufty-model hotspots="qwst-swd" float disable-default-lighting exposure="1.2" environment="none" ambient="5" shadow-intensity="1" camera-target="0m 0.004m 0m" camera-orbit="224deg 76deg 88%"></tufty-model>
+<tufty-model hotspots="qwst-swd" float shadow camera-target="0m 0.004m 0m" camera="224deg 76deg 88%"></tufty-model>
 </div>
 </figure>
 
@@ -94,7 +94,7 @@ Our **STEM kit** plugs straight into the Qw/ST port and turns your badge into a 
 
 <figure class="feature-callout">
 <div class="callout-media">
-<tufty-model backlight float disable-default-lighting exposure="1.2" environment="none" ambient="5" shadow-intensity="1" camera-target="0m 0.004m 0m" camera-orbit="190deg 80deg 90%"></tufty-model>
+<tufty-model backlight float shadow camera-target="0m 0.004m 0m" camera="190deg 80deg 90%"></tufty-model>
 </div>
 <figcaption>Four bright white LEDs glow through the back of the case.</figcaption>
 </figure>

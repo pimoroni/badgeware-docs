@@ -1,81 +1,95 @@
 ---
-title: Buttons
+title: Handling button input
 summary: Control how applications detect both single presses and continuous holds, enabling responsive controls for menus and interactivity.
 icon: gamepad_down
 ---
 
-# Introduction
-
-The `badge` module provides all the functionality needed to detect button states and handle user input events in your application.
-
-# User and Home buttons
-
-Badgeware features five front-facing buttons — **A**, **B**, **C**, **UP**, and **DOWN** — along with a **HOME** button on the rear.
-
-You can query the state of these buttons using the `badge` module, which provides four methods returning button activity during each frame:
-
-- `pressed()`: returns buttons that were pressed during the current frame
-- `released()`: returns buttons that were released during the current frame
-- `held()`: returns buttons that are currently being held down
-- `changed()`: returns buttons that have changed state this frame
-
-Each button is represented by a constant (for example, `BUTTON_A`). The API allows you to check whether a button has been pressed, released, or held, and whether its state has changed during the current frame.
-
-If you pass these methods a button constant as a parameter, they will return a bool representing whether that button fits the criteria. If you call them without a parameter as above, they will return a list of all button constants that fit the criteria.
-
-> For the **pressed** and **released** lists, buttons are only included on the first frame in which the event occurs.
-
 # Detecting button state
+
+Badgeware features five front-facing buttons — **A**, **B**, **C**, **UP**, and **DOWN** — along with a **HOME** button on the rear. In code, each is identified by a constant:
+
+- `BUTTON_A`
+- `BUTTON_B`
+- `BUTTON_C`
+- `BUTTON_UP`
+- `BUTTON_DOWN`
+- `BUTTON_HOME`
+
+The `badge` module provides methods to read the state of these buttons:
+
+| Method | Returns |
+|---|---|
+| `pressed([button])` | `True` if the button specified was pressed, or a list of all pressed buttons if no button specified |
+| `released([button])` | `True` if the button specified was released, or a list of all released buttons if no button specified |
+| `held([button])` | `True` if the button specified is held down, or a list of all held buttons if no button specified |
+| `changed([button])` | `True` if the button specified just changed state, or a list of all changed buttons if no button specified |
+
+```python-raw
+# pass a button to test just that one
+if badge.pressed(BUTTON_A):
+  print("A was pressed")
+
+# or call with no argument to get a list
+for button in badge.held():
+  print("holding", button)
+```
+
+These methods report the button state as of the most recent `badge.update()`. That call refreshes the display and takes a fresh reading of the buttons, so call it regularly — typically once each time round your loop — to keep things up to date.
 
 There are two main ways to handle button input:
 
 - Single press actions: for tasks like menu navigation or option selection, you typically want to respond only when a button is first pressed. Use **pressed**, **released**, and **changed** to handle button events like these.
 - Continuous actions: for games or repeated interactions, you often want something to happen continuously while a button is held down. Use **held** each frame to determine if a button is currently pressed.
 
-By testing whether a button appears in the pressed, held, released, or changed lists, you can respond to input events as they occur. This approach lets you distinguish between single actions, continuous input, and general state changes, giving you fine control over how your application reacts to user interaction.
-
-> Note: Click on the emulator to allow it to capture input. Use the arrow keys and space on your keyboard to try the example out!
+The example below makes the difference visible: each button lights up while it is **held**, and a line of text shows the most recent **pressed** or **released** event. Watch a button's box fill the whole time you hold it (continuous state), while the text updates only at the moment you press or let go (one-shot events).
 
 ```python
-# a readable name for each button constant
-BUTTON_NAMES = {
-  BUTTON_A: "A",
-  BUTTON_B: "B",
-  BUTTON_C: "C",
-  BUTTON_UP: "UP",
-  BUTTON_DOWN: "DOWN",
-}
+screen.font = rom_font.nope
 
-log = []
+# each button constant, with a label and where to draw its box — positioned to match
+# the badge: A B C evenly spaced along the bottom, UP and DOWN up the right-hand edge
+# (the display is 160 x 120)
+BUTTONS = [
+  (BUTTON_A,    "A",     16, 96),
+  (BUTTON_B,    "B",     64, 96),
+  (BUTTON_C,    "C",    112, 96),
+  (BUTTON_UP,   "UP",   114, 26),
+  (BUTTON_DOWN, "DOWN", 114, 62),
+]
+
+# the most recent one-shot event, shown beneath the buttons
+last_event = "press a button"
 
 while True:
-  # check each button for every kind of event, logging whatever happened
-  for button, name in BUTTON_NAMES.items():
+  # pressed() and released() fire on a single frame — capture the latest one
+  for button, name, x, y in BUTTONS:
     if badge.pressed(button):
-      log.append(name + " pressed")
+      last_event = name + " pressed"
     if badge.released(button):
-      log.append(name + " released")
+      last_event = name + " released"
+
+  # draw each button, filled bright while held() is true, dim otherwise
+  for button, name, x, y in BUTTONS:
     if badge.held(button):
-      log.append(name + " held")
+      screen.pen = color.orange
+    else:
+      screen.pen = color.rgb(40, 44, 66)
+    screen.rectangle(x, y, 42, 22)
+    screen.pen = color.white
+    screen.text(name, x + 5, y + 7)
 
-  # keep just the ten most recent events — older ones scroll off the top
-  log = log[-10:]
-
-  # draw the log, oldest at the top and newest at the bottom
+  # show the latest press/release in the free space, top-left
   screen.pen = color.white
-  for i in range(len(log)):
-    screen.text(log[i], 10, 10 + i * 20)
+  screen.text(last_event, 8, 14)
 
   badge.update()
 ```
 
 # Examples
 
-## Navigating a menu
+## A simple menu
 
 This example demonstrates a simple menu system for Badgeware. It shows how to draw a list of menu items on the display and navigate through them with the **UP** and **DOWN** buttons. The currently selected item is highlighted, and the menu index wraps around so you can cycle smoothly through all options.
-
-> Note: Click on the emulator to allow it to capture input. Use the arrow keys and space on your keyboard to try the example out!
 
 ```python {len=6}
 screen.font = rom_font.nope
@@ -88,17 +102,15 @@ menu_items = [
 ]
 selected = 0
 
-def update():
-  global selected
-
-  # adjust selected item index based on button presses
+while True:
+  # move the selection up or down as those buttons are pressed
   if badge.pressed(BUTTON_UP):
     selected -= 1
 
   if badge.pressed(BUTTON_DOWN):
     selected += 1
 
-  # wrap and clamp selected index to the range of items in the menu
+  # wrap the index so it cycles around the ends of the menu
   selected %= len(menu_items)
 
   # write out the dialogue
@@ -118,53 +130,51 @@ def update():
     # write the menu item label
     screen.text(menu_items[i], 20, i * 15 + 50)
 
-run(update)
+  badge.update()
 ```
 
-## Controlling a character
-This example demonstrates simple character movement on Badgeware, showing how to combine button input with basic motion and drawing. The character is represented as a small circle that can move left or right using the A and C buttons and jump with the B button.
+## A tiny snake game
+This example steers a snake around the screen: **UP** and **DOWN** move it vertically, **A** and **C** move it left and right. The snake advances on its own — the buttons only change its direction, and it can't turn straight back on itself. It wraps around the edges of the display.
 
-Gravity and basic physics are simulated to create a natural sense of movement.
-
-> Note: Click on the emulator to allow it to capture input. Use the arrow keys + space on your keyboard to try the example out!
+The snake moves on an 8-pixel grid, so its position is tracked in grid cells rather than pixels. Its body is just a list of cells; each step we add a new head and drop the tail, which slides it forward at a fixed length.
 
 ```python
-# character's position and motion vector
-pos = vec2(80, 60)
-vec = vec2(0, 0)
+screen.font = rom_font.nope
 
-def update():
-  global pos, vec
+CELL = 8                          # size of one grid square, in pixels
+COLS, ROWS = 160 // CELL, 120 // CELL
 
-  if badge.held(BUTTON_A):
-    vec.x = -1 # move left
+# the snake's body as a list of [col, row] cells — the head is the last one
+snake = [[3, 7], [4, 7], [5, 7], [6, 7], [7, 7]]
+dx, dy = 1, 0                      # current direction (moving right)
 
-  if badge.held(BUTTON_C):
-    vec.x = 1 # move right
+STEP_MS = 200                      # advance one cell every 200 milliseconds
+last_step = badge.ticks           # badge.ticks is the clock in milliseconds
 
-  if badge.pressed(BUTTON_B):
-    vec.y = -3 # jump when B is pressed
+while True:
+  # steer with the buttons, but never straight back on itself
+  if badge.pressed(BUTTON_UP) and dy == 0:
+    dx, dy = 0, -1
+  if badge.pressed(BUTTON_DOWN) and dy == 0:
+    dx, dy = 0, 1
+  if badge.pressed(BUTTON_A) and dx == 0:
+    dx, dy = -1, 0
+  if badge.pressed(BUTTON_C) and dx == 0:
+    dx, dy = 1, 0
 
-  # dampen sideways movement
-  vec.x *= 0.8
+  # advance one cell once enough time has passed
+  if badge.ticks - last_step >= STEP_MS:
+    last_step = badge.ticks
+    head = snake[-1]
+    new_x = (head[0] + dx) % COLS   # wrap around the edges
+    new_y = (head[1] + dy) % ROWS
+    snake.append([new_x, new_y])
+    snake.pop(0)                    # drop the tail to keep a fixed length
 
-  # apply very rudimentary gravity
-  vec.y += 0.15
+  # draw each body cell, leaving a 1px gap so the segments are visible
+  screen.pen = color.lime
+  for col, row in snake:
+    screen.rectangle(col * CELL, row * CELL, CELL - 1, CELL - 1)
 
-  pos += vec
-
-  # clamp to floor
-  if pos.y > 90:
-    vec.y = 0
-    pos.y = 90
-
-  # draw the floor
-  screen.pen = color.white
-  screen.rectangle(0, 96, 160, 26)
-
-  # draw the character
-  screen.pen = color.red
-  screen.circle(pos, 5)
-
-run(update)
+  badge.update()
 ```

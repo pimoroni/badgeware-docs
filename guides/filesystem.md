@@ -1,10 +1,10 @@
 ---
-title: Filesystem
+title: Reading and writing files
 summary: Provides storage for apps, as well as the ability to read and write saved data from them.
 icon: save
 publish: true
 ---
-# Introduction
+# Using files
 
 The Badgeware file system is fairly simple - opening it in an IDE such as Thonny, you can see that there's a `rom` folder containing the built-in read only content accessible by apps, a `state` folder that contains saved data from all apps, and a `system` folder containing the user software on the device. It is this `system` folder which is mounted as a USB drive when the badge is connected in disk mode.
 
