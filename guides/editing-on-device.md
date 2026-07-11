@@ -28,6 +28,12 @@ To put your badge to sleep, press and hold the **RESET** button on the back unti
 
 In sleep mode your badge will sip battery power. In fact it will last for over 100 days, but it'll be ready to go at the press of any front button.
 
+# Shipping mode
+
+To put your badge into shipping mode, hold down both the **UP** and **DOWN** front buttons, then press and hold the **RESET** button on the back until the lights turn off.
+
+Shipping mode puts your badge to sleep and prevents it from being woken up by an RTC alarm or any other buttons besides the **RESET** button.
+
 # Firmware update
 
 To update your firmware:
