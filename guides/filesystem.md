@@ -1,62 +1,93 @@
 ---
-title: Reading and writing files
+title: The filesystem
 summary: Provides storage for apps, as well as the ability to read and write saved data from them.
 icon: save
 publish: true
 ---
 # Using files
 
-The Badgeware file system is fairly simple - opening it in an IDE such as Thonny, you can see that there's a `rom` folder containing the built-in read only content accessible by apps, a `state` folder that contains saved data from all apps, and a `system` folder containing the user software on the device. It is this `system` folder which is mounted as a USB drive when the badge is connected in disk mode.
-
-In disk mode, you can alter files in `system` however you want, adding, removing, renaming and opening/editing/saving them directly from their folder - although remember, no filesystem is perfect and you should always keep an off-device backup of your work if you're working directly on the device. You can also upload and download files from the other folders in Thonny and similar editors, but you cannot save files directly to the device there - in this aspect it is kept read-only to prevent file corruption.
-
-# Loading and Saving at runtime
-That's all very well for you to create and edit your programs on Badgeware, but what about the programs saving and loading their own data? It might be to remember the user's settings between different runs, it might be for logging data, taking screenshots or for saved games, but data needs to be saved.
-
-During runtime, everything in `/system/` is read-only, so you cannot save data into your app folder. However, `/state/` is accessible, and the usual MicroPython file reading and writing methods will work in this folder. However, there is another way to store simple data quickly and conveniently:
-
-# The State module
-The `State` module is a quick way of writing JSON data to a reserved area of the unit's flash, and load it back in as variables. It's useful for small pieces of data that need to persist in between restarts of the program - often just settings or preferences, but in the case of Badger, where the program might often sleep and restart between every update, you might need to retain data such as a previous set of values to add new data to, or the player's current position in the level.
-
-## State.save()
-This is used to simply save the state. It takes a dictionary, which will be saved in JSON form in the `state` folder.
-
-### Usage
-- `State.save(app_name, data)`
-	- `app_name` - The name of the JSON file to output. This can be found in `/state/`.
-	- `data` - The data to save, in the form of a dictionary. This dictionary can include any basic types.
-
-### Returns
-`None`.
-
-## State.load()
-This writes the data from the specified save file into the specified dictionary. It's a sensible idea to create the dictionary first containing default values, then overwrite the data using `State.load()`, in case there is no saved state file to load from. If there is no saved state, the default values will be kept and a save state will be created using the current data in the target dictionary.
-
-### Usage
-- `State.load(app_name, dictionary)`
-	- `app_name` - The name of the JSON file to load. This can be found in `/state/`.
-	- `dictionary` - The dictionary into which to place the loaded data.
-
-### Returns
-`True` if data was loaded successfully, otherwise `False`.
-
-## state.delete()
-This deletes the specified JSON file. Next time `State.load()` is used, it will revert to defaults as described above.
-
-### Usage
-- `State.load(app_name)`
-	- `app_name` - The name of the JSON file to delete. This can be found in `/state/`.
-
-### Returns
-`None`.
-
-### Writing to files from application code
-
-The badge has a writeable LittleFS partition located at `/` which is intended for applications to store state information and cache any data they may need to hold on to across resets.
-
-You can use normal Python style file access from your code:
+Reading and writing files on the badge works just like it does in standard Python. You open a file with the built-in `open()` function, read from or write to it, then close it again - and the tidiest way to do that is with a `with` block, which closes the file for you automatically:
 
 ```python-raw
-with open("/storage/myfile.txt", "w") as out:
-  out.write("this is some text i want to keep\n")
+# Write some text to a file
+with open("/notes.txt", "w") as f:
+    f.write("hello badge\n")
+
+# Read it back
+with open("/notes.txt", "r") as f:
+    print(f.read())
 ```
+
+The second argument to `open()` is the *mode*: `"r"` to read, `"w"` to write (replacing whatever was there), or `"a"` to append to the end of an existing file.
+
+This is how your app remembers things between runs - the user's settings, a high score, a cached download, a screenshot. There's one catch: while your code is running it can only write to the root volume `/` (paths like `/notes.txt` above). The other volumes are read-only to the badge, as the [next section](#volumes) explains. Anything you save under `/` persists across resets, so it's the right home for settings, caches, save games and logs.
+
+# Saving your app's data
+
+Writing plain text is fine, but most of the time you'll want to save structured data - a dictionary of settings, a list of high scores, the state of a game. The `json` module makes this really handy: it turns Python objects like dictionaries and lists straight into text you can write to a file, and back again when you load them.
+
+```python-raw
+import json
+
+settings = {"name": "Ada", "brightness": 80, "sound": True}
+
+# Save the dictionary to a file
+with open("/settings.json", "w") as f:
+    json.dump(settings, f)
+
+# Load it back later
+with open("/settings.json", "r") as f:
+    settings = json.load(f)
+
+print(settings["brightness"])  # 80
+```
+
+`json.dump()` writes an object to an open file and `json.load()` reads it back. This works for anything made of the basic types - dictionaries, lists, strings, numbers and booleans - so it's a quick, readable way to keep an app's data between runs. It's worth wrapping the load in a `try`/`except` so a missing or empty file falls back to sensible defaults the first time your app runs:
+
+```python-raw
+defaults = {"name": "", "brightness": 100, "sound": True}
+
+try:
+    with open("/settings.json", "r") as f:
+        settings = json.load(f)
+except (OSError, ValueError):
+    settings = defaults
+```
+
+# Volumes
+
+The badge's 16MB of flash is split into a few separate storage areas, or *volumes*. Opening the badge in an IDE such as Thonny, you'll see three of them mounted as top-level folders:
+
+| Folder | Holds | Writeable by |
+| --- | --- | --- |
+| `/` | Saved data and caches written by apps | The badge |
+| `/system` | Apps, assets and your own `main.py` | The host, in disk mode |
+| `/rom` | Built-in content, such as the bundled fonts | Nothing (read-only) |
+
+The remaining flash is reserved for the badge's firmware and isn't visible as a folder. Each volume is described in more detail below.
+
+## `/` — the writeable root
+
+`/` is a LittleFS filesystem and the only volume your app can write to at runtime. Use it to save settings, cache data, or keep anything you need to persist across resets, as shown in [Using files](#using-files) above.
+
+## `/system` and disk mode
+
+`/system` is a FAT filesystem, and it's the only volume the host computer can write to. When the badge is connected in **disk mode** it appears as a USB drive (labelled after your device, such as `TUFTY`, `BADGER` or `BLINKY`), and you can add, remove, rename and edit files in it freely - although remember, no filesystem is perfect, so always keep an off-device backup of anything you're working on directly on the device.
+
+Importantly, `/system` is **read-only to code running on the badge**. The host can change it over USB in disk mode, but an app cannot write to its own folder at runtime. This split keeps the user software safe from corruption while a program is running.
+
+## `/rom`
+
+`/rom` is a genuinely read-only volume baked into the firmware. It holds the built-in fonts that apps can load without shipping their own font files. Neither the badge nor the host can write to it.
+
+# Limitations to keep in mind
+
+Flash storage on the badge is small and works a little differently to a hard drive or SD card. None of this is anything to worry about - you just get better results if you keep a few things in mind while designing your app.
+
+- **Space is tight, and it's shared.** The writeable `/` volume is only 1MB, and *every* app on the badge shares it. Treat it as a communal cupboard rather than your own room: clean up files you no longer need, and avoid logging or caching without some sort of upper limit.
+
+- **Files are stored in 4KB blocks.** LittleFS hands out storage one 4KB block at a time, and a file always takes at least one whole block - so even a 10-byte file costs 4KB. With a 1MB volume that works out to around **256 blocks in total** (a little fewer once the filesystem's own bookkeeping is taken into account), which means you can only ever have a couple of hundred files, no matter how small they are. The *number* of files matters just as much as their total size. Where you can, gather lots of little pieces of data into one file - a single JSON file, say, rather than one per item.
+
+- **Use efficient file formats.** With both space and block count limited, compact assets go a long way. Store images at the resolution you'll actually display them at, reach for binary or packed formats over verbose text where it makes sense, and strip out anything you don't need before copying it across to the badge.
+
+- **Flash wears out (eventually).** Flash memory can only be rewritten so many times. You're very unlikely to hit this in normal use, but it's a good reason not to rewrite the same file in a tight loop - buffer your data in memory and save it every now and then, rather than on every frame or sensor reading.
