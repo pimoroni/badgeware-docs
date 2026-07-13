@@ -66,6 +66,8 @@ The badge's 16MB of flash is split into a few separate storage areas, or *volume
 
 The remaining flash is reserved for the badge's firmware and isn't visible as a folder. Each volume is described in more detail below.
 
+> **Note:** Editors like Thonny don't write to these volumes the way the host does in disk mode - they hand files to the badge and let *it* do the writing. Because of that, they follow the same rules as your own code: they can write to `/`, but not to the read-only `/system` and `/rom` volumes.
+
 ## `/` — the writeable root
 
 `/` is a LittleFS filesystem and the only volume your app can write to at runtime. Use it to save settings, cache data, or keep anything you need to persist across resets, as shown in [Using files](#using-files) above.
