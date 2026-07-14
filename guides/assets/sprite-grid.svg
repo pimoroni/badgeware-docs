@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="250" viewBox="0 0 480 250" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
+  <style>
+    /* Single palette tuned for the site's dark background.
+       Cells are light, so text inside them is dark; axis and header
+       labels sit on the dark page background, so they're light. */
+    .cell    { fill: #f4f4f8; stroke: #d0cdda; stroke-width: 1.5; }
+    .coord   { fill: #726c84; font-size: 16px; }
+    .axis    { fill: #b3a9c9; font-size: 16px; font-weight: 600; }
+    .label   { fill: #e7e2f0; font-size: 16px; font-weight: 700; }
+    .hl      { fill: rgba(232,89,12,0.16); stroke: #e8590c; stroke-width: 2.5; }
+    .hlcoord { fill: #d1490a; font-size: 16px; font-weight: 700; }
+    .call    { fill: #ff9a4d; font-size: 16px; font-weight: 700; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .lead    { stroke: #ff9a4d; stroke-width: 2; fill: none; }
+  </style>
+
+  <!-- axis labels -->
+  <text class="axis" x="182" y="22" text-anchor="middle">column (x) →</text>
+  <text class="axis" x="20" y="144" text-anchor="middle" transform="rotate(90 20 144)">row (y) →</text>
+
+  <!-- column headers -->
+  <g text-anchor="middle">
+    <text class="label" x="98"  y="50">0</text>
+    <text class="label" x="154" y="50">1</text>
+    <text class="label" x="210" y="50">2</text>
+    <text class="label" x="266" y="50">3</text>
+  </g>
+
+  <!-- row headers -->
+  <g text-anchor="middle">
+    <text class="label" x="52" y="93">0</text>
+    <text class="label" x="52" y="149">1</text>
+    <text class="label" x="52" y="205">2</text>
+  </g>
+
+  <!-- grid cells (origin 70,60; cell 56) -->
+  <g>
+    <rect class="cell" x="70"  y="60"  width="56" height="56"/>
+    <rect class="cell" x="126" y="60"  width="56" height="56"/>
+    <rect class="cell" x="182" y="60"  width="56" height="56"/>
+    <rect class="cell" x="238" y="60"  width="56" height="56"/>
+
+    <rect class="cell" x="70"  y="116" width="56" height="56"/>
+    <rect class="cell" x="126" y="116" width="56" height="56"/>
+    <rect class="cell" x="182" y="116" width="56" height="56"/>
+
+    <rect class="cell" x="70"  y="172" width="56" height="56"/>
+    <rect class="cell" x="126" y="172" width="56" height="56"/>
+    <rect class="cell" x="182" y="172" width="56" height="56"/>
+    <rect class="cell" x="238" y="172" width="56" height="56"/>
+
+    <!-- highlighted cell (3, 1) -->
+    <rect class="hl" x="238" y="116" width="56" height="56"/>
+  </g>
+
+  <!-- cell coordinates -->
+  <g text-anchor="middle">
+    <text class="coord" x="98"  y="93">0,0</text>
+    <text class="coord" x="154" y="93">1,0</text>
+    <text class="coord" x="210" y="93">2,0</text>
+    <text class="coord" x="266" y="93">3,0</text>
+
+    <text class="coord"   x="98"  y="149">0,1</text>
+    <text class="coord"   x="154" y="149">1,1</text>
+    <text class="coord"   x="210" y="149">2,1</text>
+    <text class="hlcoord" x="266" y="149">3,1</text>
+
+    <text class="coord" x="98"  y="205">0,2</text>
+    <text class="coord" x="154" y="205">1,2</text>
+    <text class="coord" x="210" y="205">2,2</text>
+    <text class="coord" x="266" y="205">3,2</text>
+  </g>
+
+  <!-- callout to the highlighted cell -->
+  <path class="lead" d="M294 144 H330"/>
+  <text class="call" x="338" y="149">sprite(3, 1)</text>
+</svg>
