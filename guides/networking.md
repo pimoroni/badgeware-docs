@@ -1,5 +1,5 @@
 ---
-title: Using WiFi
+title: Getting online
 summary: Connect Badgeware to Wi-Fi and get online, using the built-in wifi module to skip the usual boilerplate.
 icon: cloud_sync
 publish: true
