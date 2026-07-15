@@ -358,7 +358,7 @@ The `text()` method can be called in two forms: by passing a `vec2` that defines
 | `message` | `string` | The text to write |
 | `x`, `y` | `int` | Position of the top-left corner of the text |
 | `p` | `vec2` | Position of the top-left corner of the text |
-| `size` | `int` | *Optional.* The size of the text for vector fonts. Using this parameter with pixel fonts will cause an error. |
+| `size` | `int` | *Optional.* For a vector font, the text size. For a pixel font, an integer scale factor — e.g. `3` draws the font at 3× its native size. |
 
 ```python
 def update():
