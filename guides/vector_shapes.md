@@ -1,5 +1,5 @@
 ---
-title: Vector Shapes
+title: Vector shapes
 summary: Vector shapes make it easy to build and edit detailed geometry, then reuse and animate it smoothly. Ideal for UI elements, animations, and generative art.
 icon: shapes
 ---
