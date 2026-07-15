@@ -1,5 +1,5 @@
 ---
-title: Handling button input
+title: Reading the buttons
 summary: Control how applications detect both single presses and continuous holds, enabling responsive controls for menus and interactivity.
 icon: gamepad_down
 ---
