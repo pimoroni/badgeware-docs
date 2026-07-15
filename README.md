@@ -8,7 +8,7 @@ hide_toc: true
 
 Badgeware is a MicroPython-powered platform for our family of programmable badges — **Tufty**, **Badger**, and **Blinky**. Write a short Python script, copy it to your badge over USB, and it runs. No toolchains, no compilers, no fuss.
 
-Your badge comes preloaded with a set of apps, but the real fun starts when you write your own. Everything is built around a simple `update()` function that the badge calls once per frame — draw to the screen, read some buttons, and you've got an app. If you've ever written a few lines of Python, you already have everything you need to get started.
+Your badge comes preloaded with a set of apps, but the real fun starts when you write your own. Everything is built around a simple loop: draw to the screen, call `badge.update()` to show the frame and read the buttons, then go round again — and you've got an app. If you've ever written a few lines of Python, you already have everything you need to get started.
 
 This site is your guide. You'll find step-by-step tutorials to get you up and running, feature guides that go deeper on topics like sprites, text, and vector shapes, and a full API reference for when you need the details. Whether you're building a name badge for a conference, a tiny game to pass the time, or a dashboard that pulls live data over WiFi — it all starts here.
 
@@ -45,7 +45,7 @@ Despite their different displays, all three badges share the same core hardware 
 
 # A taste of Badgeware
 
-Every app is built around a single `update()` function that the badge calls once per frame. Here's a quick example — a bouncing ball with a greeting, in about 20 lines:
+Every app is a loop that draws a frame, then calls `badge.update()` to show it. Here's a quick example — a bouncing ball with a greeting, in about 20 lines:
 
 ```python
 x, y = 80, 60
@@ -70,7 +70,7 @@ while True:
     badge.update()
 ```
 
-That's a complete, runnable app — copy it onto your badge and it just works. Everything else is building on these ideas: drawing to the screen, reading buttons, and letting `update()` do its thing.
+That's a complete, runnable app — copy it onto your badge and it just works. Everything else builds on these ideas: drawing to the screen, reading buttons, and calling `badge.update()` each time round the loop.
 
 # Where to next
 
