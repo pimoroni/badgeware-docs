@@ -1,5 +1,5 @@
 ---
-title: Time
+title: Keeping time
 summary: Measure elapsed time for animations and timing, and keep the real date and time using Badgeware's clocks, alarms and NTP.
 icon: timer
 ---
@@ -31,7 +31,7 @@ blink = round(badge.ticks / 250) % 2 == 0
 wobble = math.sin(badge.ticks / 250)
 ```
 
-## Frame-rate independent movement
+## Frame-rate independence
 
 Badgeware won't always render at exactly the same rate, so if you move something by a fixed amount every frame it'll speed up and slow down as the framerate changes. Instead, multiply by `ticks_delta` to move by an amount of time rather than an amount of frames:
 
@@ -63,7 +63,7 @@ do_something_slow()
 elapsed = time.ticks_diff(time.ticks_ms(), start)  # milliseconds taken
 ```
 
-# Keeping the real date and time
+# The real date and time
 
 Badgeware has **two** real-time clocks working together:
 
@@ -74,7 +74,7 @@ The two are kept in sync automatically. When Badgeware starts up, it copies the 
 
 You reach the onboard RTC through the global `rtc` object, which is always available in your apps.
 
-## Reading and setting the time
+## Reading and setting
 
 `rtc.datetime()`\
 Called with no arguments, returns the current date and time as a tuple:
