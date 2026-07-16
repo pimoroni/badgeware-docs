@@ -75,7 +75,7 @@ That's a complete, runnable app — copy it onto your badge and it just works. E
 # Where to next
 
 - **[Meet your badge](/introduction/meet-your-badge.md)** — a quick tour of the hardware and what it can do.
-- **[Creating your first app](/introduction/your-first-app.md)** — the full app structure, including `init()` and `on_exit()`.
+- **[Creating your first app](/introduction/your-first-app.md)** — turn your code into a real app: the folder layout, an icon, and installing it on your badge.
 - **[Coding for the different badges](/guides/badge-differences.md)** — how Tufty, Badger, and Blinky differ, and how to write code that runs on all three.
 - **[Guides](/README.md#guides)** — go deeper on sprites, text, vector shapes, animation, and more.
 - **[API reference](/README.md#api)** — the details, for when you need them.

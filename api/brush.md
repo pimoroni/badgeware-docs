@@ -1,11 +1,11 @@
 ---
 title: brush
-summary: Methods for painting images or patterns as fill when creating vector shapes.
+summary: Fill vector shapes with images, gradients or patterns — or transform what's underneath with effect brushes like blur, pixelate and darken.
 icon: brush
 publish: true
 ---
 # Introduction
-Brushes are a powerful tool when drawing vector shapes on Badgeware. Instead of a solid flat colour, they can paint an image or a repeating pattern across the shapes you draw. In fact, `color` itself is a type of brush - anywhere that you might use `color` to set a pen, you can set that pen to a `brush` instead.
+Brushes are a powerful tool when drawing vector shapes on Badgeware. Instead of a solid flat colour, they can paint an image, a smooth gradient, or a repeating pattern across the shapes you draw. In fact, `color` itself is a type of brush - anywhere that you might use `color` to set a pen, you can set that pen to a `brush` instead.
 
 # Image brushes
 One use of brushes is to fill a shape with an image rather than with a flat colour. The image should be loaded in as a variable as usual, then passed into `brush.image()`. You can also pass in a transformation matrix as a `mat3` to determine the size, translation and rotation of the image. This image will tile infinitely if its size is smaller than the shape it is filling.
@@ -26,14 +26,145 @@ import math
 
 skull = image.load("/system/assets/skull.png")
 
-def update():
+while True:
   t = mat3().translate(-12, -12).rotate(badge.ticks / 100).translate(80, 60).scale(math.sin(badge.ticks / 1000) * 4)
   imgbrush = brush.image(skull, t)
 
   screen.pen = imgbrush
   screen.shape(shape.circle(80, 60, 50))
 
-run(update)
+  badge.update()
+```
+
+# Gradient brushes
+A gradient brush fills a shape with a smooth blend between colours. A **linear** gradient runs the colours along a line, and a **radial** one spreads them outward from a point. You give it the type, the two points that define its axis, and a list of colour *stops* — each a position from `0` to `1` along the axis paired with a colour. An optional `mat3` can move, rotate or scale the whole gradient.
+
+### Usage
+`brush.gradient(type, x1, y1, x2, y2, stops, matrix)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `type` | `int` | `brush.LINEAR` to blend along the axis, or `brush.RADIAL` to blend outward from the first point |
+| `x1`, `y1` | `float` | The start of the gradient axis — the centre, for a radial gradient |
+| `x2`, `y2` | `float` | The end of the axis; for a radial gradient this sets the outer radius |
+| `stops` | `list` | Up to 16 `(position, color)` tuples, where `position` runs from `0` to `1` along the axis |
+| `matrix` | `mat3` | *Optional.* A transformation applied to the gradient — its size, position and rotation |
+
+### Returns
+A `brush` which can then be used to set an `image`'s pen.
+
+```python
+# every colour, all at once — graphic design is my passion
+loud = [
+  (0.0,  color.rgb(255, 0, 200)),   # hot pink
+  (0.33, color.rgb(255, 230, 0)),   # yellow
+  (0.66, color.rgb(0, 220, 255)),   # cyan
+  (1.0,  color.rgb(120, 255, 0)),   # lime
+]
+clash = [(0.0, color.rgb(255, 0, 255)), (1.0, color.rgb(0, 255, 0))]
+
+screen.antialias = image.X4     # smooth edges on the vector shapes
+screen.font = rom_font.nope
+
+while True:
+  # LINEAR: a clashing gradient right across the background
+  screen.pen = brush.gradient(brush.LINEAR, 0, 0, 160, 120, loud)
+  screen.clear()
+
+  # RADIAL: the stops spread out from the centre — filling a very tasteful star
+  screen.pen = brush.gradient(brush.RADIAL, 80, 50, 80, 98, clash)
+  screen.shape(shape.star(80, 50, 9, 20, 46))
+
+  # a gradient fills text just as it fills a shape (restraint is optional)
+  screen.pen = color.black
+  screen.text("Graphic design is my passion", -13, 105)          # drop shadow
+  screen.pen = brush.gradient(brush.LINEAR, 0, 0, 200, 0, loud)
+  screen.text("Graphic design is my passion", -16, 102)
+
+  badge.update()
+```
+
+# Effect brushes
+The brushes above paint new content into a shape. A second family instead *transforms the pixels already on the target* beneath the shape — the shape becomes a mask for an effect. They're ideal for spotlights, frosted-glass panels, pixelated censor boxes and vignettes, and all have antialiased edges.
+
+## pixelate()
+Mosaics the area under the shape into blocks.
+
+### Usage
+`brush.pixelate(size)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `size` | `int` | The block size in pixels (`1` or more) |
+
+## blur()
+Box-blurs the area under the shape.
+
+### Usage
+`brush.blur(radius)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `radius` | `int` | The blur radius in pixels (`1` or more) |
+
+## lighten() / darken()
+Adds to (or subtracts from) every colour channel of the pixels under the shape, brightening or darkening what's already there.
+
+### Usage
+`brush.lighten(amount)` \
+`brush.darken(amount)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `amount` | `int` | How much to add or subtract per channel, `0`–`255` |
+
+## erase()
+Punches through what's been drawn — fully transparent with no argument, or a translucent window tinted toward colour `c` if one is given.
+
+### Usage
+`brush.erase()` \
+`brush.erase(c)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `c` | `color` | *Optional.* Tint the erased window toward this colour instead of clearing to full transparency |
+
+### Returns
+Each of these returns a `brush` which can then be used to set an `image`'s pen.
+
+```python
+import math
+
+# a backdrop for the effects to work on
+backdrop = brush.gradient(brush.LINEAR, 0, 0, 160, 120,
+                          [(0.0, color.navy), (1.0, color.grape)])
+
+screen.font = rom_font.nope
+screen.antialias = image.X4
+
+while True:
+  # draw the scene first — effect brushes transform what's already there
+  screen.pen = backdrop
+  screen.clear()
+  screen.pen = color.white
+  screen.text("CLASSIFIED", 44, 14)
+
+  # pixelate: a mosaic censor bar over the text
+  screen.pen = brush.pixelate(5)
+  screen.shape(shape.rectangle(40, 10, 82, 16))
+
+  # blur: a frosted lens sliding across
+  lens = 80 + math.sin(badge.ticks / 700) * 55
+  screen.pen = brush.blur(4)
+  screen.shape(shape.circle(lens, 62, 24))
+
+  # lighten and darken: a bright spot and a dark one
+  screen.pen = brush.lighten(70)
+  screen.shape(shape.circle(30, 96, 22))
+  screen.pen = brush.darken(70)
+  screen.shape(shape.circle(130, 96, 22))
+
+  badge.update()
 ```
 
 # Pattern brushes
@@ -57,7 +188,7 @@ import math
 # unlit pixels let whatever is behind them show through
 TRANSPARENT = color.rgb(0, 0, 0, 0)
 
-def update():
+while True:
   # a custom pattern: each 0b number is one binary row, where the 1s and 0s
   # are the lit and unlit pixels of the pattern
   custom_pattern = brush.pattern(color.red, TRANSPARENT, (
@@ -80,7 +211,7 @@ def update():
   screen.pen = built_in_pattern
   screen.shape(shape.circle(80 + math.cos(badge.ticks / 250) * 60, 60 + math.sin(badge.ticks / 500) * 60, 30))
 
-run(update)
+  badge.update()
 ```
 
 ## Built-in patterns
