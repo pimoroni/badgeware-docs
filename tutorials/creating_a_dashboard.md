@@ -2,7 +2,7 @@
 title: Sensor dashboard
 summary: "Accessing Badgeware's hardware features"
 icon: readiness_score
-publish: true
+publish: false
 ---
 # Tutorial 2: A Dashboard
 For the second tutorial, we're going to dive deep into Badgeware's vector drawing system as well as some of the different things we can access in hardware. We'll make a page that shows charts for our flash usage and our battery power, as well as showing the current time and allowing us to test the rear case lighting.

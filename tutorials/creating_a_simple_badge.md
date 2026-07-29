@@ -2,7 +2,7 @@
 title: A simple badge
 summary: An absolute beginner's guide to coding an app for Badgeware.
 icon: badge
-publish: true
+publish: false
 sort: 1
 ---
 # A Simple Badge

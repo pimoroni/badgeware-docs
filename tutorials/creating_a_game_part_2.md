@@ -2,7 +2,7 @@
 title: "A simple game - part 2"
 summary: "Animation, sprites and interactivity"
 icon: sports_esports
-publish: true
+publish: false
 ---
 # A simple game: Acorn Highway (Part 2)
 
