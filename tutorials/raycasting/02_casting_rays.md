@@ -12,7 +12,7 @@ The lazy way to find a wall would be to creep along the ray in tiny steps — `0
 
 # Stepping along the grid
 
-Here's the insight: a ray can only enter a new cell by crossing one of the grid lines — a vertical line (moving into the next column) or a horizontal one (moving into the next row). So instead of inching along, we jump straight from one grid line to the next, and at each jump check whether the cell we've entered is a wall. A ray crossing an 8-cell map hits a wall in a handful of jumps, not hundreds of tiny steps. This is the **DDA** — Digital Differential Analysis — and it's the classic raycasting workhorse.
+Here's the insight: a ray can only enter a new cell by crossing one of the grid lines — a vertical line (moving into the next column) or a horizontal one (moving into the next row). So instead of inching along, we jump straight from one grid line to the next, and at each jump check whether the cell we've entered is a wall. A ray crossing the whole width of our map hits a wall in a handful of jumps, not hundreds of tiny steps. This is the **DDA** — Digital Differential Analysis — and it's the classic raycasting workhorse.
 
 To do it we track two races at once: how far along the ray to the **next vertical** grid line, and how far to the **next horizontal** one. Whichever is closer, we take that jump, step into the neighbouring cell, and then top that race back up. Repeat until the cell we step into is solid.
 
@@ -92,17 +92,21 @@ Here it is all together: the top-down map from Part 1, with a fan of rays cast a
 import math
 
 MAP = [
-  "########",
-  "#      #",
-  "#  ##  #",
-  "#  ##  #",
-  "#      #",
-  "#    ###",
-  "#      #",
-  "########",
+  "################",
+  "#      #       #",
+  "#  ##  #  ###  #",
+  "#  ##  #  # #  #",
+  "#      #  # #  #",
+  "#         #    #",
+  "####  ##  #  ###",
+  "#     ##     # #",
+  "#  ##     #    #",
+  "#  ##  #  #  # #",
+  "#      #      ##",
+  "################",
 ]
 MW, MH = len(MAP[0]), len(MAP)
-CELL = 14
+CELL = 9
 OX = (screen.width - MW * CELL) // 2
 OY = (screen.height - MH * CELL) // 2
 

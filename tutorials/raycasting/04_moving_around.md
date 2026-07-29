@@ -55,14 +55,18 @@ Here's the walkable version. Click the preview to give it focus, then use the on
 import math
 
 MAP = [
-  "########",
-  "#      #",
-  "#  ##  #",
-  "#  ##  #",
-  "#      #",
-  "#    ###",
-  "#      #",
-  "########",
+  "################",
+  "#      #       #",
+  "#  ##  #  ###  #",
+  "#  ##  #  # #  #",
+  "#      #  # #  #",
+  "#         #    #",
+  "####  ##  #  ###",
+  "#     ##     # #",
+  "#  ##     #    #",
+  "#  ##  #  #  # #",
+  "#      #      ##",
+  "################",
 ]
 W, H = screen.width, screen.height
 
@@ -134,6 +138,6 @@ while True:
   badge.update()
 ```
 
-Have a wander. Notice you can walk right up to the central pillar and slide around its corner without catching — that's the per-axis check earning its keep. The world already feels like a place.
+Have a wander. Notice you can walk right up to one of the free-standing pillars and slide around its corner without catching — that's the per-axis check earning its keep. With rooms and corridors to explore now, the world already feels like a place.
 
 It's a convincing room, but a grey one. In the [next part](05_texturing.md) we'll paint the walls with brickwork, mapping a texture onto every slice as we draw it.

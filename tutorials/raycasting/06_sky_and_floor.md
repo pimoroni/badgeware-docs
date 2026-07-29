@@ -36,14 +36,18 @@ Here's everything, all six parts of it, in one program: a textured, walkable roo
 import math
 
 MAP = [
-  "########",
-  "#      #",
-  "#  ##  #",
-  "#  ##  #",
-  "#      #",
-  "#    ###",
-  "#      #",
-  "########",
+  "################",
+  "#      #       #",
+  "#  ##  #  ###  #",
+  "#  ##  #  # #  #",
+  "#      #  # #  #",
+  "#         #    #",
+  "####  ##  #  ###",
+  "#     ##     # #",
+  "#  ##     #    #",
+  "#  ##  #  #  # #",
+  "#      #      ##",
+  "################",
 ]
 W, H = screen.width, screen.height
 

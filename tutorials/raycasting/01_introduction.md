@@ -18,18 +18,22 @@ Our world is a grid of cells. Each cell is either empty (you can stand there) or
 
 ```python-raw
 MAP = [
-  "########",
-  "#      #",
-  "#  ##  #",
-  "#  ##  #",
-  "#      #",
-  "#    ###",
-  "#      #",
-  "########",
+  "################",
+  "#      #       #",
+  "#  ##  #  ###  #",
+  "#  ##  #  # #  #",
+  "#      #  # #  #",
+  "#         #    #",
+  "####  ##  #  ###",
+  "#     ##     # #",
+  "#  ##     #    #",
+  "#  ##  #  #  # #",
+  "#      #      ##",
+  "################",
 ]
 ```
 
-Read as a grid, `MAP[y][x]` is the cell in row `y`, column `x`. So `MAP[0][0]` is the top-left corner (a wall), and `MAP[4][3]` is a bit of floor in the middle. The outer ring is solid so the player can never escape the world, and there's a little block in the centre plus a stub wall to give us some corners to look at.
+Read as a grid, `MAP[y][x]` is the cell in row `y`, column `x`. So `MAP[0][0]` is the top-left corner (a wall), and `MAP[4][3]` is a bit of floor. The outer ring is solid so the player can never escape the world, and inside it there's a warren of little rooms, corridors and free-standing pillars — plenty of corners and doorways to send rays at.
 
 Storing the map as text has a lovely side benefit: you can *see* the level right there in your code, and editing it is as easy as typing. Later on we'll only ever ask one question of the map — "is the cell at `(x, y)` a wall?" — which is just `MAP[y][x] != " "`.
 
@@ -52,18 +56,22 @@ Let's draw the map top-down so we've got our bearings. We'll pick a `CELL` size 
 import math
 
 MAP = [
-  "########",
-  "#      #",
-  "#  ##  #",
-  "#  ##  #",
-  "#      #",
-  "#    ###",
-  "#      #",
-  "########",
+  "################",
+  "#      #       #",
+  "#  ##  #  ###  #",
+  "#  ##  #  # #  #",
+  "#      #  # #  #",
+  "#         #    #",
+  "####  ##  #  ###",
+  "#     ##     # #",
+  "#  ##     #    #",
+  "#  ##  #  #  # #",
+  "#      #      ##",
+  "################",
 ]
 MW, MH = len(MAP[0]), len(MAP)     # map width and height, in cells
 
-CELL = 14                                    # pixels per map cell in this top-down view
+CELL = 9                                     # pixels per map cell in this top-down view
 OX = (screen.width - MW * CELL) // 2         # offsets to centre the map on screen
 OY = (screen.height - MH * CELL) // 2
 
