@@ -37,7 +37,7 @@ Because it redraws continuously and works in full colour, a Tufty clock is just 
 ```python
 import time
 
-screen.font = rom_font.absolute
+screen.font = font.absolute
 
 # cyan -> violet with a white highlight that sweeps as the gradient spins
 STOPS = [
@@ -112,7 +112,7 @@ Blinky's 39 × 26 LED matrix is bright and bold — perfect for scrolling text, 
 With so few pixels, a clock has to be compact — stack the hours over the minutes:
 
 ```python
-screen.font = rom_font.nope
+screen.font = font.nope
 
 while True:
   now = rtc.datetime()

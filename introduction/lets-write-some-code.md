@@ -15,7 +15,7 @@ We'll write each part as its own little **function** — one for the loading scr
 
 # 1. Basic setup
 
-Every app starts by setting the stage. First, imports. For convenience, `screen`, `badge`, `color`, `rom_font` and other essentials are **always available** — they're needed by every badge app, so Badgeware imports them for you. Anything else — `time`, networking, and so on — you import yourself, just like normal Python.
+Every app starts by setting the stage. First, imports. For convenience, `screen`, `badge`, `color`, `font` and other essentials are **always available** — they're needed by every badge app, so Badgeware imports them for you. Anything else — `time`, networking, and so on — you import yourself, just like normal Python.
 
 We only need `time` here, for the pause on the loading screen. While we're at it, we'll choose a pen colour and font once, up front, so the rest of the app can just draw without repeating itself:
 
@@ -23,7 +23,7 @@ We only need `time` here, for the pause on the loading screen. While we're at it
 import time                     # for the pause on the loading screen
 
 screen.pen = color.white        # everything we draw will be white...
-screen.font = rom_font.smart    # ...in the built-in "smart" font
+screen.font = font.smart    # ...in the built-in "smart" font
 ```
 
 With those prepared ahead of time, each part below is just drawing and reading buttons.
@@ -109,7 +109,7 @@ And that's the whole app. Here it is all in one place, ready to run:
 import time
 
 screen.pen = color.white
-screen.font = rom_font.smart
+screen.font = font.smart
 
 def loading_screen():
   screen.text("MY BADGE", 10, 40)

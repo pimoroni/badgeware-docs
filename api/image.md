@@ -107,7 +107,7 @@ run(update)
 | `antialias` | `int` | Antialiasing level for vector drawing. One of `image.OFF`, `image.X2`, or `image.X4` |
 | `alpha` | `int` | Global alpha for drawing, 0–255 (0 = transparent, 255 = opaque) |
 | `pen` | `color` \| `brush` | Colour or brush used for drawing operations |
-| `font` | `pixel_font` \| `vector_font` | Font used for drawing text |
+| `font` | `font` | Font used for drawing text |
 
 # Drawing
 The drawing API provides a collection of fast, low-level primitives for rendering simple shapes directly into an image’s pixel buffer. These methods are designed for speed and simplicity, making them suitable for real-time graphics, UI elements, and procedural drawing. They round position and dimension values to the nearest pixel for speed, and are not antialiased.

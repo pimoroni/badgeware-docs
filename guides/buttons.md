@@ -44,7 +44,7 @@ There are two main ways to handle button input:
 The example below makes the difference visible: each button lights up while it is **held**, and a line of text shows the most recent **pressed** or **released** event. Watch a button's box fill the whole time you hold it (continuous state), while the text updates only at the moment you press or let go (one-shot events).
 
 ```python
-screen.font = rom_font.nope
+screen.font = font.nope
 
 # each button constant, with a label and where to draw its box — positioned to match
 # the badge: A B C evenly spaced along the bottom, UP and DOWN up the right-hand edge
@@ -92,7 +92,7 @@ while True:
 This example demonstrates a simple menu system for Badgeware. It shows how to draw a list of menu items on the display and navigate through them with the **UP** and **DOWN** buttons. The currently selected item is highlighted, and the menu index wraps around so you can cycle smoothly through all options.
 
 ```python {len=6}
-screen.font = rom_font.nope
+screen.font = font.nope
 
 menu_items = [
   "Free loot!",
@@ -139,7 +139,7 @@ This example steers a snake around the screen: **UP** and **DOWN** move it verti
 The snake moves on an 8-pixel grid, so its position is tracked in grid cells rather than pixels. Its body is just a list of cells; each step we add a new head and drop the tail, which slides it forward at a fixed length.
 
 ```python
-screen.font = rom_font.nope
+screen.font = font.nope
 
 CELL = 8                          # size of one grid square, in pixels
 COLS, ROWS = 160 // CELL, 120 // CELL

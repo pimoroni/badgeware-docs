@@ -51,7 +51,7 @@ Every app is a loop that draws a frame, then calls `badge.update()` to show it. 
 x, y = 80, 60
 dx, dy = 2, 1
 
-screen.font = rom_font.smart
+screen.font = font.smart
 
 while True:
     x, y = x + dx, y + dy

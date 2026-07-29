@@ -120,7 +120,7 @@ def render():
     screen.pen = color.rgb(c, c, c)
     screen.rectangle(x, top, 1, height)
 
-screen.font = rom_font.nope
+screen.font = font.nope
 
 while True:
   # turn and walk from the buttons, blocked by walls

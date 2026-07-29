@@ -72,7 +72,7 @@ For example, a ball crossing the screen at a steady pace while bouncing as it fa
 across = tween(12, 148, easing=tween.LINEAR)
 drop = tween(16, 92, easing=tween.BOUNCE_OUT)
 
-screen.font = rom_font.sins
+screen.font = font.sins
 
 while True:
   screen.pen = color.black

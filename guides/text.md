@@ -16,13 +16,13 @@ Badgeware has two kinds of font, and it's worth knowing which you're reaching fo
 
 | | Pixel fonts | Vector fonts |
 |---|---|---|
-| Loaded with | `rom_font.<name>` or `pixel_font.load()` | `font.load()` |
+| Loaded with | `font.<name>` or `font.load()` | `font.load()` |
 | Stored as | `.ppf` — bitmaps | `.af` — scalable outlines |
 | Sizing | native size, or an integer scale (2×, 3×…) | any pixel size you ask for |
 | Character | crisp, retro, pixel-exact | smooth, scales to any size |
 | Best for | small screens, UI, that pixel look | headings and large or unusual sizes |
 
-There are over thirty pixel fonts baked into ROM — browse them in the [`pixel_font` gallery](/api/pixel_font.md) — plus three vector fonts preloaded under `/system/assets/fonts/`. You load a font once and assign it to `screen.font`; swapping between fonts is just another assignment.
+There are over thirty pixel fonts baked into ROM — browse them in the [font gallery](/api/font.md#font-gallery) — plus three vector fonts preloaded under `/system/assets/fonts/`. You load a font once and assign it to `screen.font`; swapping between fonts is just another assignment.
 
 # Drawing text
 
@@ -39,7 +39,7 @@ while True:
   screen.pen = color.white
 
   # a pixel font: crisp, drawn at its native size
-  screen.font = rom_font.smart
+  screen.font = font.smart
   screen.text("Pixel perfect", 10, 14)
 
   # a vector font: pass a size in pixels and it scales cleanly
@@ -54,6 +54,35 @@ Loading a font is a little expensive, so do it **once** at the start — never i
 Pixel fonts can be scaled too, by passing an integer as that fourth argument — `screen.text("BIG", 10, 40, 3)` draws at 3× size, staying pixel-crisp.
 
 For smooth edges on vector fonts, turn on antialiasing with `screen.antialias = image.X2` or `image.X4` (as in the example above). It applies to all vector drawing; pixel fonts are already pixel-exact, so it leaves them untouched.
+
+# The text cursor
+
+Every `screen.text()` call also moves an invisible **cursor** to the start of the next line — so, just like Python's `print()`, you can keep calling `screen.text()` with no coordinates and each line stacks below the last:
+
+```python
+screen.font = font.smart
+
+lines = ["Shopping list:", "- lemons", "- olive oil", "- a nice hat"]
+
+while True:
+  screen.pen = color.navy
+  screen.clear()
+
+  screen.pen = color.white
+  screen.cursor = vec2(12, 12)   # where the first line goes
+  for line in lines:
+    screen.text(line)            # no x, y — each falls on the next line
+
+  badge.update()
+```
+
+`screen.cursor` is a `vec2` you can read or set at any time; assigning it positions the *next* `screen.text()`. A `\n` inside a string does the same thing mid-string, dropping to a new line at the x the line started at:
+
+```python
+screen.text("two\nlines", 10, 10)   # draws "two", then "lines" below it
+```
+
+Give `screen.text()` an explicit `x, y` whenever you want to jump somewhere; leave it off to keep flowing from the cursor.
 
 # Placing and measuring
 
@@ -86,7 +115,7 @@ The same trick right-aligns text (`x = screen.width - w`) or lets you draw a bac
 Text is drawn with the current brush — whatever you last assigned to `screen.pen`. That's usually a solid colour, but any brush works, so you can fill letters with gradients or patterns. It also means effects like shadows and outlines are just the *same string drawn more than once*: draw it offset and dark underneath, then draw it again on top.
 
 ```python
-screen.font = rom_font.smart
+screen.font = font.smart
 
 def outline_text(message, x, y):
   # draw the text shifted in eight directions for a solid outline
@@ -112,7 +141,7 @@ A drop shadow is the same idea with a single offset — draw the string once in 
 `screen.text()` draws a single line and lets it run off the edge. For a paragraph, `text.draw()` flows a string into a rectangle, breaking it onto new lines as it fills the width:
 
 ```python
-screen.font = rom_font.sins
+screen.font = font.sins
 
 message = ("Badgeware wraps long text for you: hand text.draw a "
            "rectangle and it flows the words onto as many lines "
@@ -130,12 +159,37 @@ while True:
 
 The `rect` is the area to fill; text that runs past the bottom is simply clipped. You can also tune the line and word spacing — see the [`text` API](/api/text.md#draw).
 
+# Aligning a block
+
+`text.draw()` can position the whole block for you, so you rarely need to measure by hand. Pass `align` to line each row up horizontally, and `valign` to place the block vertically within the rectangle:
+
+```python
+screen.font = font.sins
+
+message = "Badgeware lines this text up for you, horizontally and vertically, inside the box."
+
+while True:
+  screen.pen = color.navy
+  screen.clear()
+
+  # a faint box so you can see the bounds it aligns within
+  screen.pen = color.rgb(30, 40, 70)
+  screen.shape(shape.rectangle(10, 10, 140, 100))
+
+  screen.pen = color.white
+  text.draw(screen, message, rect(10, 10, 140, 100), align="center", valign="middle")
+
+  badge.update()
+```
+
+`align` is `"left"` (the default), `"center"` or `"right"`; `valign` is `"top"`, `"middle"` or `"bottom"`. Either can take a pixel offset instead of a keyword. Set `ellipsis=True` and text that's too tall to fit is cut off with a trailing `…` rather than clipped mid-line. `text.draw()` also returns the `rect` it actually filled, which is handy for placing something right after it.
+
 # Scrolling text
 
 A single line sweeping across the screen suits a small display well, and there's no special trick to it: measure the text, then move it a little further left each frame based on the clock. Drawing a second copy one text-width behind makes it loop seamlessly:
 
 ```python
-screen.font = rom_font.smart
+screen.font = font.smart
 
 message = "Now showing on Badgeware... "
 w, h = screen.measure_text(message)
@@ -159,25 +213,41 @@ Because the motion comes from `badge.ticks`, the speed stays a true pixels-per-s
 
 # Rich text
 
-For styling *within* a string — a word in a different colour, an inline icon — Badgeware has **glyph renderers**. You write a small function, give it a name, and call it inline with `[name:arguments]`. Here a `pen` renderer switches colour partway through:
+For styling *within* a string — a word in a different colour, an inline icon — Badgeware has **glyph renderers**. You call one inline with `[name]` or `[name:arguments]`. Two come built in: `[pen:r,g,b]` recolours the text that follows, and `[sprite:name]` drops in an image you've registered. So changing colour mid-string needs no code at all:
 
 ```python
-screen.font = rom_font.sins
+screen.font = font.sins
 
-# [pen:r,g,b] changes colour mid-string; it draws nothing itself,
-# so when asked to measure its width it returns 0
-def pen(_image, params, _cursor, measure):
-  if measure:
-    return 0
-  screen.pen = color.rgb(int(params[0]), int(params[1]), int(params[2]))
-
-renderers = {"pen": pen}
 message = "Written in [pen:220,80,80]red[pen:230,240,230] and white."
 
 while True:
   screen.pen = color.navy
   screen.clear()
   screen.pen = color.rgb(230, 240, 230)
+  text.draw(screen, message, rect(10, 40, 140, 60))
+  badge.update()
+```
+
+To make your own, write a function taking `(image, parameters, measure)` and hand it to `tokenise()` under the name you'll call it by. When `measure` is `True` it just returns the width it occupies (and `image` is `None`, since nothing is drawn); otherwise it draws, reading `image.cursor` — a `vec2` — for the position the text has reached:
+
+```python
+screen.font = font.sins
+
+# an inline [box] that draws a small square where the text has got to
+def box(image, parameters, measure):
+  if measure:
+    return 10                    # the width we take up in the line
+  image.pen = color.yellow
+  image.shape(shape.rectangle(image.cursor.x, image.cursor.y, 8, 8))
+  return None
+
+renderers = {"box": box}
+message = "tick the [box] and carry on"
+
+while True:
+  screen.pen = color.navy
+  screen.clear()
+  screen.pen = color.white
 
   tokens = text.tokenise(screen, message, renderers)
   text.draw(screen, tokens, rect(10, 40, 140, 60))
@@ -185,4 +255,4 @@ while True:
   badge.update()
 ```
 
-A renderer can do anything — draw an image, a shape, adjust spacing — which makes it easy to mix icons and coloured highlights into a line of text. The [`text` API](/api/text.md#glyph-renderers) covers the full set of parameters and more examples.
+A renderer can do anything — draw an image, a shape, adjust spacing — which makes it easy to mix icons and coloured highlights into a line of text. The [`text` API](/api/text.md#glyph-renderers) covers the full set of parameters, registering renderers globally, and more examples.

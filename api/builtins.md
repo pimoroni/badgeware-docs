@@ -1,11 +1,11 @@
 ---
 title: builtins
-summary: Handy global helpers — clamping, random numbers, font loading, file checks and memory reporting — available in any app without importing anything.
+summary: Handy global helpers — clamping, random numbers, file checks and memory reporting — available in any app without importing anything.
 icon: widgets
 publish: true
 ---
 # Introduction
-Badgeware puts a handful of convenience functions straight into the global namespace, so they're available in any app without an `import`. They cover the little jobs that come up constantly: keeping a number in range, picking a random value, loading a font, checking for a file, and seeing how much memory is free.
+Badgeware puts a handful of convenience functions straight into the global namespace, so they're available in any app without an `import`. They cover the little jobs that come up constantly: keeping a number in range, picking a random value, checking for a file, and seeing how much memory is free.
 
 # Numbers
 
@@ -61,31 +61,6 @@ A random `float` within the range.
 ```python-raw
 angle = frnd(6.28)          # a random angle in radians
 speed = frnd(0.5, 2.0)      # a random speed
-```
-
-# Fonts
-
-## load_font()
-Loads a font by name, ready to assign to `screen.font`. It's a shortcut that finds the font wherever it lives and picks the right loader for you:
-
-- a ROM font name (such as `"nope"`) returns that built-in pixel font
-- otherwise it searches the system font folders for a matching file, loading `.af` files as vector fonts and `.ppf` files as pixel fonts
-
-You can pass a bare name, a filename, or a full path, with or without the extension.
-
-### Usage
-`load_font(font_file)`
-
-| Parameter | Type | Description |
-|---|---|---|
-| `font_file` | `string` | A ROM font name, a filename, or a path |
-
-### Returns
-A [`font`](/api/font.md) (vector) or [`pixel_font`](/api/pixel_font.md) object. Raises `OSError` if no matching font is found.
-
-```python-raw
-title = load_font("MonaSans-Medium")   # a vector font from the assets folder
-label = load_font("nope")              # a built-in ROM pixel font
 ```
 
 # Files

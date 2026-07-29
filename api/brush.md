@@ -64,7 +64,7 @@ loud = [
 clash = [(0.0, color.rgb(255, 0, 255)), (1.0, color.rgb(0, 255, 0))]
 
 screen.antialias = image.X4     # smooth edges on the vector shapes
-screen.font = rom_font.nope
+screen.font = font.nope
 
 while True:
   # LINEAR: a clashing gradient right across the background

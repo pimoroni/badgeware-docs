@@ -50,7 +50,7 @@ Inside that folder, save your program as `__init__.py` — that exact name, beca
 import time
 
 screen.pen = color.white
-screen.font = rom_font.smart
+screen.font = font.smart
 
 def loading_screen():
   screen.text("MY BADGE", 10, 40)

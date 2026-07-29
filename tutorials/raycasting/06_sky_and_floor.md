@@ -149,7 +149,7 @@ def render():
     screen.rectangle(x, top, 1, height)
     screen.alpha = 255
 
-screen.font = rom_font.nope
+screen.font = font.nope
 
 while True:
   dirx, diry = math.cos(angle), math.sin(angle)

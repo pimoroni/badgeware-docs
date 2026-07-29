@@ -155,7 +155,7 @@ If you run your app now, you'll see the picture displaying. If you're a Badger u
 
 # Adding text
 
-Now we'll add some text. We've got over 30 fantastic pixel fonts built in on Badgeware to choose from, and they can be seen [here](/api/pixel_font.md#font-gallery). I'm going to go with `smart`, but you choose whatever you think looks good and fits your text well. A lot of this will be familiar from placing the image. We'll come back and tweak the positioning of everything to look great later.
+Now we'll add some text. We've got over 30 fantastic pixel fonts built in on Badgeware to choose from, and they can be seen [here](/api/font.md#font-gallery). I'm going to go with `smart`, but you choose whatever you think looks good and fits your text well. A lot of this will be familiar from placing the image. We'll come back and tweak the positioning of everything to look great later.
 
 > Note: Blinky users especially will have to think carefully about what font to choose and how to lay things out.
 
@@ -188,7 +188,7 @@ def update():
     # First we'll change the pen and pick our font. Note we're
     # now creating our own very dark blue-grey colour.
     screen.pen = color.rgb(40, 50, 80)
-    screen.font = rom_font.smart
+    screen.font = font.smart
 
     # We're setting the text as a variable, because we want to
     # measure how big it'll be before we write it to the screen.
@@ -244,7 +244,7 @@ def update():
     screen.blit(picture, picture_rect)
 
     screen.pen = color.rgb(40, 50, 80)
-    screen.font = rom_font.smart
+    screen.font = font.smart
 
     name_text = "Jimmy J. Pirate is:"
     name_width, name_height = screen.measure_text(name_text)
@@ -253,7 +253,7 @@ def update():
 
     screen.text(name_text, name_x, name_y)
 
-    screen.font = rom_font.ignore
+    screen.font = font.ignore
 
     # All of this is just the same as the last line of text, but you
     # can see we're using the height of the first line to calculate
@@ -354,7 +354,7 @@ def update():
     screen.blit(picture, picture_rect)
 
     screen.pen = color.rgb(40, 50, 80)
-    screen.font = rom_font.smart
+    screen.font = font.smart
 
     name_text = "Jimmy J. Pirate is:"
     name_width, name_height = screen.measure_text(name_text)
@@ -363,7 +363,7 @@ def update():
 
     screen.text(name_text, name_x, name_y)
 
-    screen.font = rom_font.ignore
+    screen.font = font.ignore
 
     mood_width, _ = screen.measure_text(mood_text[selected_mood])
     mood_x = (screen.width / 2) - (mood_width / 2)
@@ -443,7 +443,7 @@ def update():
     screen.blit(picture, picture_rect)
 
     screen.pen = color.rgb(40, 50, 80)
-    screen.font = rom_font.smart
+    screen.font = font.smart
 
     name_text = "Jimmy J. Pirate is:"
     name_width, name_height = screen.measure_text(name_text)
@@ -452,7 +452,7 @@ def update():
 
     screen.text(name_text, name_x, name_y)
 
-    screen.font = rom_font.ignore
+    screen.font = font.ignore
 
     mood_width, _ = screen.measure_text(mood_text[selected_mood])
     mood_x = (screen.width / 2) - (mood_width / 2)
@@ -529,7 +529,7 @@ def update():
     screen.blit(picture, picture_rect)
 
     screen.pen = color.rgb(40, 50, 80)
-    screen.font = rom_font.smart
+    screen.font = font.smart
 
     name_text = "Jimmy J. Pirate is:"
     name_width, name_height = screen.measure_text(name_text)
@@ -538,7 +538,7 @@ def update():
 
     screen.text(name_text, name_x, name_y)
 
-    screen.font = rom_font.ignore
+    screen.font = font.ignore
 
     mood_width, _ = screen.measure_text(mood_text[selected_mood])
     mood_x = (screen.width / 2) - (mood_width / 2)

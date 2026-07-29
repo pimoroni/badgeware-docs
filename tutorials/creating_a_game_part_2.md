@@ -2396,7 +2396,7 @@ So we're just using the existing frame counter we've always got running in the b
 For another touch, let's add a flashing "Press any button!" message to the title and game over screens. There are some pixel fonts just the right fit for this purpose - we'll add the following line right at the end of our image imports:
 
 ```python-raw
-title_font = rom_font.yesterday
+title_font = font.yesterday
 ```
 
 We're actually going to be centering text on the screen a fair bit for the rest of this tutorial, so let's make a quick method for doing this more easily. Here it is in full, and it can go at the very beginning of our methods, right after the definition for the `acorn_base` class:
@@ -2730,7 +2730,7 @@ sqirl_die = AnimatedSprite(sqirl_die_sheet, 1, 0, 2)
 acorn_sml = image.load("assets/acorn_sml.png")
 title = image.load("assets/title.png")
 gameover = image.load("assets/gameover.png")
-title_font = rom_font.yesterday
+title_font = font.yesterday
 
 gamepad = None
 controls = {}
@@ -2868,7 +2868,7 @@ And we'll import it in just the same way as we have the others, adding in right 
 
 ```python-raw
 acorn_lg = image.load("assets/acorn_lg.png")
-score_font = rom_font.futile
+score_font = font.futile
 ```
 
 You can see we also loaded another pixel font from memory. That's all the assets we need to add for the game! Now let's just implement them. Let's scroll back up to the `draw_score()` method that we created all that time ago.
@@ -3341,9 +3341,9 @@ sqirl_die = AnimatedSprite(sqirl_die_sheet, 1, 0, 2)
 acorn_sml = image.load("assets/acorn_sml.png")
 title = image.load("assets/title.png")
 gameover = image.load("assets/gameover.png")
-title_font = rom_font.yesterday
+title_font = font.yesterday
 acorn_lg = image.load("assets/acorn_lg.png")
-score_font = rom_font.futile
+score_font = font.futile
 
 gamepad = None
 controls = {}
