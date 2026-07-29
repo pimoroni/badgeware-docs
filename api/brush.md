@@ -87,6 +87,8 @@ while True:
 # Effect brushes
 The brushes above paint new content into a shape. A second family instead *transforms the pixels already on the target* beneath the shape — the shape becomes a mask for an effect. They're ideal for spotlights, frosted-glass panels, pixelated censor boxes and vignettes, and all have antialiased edges.
 
+The effect brushes on this page fall into a few groups: the simple masks below, then the [colour and tone brushes](#colour-and-tone-brushes), the [retro and screen brushes](#retro-and-screen-brushes), and the [artistic brushes](#artistic-brushes). Every one of them reads whatever is already on the target and rewrites it, so remember to draw your scene *first* — the effect only shows where there is something underneath it.
+
 ## pixelate()
 Mosaics the area under the shape into blocks.
 
@@ -96,6 +98,30 @@ Mosaics the area under the shape into blocks.
 | Parameter | Type | Description |
 |---|---|---|
 | `size` | `int` | The block size in pixels (`1` or more) |
+
+### Returns
+A `brush` which can then be used to set an `image`'s pen.
+
+```python
+import math
+
+badge.mode(HIRES)
+
+while True:
+  # a common scene for every example — a full-screen photo
+  screen.load_into("/system/assets/tufty.png")
+
+  # mosaic everything to the right of a sliding split
+  split = 160 + math.sin(badge.ticks / 1000) * 120
+  screen.pen = brush.pixelate(6)
+  screen.shape(shape.rectangle(split, 0, 320 - split, 240))
+
+  # mark the split with a white line
+  screen.pen = color.white
+  screen.line(split, 0, split, 240)
+
+  badge.update()
+```
 
 ## blur()
 Box-blurs the area under the shape.
@@ -107,6 +133,30 @@ Box-blurs the area under the shape.
 |---|---|---|
 | `radius` | `int` | The blur radius in pixels (`1` or more) |
 
+### Returns
+A `brush` which can then be used to set an `image`'s pen.
+
+```python
+import math
+
+badge.mode(HIRES)
+
+while True:
+  # a common scene for every example — a full-screen photo
+  screen.load_into("/system/assets/tufty.png")
+
+  # blur everything to the right of a sliding split
+  split = 160 + math.sin(badge.ticks / 1000) * 120
+  screen.pen = brush.blur(4)
+  screen.shape(shape.rectangle(split, 0, 320 - split, 240))
+
+  # mark the split with a white line
+  screen.pen = color.white
+  screen.line(split, 0, split, 240)
+
+  badge.update()
+```
+
 ## lighten() / darken()
 Adds to (or subtracts from) every colour channel of the pixels under the shape, brightening or darkening what's already there.
 
@@ -117,6 +167,32 @@ Adds to (or subtracts from) every colour channel of the pixels under the shape, 
 | Parameter | Type | Description |
 |---|---|---|
 | `amount` | `int` | How much to add or subtract per channel, `0`–`255` |
+
+### Returns
+A `brush` which can then be used to set an `image`'s pen.
+
+```python
+import math
+
+badge.mode(HIRES)
+
+while True:
+  # a common scene for every example — a full-screen photo
+  screen.load_into("/system/assets/tufty.png")
+
+  # darken the left of a sliding split, lighten the right
+  split = 160 + math.sin(badge.ticks / 1000) * 120
+  screen.pen = brush.darken(70)
+  screen.shape(shape.rectangle(0, 0, split, 240))
+  screen.pen = brush.lighten(70)
+  screen.shape(shape.rectangle(split, 0, 320 - split, 240))
+
+  # mark the split with a white line
+  screen.pen = color.white
+  screen.line(split, 0, split, 240)
+
+  badge.update()
+```
 
 ## erase()
 Punches through what's been drawn — fully transparent with no argument, or a translucent window tinted toward colour `c` if one is given.
@@ -130,39 +206,544 @@ Punches through what's been drawn — fully transparent with no argument, or a t
 | `c` | `color` | *Optional.* Tint the erased window toward this colour instead of clearing to full transparency |
 
 ### Returns
-Each of these returns a `brush` which can then be used to set an `image`'s pen.
+A `brush` which can then be used to set an `image`'s pen.
 
 ```python
 import math
 
-# a backdrop for the effects to work on
-backdrop = brush.gradient(brush.LINEAR, 0, 0, 160, 120,
-                          [(0.0, color.navy), (1.0, color.grape)])
-
-screen.font = rom_font.nope
-screen.antialias = image.X4
+badge.mode(HIRES)
 
 while True:
-  # draw the scene first — effect brushes transform what's already there
-  screen.pen = backdrop
-  screen.clear()
+  # a common scene for every example — a full-screen photo
+  screen.load_into("/system/assets/tufty.png")
+
+  # erase everything to the right of a sliding split (pass a colour
+  # to erase(...) for a translucent tinted window instead of a hole)
+  split = 160 + math.sin(badge.ticks / 1000) * 120
+  screen.pen = brush.erase()
+  screen.shape(shape.rectangle(split, 0, 320 - split, 240))
+
+  # mark the split with a white line
   screen.pen = color.white
-  screen.text("CLASSIFIED", 44, 14)
+  screen.line(split, 0, split, 240)
 
-  # pixelate: a mosaic censor bar over the text
-  screen.pen = brush.pixelate(5)
-  screen.shape(shape.rectangle(40, 10, 82, 16))
+  badge.update()
+```
 
-  # blur: a frosted lens sliding across
-  lens = 80 + math.sin(badge.ticks / 700) * 55
-  screen.pen = brush.blur(4)
-  screen.shape(shape.circle(lens, 62, 24))
+# Colour and tone brushes
+These effect brushes leave the *shape* of what's underneath alone and instead re-map its colours — draining, boosting, posterising or recolouring the pixels beneath the shape. Like all effect brushes they feather in at antialiased edges, so a filter can fade smoothly across a soft-edged shape.
 
-  # lighten and darken: a bright spot and a dark one
-  screen.pen = brush.lighten(70)
-  screen.shape(shape.circle(30, 96, 22))
-  screen.pen = brush.darken(70)
-  screen.shape(shape.circle(130, 96, 22))
+## monochrome()
+Drains all colour from the area under the shape, leaving a greyscale image.
+
+### Usage
+`brush.monochrome()`
+
+Takes no arguments.
+
+### Returns
+A `brush` which can then be used to set an `image`'s pen.
+
+```python
+import math
+
+badge.mode(HIRES)
+
+while True:
+  # a common scene for every example — a full-screen photo
+  screen.load_into("/system/assets/tufty.png")
+
+  # drain the colour from everything right of a sliding split
+  split = 160 + math.sin(badge.ticks / 1000) * 120
+  screen.pen = brush.monochrome()
+  screen.shape(shape.rectangle(split, 0, 320 - split, 240))
+
+  # mark the split with a white line
+  screen.pen = color.white
+  screen.line(split, 0, split, 240)
+
+  badge.update()
+```
+
+## invert()
+Photonegative — flips every colour channel of the pixels under the shape (`255 - value`).
+
+### Usage
+`brush.invert()`
+
+Takes no arguments.
+
+### Returns
+A `brush` which can then be used to set an `image`'s pen.
+
+```python
+import math
+
+badge.mode(HIRES)
+
+while True:
+  # a common scene for every example — a full-screen photo
+  screen.load_into("/system/assets/tufty.png")
+
+  # invert everything to the right of a sliding split
+  split = 160 + math.sin(badge.ticks / 1000) * 120
+  screen.pen = brush.invert()
+  screen.shape(shape.rectangle(split, 0, 320 - split, 240))
+
+  # mark the split with a white line
+  screen.pen = color.white
+  screen.line(split, 0, split, 240)
+
+  badge.update()
+```
+
+## saturation()
+Pushes the colours under the shape toward or away from grey without changing their brightness.
+
+### Usage
+`brush.saturation(amount)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `amount` | `int` | `0` leaves the colours unchanged; positive values boost the colour, negative values drain it. `-256` gives a fully greyscale result |
+
+### Returns
+A `brush` which can then be used to set an `image`'s pen.
+
+```python
+import math
+
+badge.mode(HIRES)
+
+while True:
+  # a common scene for every example — a full-screen photo
+  screen.load_into("/system/assets/tufty.png")
+
+  # boost the colour on everything right of a sliding split
+  split = 160 + math.sin(badge.ticks / 1000) * 120
+  screen.pen = brush.saturation(180)
+  screen.shape(shape.rectangle(split, 0, 320 - split, 240))
+
+  # mark the split with a white line
+  screen.pen = color.white
+  screen.line(split, 0, split, 240)
+
+  badge.update()
+```
+
+## contrast()
+Expands or compresses the pixels under the shape around mid-grey.
+
+### Usage
+`brush.contrast(amount)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `amount` | `int` | `0` leaves the pixels unchanged; positive values increase contrast, negative values flatten it. `-256` collapses everything to mid-grey |
+
+### Returns
+A `brush` which can then be used to set an `image`'s pen.
+
+```python
+import math
+
+badge.mode(HIRES)
+
+while True:
+  # a common scene for every example — a full-screen photo
+  screen.load_into("/system/assets/tufty.png")
+
+  # add contrast to everything right of a sliding split
+  split = 160 + math.sin(badge.ticks / 1000) * 120
+  screen.pen = brush.contrast(160)
+  screen.shape(shape.rectangle(split, 0, 320 - split, 240))
+
+  # mark the split with a white line
+  screen.pen = color.white
+  screen.line(split, 0, split, 240)
+
+  badge.update()
+```
+
+## threshold()
+Hard two-tone posterisation: every pixel under the shape becomes one of two colours depending on how bright it is.
+
+### Usage
+`brush.threshold(level, lo, hi)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `level` | `int` | The brightness cut-off, `0`–`255`. Pixels brighter than this become `hi`, the rest become `lo` |
+| `lo` | `color` | The colour used for pixels at or below `level` |
+| `hi` | `color` | The colour used for pixels above `level` |
+
+### Returns
+A `brush` which can then be used to set an `image`'s pen.
+
+```python
+import math
+
+badge.mode(HIRES)
+
+while True:
+  # a common scene for every example — a full-screen photo
+  screen.load_into("/system/assets/tufty.png")
+
+  # posterise everything right of a sliding split: bright pixels turn
+  # lime, the rest navy
+  split = 160 + math.sin(badge.ticks / 1000) * 120
+  screen.pen = brush.threshold(128, color.navy, color.lime)
+  screen.shape(shape.rectangle(split, 0, 320 - split, 240))
+
+  # mark the split with a white line
+  screen.pen = color.white
+  screen.line(split, 0, split, 240)
+
+  badge.update()
+```
+
+## dither()
+Ordered (Bayer) dither of the area under the shape down to a small, screen-aligned palette — a classic retro, low-colour look.
+
+### Usage
+`brush.dither()`
+
+Takes no arguments.
+
+### Returns
+A `brush` which can then be used to set an `image`'s pen.
+
+```python
+import math
+
+badge.mode(HIRES)
+
+while True:
+  # a common scene for every example — a full-screen photo
+  screen.load_into("/system/assets/tufty.png")
+
+  # dither everything to the right of a sliding split
+  split = 160 + math.sin(badge.ticks / 1000) * 120
+  screen.pen = brush.dither()
+  screen.shape(shape.rectangle(split, 0, 320 - split, 240))
+
+  # mark the split with a white line
+  screen.pen = color.white
+  screen.line(split, 0, split, 240)
+
+  badge.update()
+```
+
+## duotone()
+Maps the brightness of the pixels under the shape onto a two-colour ramp — dark areas take the `shadow` colour, bright areas the `highlight` colour, with a smooth blend between. Great for sepia and other tinted looks.
+
+### Usage
+`brush.duotone(shadow, highlight)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `shadow` | `color` | The colour the darkest pixels map to |
+| `highlight` | `color` | The colour the brightest pixels map to |
+
+### Returns
+A `brush` which can then be used to set an `image`'s pen.
+
+```python
+import math
+
+badge.mode(HIRES)
+
+while True:
+  # a common scene for every example — a full-screen photo
+  screen.load_into("/system/assets/tufty.png")
+
+  # map everything right of a sliding split onto a warm sepia ramp
+  split = 160 + math.sin(badge.ticks / 1000) * 120
+  screen.pen = brush.duotone(color.rgb(40, 20, 10), color.rgb(255, 230, 180))
+  screen.shape(shape.rectangle(split, 0, 320 - split, 240))
+
+  # mark the split with a white line
+  screen.pen = color.white
+  screen.line(split, 0, split, 240)
+
+  badge.update()
+```
+
+# Retro and screen brushes
+This family fakes the look of old displays and worn video — scanlines, vignettes, phosphor glow, chromatic fringing, grain and glitching. Several of them animate on their own (they read `badge.ticks` as they're built), so rebuild them inside your loop to see them move.
+
+## crt()
+A CRT tube look: darkens every few rows to fake scanlines, and rounds off the corners so the picture reads like a curved glass tube.
+
+### Usage
+`brush.crt(spacing, darkness)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `spacing` | `int` | Scanline spacing — every `spacing`-th row is darkened (`1` or more) |
+| `darkness` | `int` | How hard the scanlines darken, `0`–`255` |
+
+### Returns
+A `brush` which can then be used to set an `image`'s pen.
+
+```python
+import math
+
+badge.mode(HIRES)
+
+while True:
+  # a common scene for every example — a full-screen photo
+  screen.load_into("/system/assets/tufty.png")
+
+  # CRT scanlines and rounded corners over everything right of a sliding split
+  split = 160 + math.sin(badge.ticks / 1000) * 120
+  screen.pen = brush.crt(3, 60)
+  screen.shape(shape.rectangle(split, 0, 320 - split, 240))
+
+  # mark the split with a white line
+  screen.pen = color.white
+  screen.line(split, 0, split, 240)
+
+  badge.update()
+```
+
+## vignette()
+Darkens the pixels under the shape by their distance from the centre of the screen, so the frame falls off toward black at the corners.
+
+### Usage
+`brush.vignette(strength)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `strength` | `int` | How dark the corners get, `0`–`255` |
+
+### Returns
+A `brush` which can then be used to set an `image`'s pen.
+
+```python
+import math
+
+badge.mode(HIRES)
+
+while True:
+  # a common scene for every example — a full-screen photo
+  screen.load_into("/system/assets/tufty.png")
+
+  # darken everything right of a sliding split by distance from the centre
+  split = 160 + math.sin(badge.ticks / 1000) * 120
+  screen.pen = brush.vignette(220)
+  screen.shape(shape.rectangle(split, 0, 320 - split, 240))
+
+  # mark the split with a white line
+  screen.pen = color.white
+  screen.line(split, 0, split, 240)
+
+  badge.update()
+```
+
+## phosphor()
+Recolours the area under the shape as a glowing single-colour phosphor — bright pixels take the full `tint`, dark pixels stay dark. Perfect for green- or amber-screen terminals.
+
+### Usage
+`brush.phosphor(tint)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `tint` | `color` | The phosphor colour the glow is tinted toward, e.g. a green or amber |
+
+### Returns
+A `brush` which can then be used to set an `image`'s pen.
+
+```python
+import math
+
+badge.mode(HIRES)
+
+while True:
+  # a common scene for every example — a full-screen photo
+  screen.load_into("/system/assets/tufty.png")
+
+  # recolour everything right of a sliding split as a green terminal
+  split = 160 + math.sin(badge.ticks / 1000) * 120
+  screen.pen = brush.phosphor(color.rgb(0, 255, 0))
+  screen.shape(shape.rectangle(split, 0, 320 - split, 240))
+
+  # mark the split with a white line
+  screen.pen = color.white
+  screen.line(split, 0, split, 240)
+
+  badge.update()
+```
+
+## chromatic()
+Chromatic aberration — pulls the red and blue channels apart horizontally to fake a mis-aligned lens or a cheap CRT.
+
+### Usage
+`brush.chromatic(offset)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `offset` | `int` | How far, in pixels, to split the red and blue channels apart |
+
+### Returns
+A `brush` which can then be used to set an `image`'s pen.
+
+```python
+import math
+
+badge.mode(HIRES)
+
+while True:
+  # a common scene for every example — a full-screen photo
+  screen.load_into("/system/assets/tufty.png")
+
+  # split the red and blue channels on everything right of a sliding split
+  split = 160 + math.sin(badge.ticks / 1000) * 120
+  screen.pen = brush.chromatic(3)
+  screen.shape(shape.rectangle(split, 0, 320 - split, 240))
+
+  # mark the split with a white line
+  screen.pen = color.white
+  screen.line(split, 0, split, 240)
+
+  badge.update()
+```
+
+## noise()
+Adds film grain to the pixels under the shape — the same random amount is added to every channel of each pixel.
+
+### Usage
+`brush.noise(amount, interval)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `amount` | `int` | The most the grain can lighten or darken a pixel |
+| `interval` | `int` | *Optional.* How often the grain refreshes, in milliseconds. `0` (the default) holds a single static pattern |
+
+### Returns
+A `brush` which can then be used to set an `image`'s pen.
+
+```python
+import math
+
+badge.mode(HIRES)
+
+while True:
+  # a common scene for every example — a full-screen photo
+  screen.load_into("/system/assets/tufty.png")
+
+  # add static film grain to everything right of a sliding split
+  split = 160 + math.sin(badge.ticks / 1000) * 120
+  screen.pen = brush.noise(30, 0)
+  screen.shape(shape.rectangle(split, 0, 320 - split, 240))
+
+  # mark the split with a white line
+  screen.pen = color.white
+  screen.line(split, 0, split, 240)
+
+  badge.update()
+```
+
+## glitch()
+Animated VHS-style datamosh — horizontal bands slide sideways with a magenta/cyan channel split, and the odd bright line flashes across the frame. It animates on its own from `badge.ticks`.
+
+### Usage
+`brush.glitch(amount)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `amount` | `int` | How much glitching, `0`–`255` — scales how many bands break up, how far they slide, and how often the lines flash |
+
+### Returns
+A `brush` which can then be used to set an `image`'s pen.
+
+```python
+import math
+
+badge.mode(HIRES)
+
+while True:
+  # a common scene for every example — a full-screen photo
+  screen.load_into("/system/assets/tufty.png")
+
+  # break everything right of a sliding split into glitching bands
+  split = 160 + math.sin(badge.ticks / 1000) * 120
+  screen.pen = brush.glitch(80)
+  screen.shape(shape.rectangle(split, 0, 320 - split, 240))
+
+  # mark the split with a white line
+  screen.pen = color.white
+  screen.line(split, 0, split, 240)
+
+  badge.update()
+```
+
+## nightvision()
+A night-vision goggle look: amplifies everything into green, adds animated grain and darkens the edges.
+
+### Usage
+`brush.nightvision()`
+
+Takes no arguments.
+
+### Returns
+A `brush` which can then be used to set an `image`'s pen.
+
+```python
+import math
+
+badge.mode(HIRES)
+
+while True:
+  # a common scene for every example — a full-screen photo
+  screen.load_into("/system/assets/tufty.png")
+
+  # night-vision everything to the right of a sliding split
+  split = 160 + math.sin(badge.ticks / 1000) * 120
+  screen.pen = brush.nightvision()
+  screen.shape(shape.rectangle(split, 0, 320 - split, 240))
+
+  # mark the split with a white line
+  screen.pen = color.white
+  screen.line(split, 0, split, 240)
+
+  badge.update()
+```
+
+# Artistic brushes
+A brush for turning the pixels under a shape into something that looks hand-made.
+
+## oilpaint()
+A painterly, oil-paint filter — replaces each pixel under the shape with the dominant colour of its neighbourhood, flattening detail into brush-stroke-like blobs, then eases the result back toward the original by `strength`.
+
+### Usage
+`brush.oilpaint(radius, strength)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `radius` | `int` | The size of the neighbourhood each pixel looks at, `1`–`4`. Larger is chunkier (and slower) |
+| `strength` | `int` | *Optional.* How strongly the painted result replaces the original, `0`–`255`. Defaults to `255` (fully painted) |
+
+### Returns
+A `brush` which can then be used to set an `image`'s pen.
+
+```python
+import math
+
+badge.mode(HIRES)
+
+while True:
+  # a common scene for every example — a full-screen photo
+  screen.load_into("/system/assets/tufty.png")
+
+  # turn everything right of a sliding split into oil paint
+  split = 160 + math.sin(badge.ticks / 1000) * 120
+  screen.pen = brush.oilpaint(2)
+  screen.shape(shape.rectangle(split, 0, 320 - split, 240))
+
+  # mark the split with a white line
+  screen.pen = color.white
+  screen.line(split, 0, split, 240)
 
   badge.update()
 ```
