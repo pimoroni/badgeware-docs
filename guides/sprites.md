@@ -267,7 +267,7 @@ while True:
 
   outline = shape.rectangle(0, 0, cw, ch)
   outline.transform = m                   # the shape follows the matrix...
-  screen.pen = brush.image(card, m)       # ...and so does the sprite that fills it
+  screen.pen = brush.image(card)       # ...and so does the sprite that fills it
   screen.shape(outline)
 
   badge.update()
