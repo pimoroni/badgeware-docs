@@ -15,21 +15,22 @@ For movement we want something to happen *continuously* while a button is down, 
 - **UP** / **DOWN** — walk forward / back
 - **A** / **C** — turn left / right
 
-Turning is the easy half: nudge `angle` by a small step. Because the whole renderer derives its direction from `angle` every frame, changing it is all it takes to look around:
+Turning is the easy half: nudge `angle` by a small step. Because the whole renderer derives its direction from `angle` every frame, changing it is all it takes to look around. We scale each nudge by `badge.ticks_delta` — the milliseconds elapsed since the last frame — so `TURN` is a rate *per second* and turning feels the same whether the badge runs at 60 frames a second or 30:
 
 ```python-raw
-if badge.held(BUTTON_A): angle -= TURN     # turn left
-if badge.held(BUTTON_C): angle += TURN     # turn right
+dt = badge.ticks_delta / 1000                 # seconds since the last frame
+if badge.held(BUTTON_A): angle -= TURN * dt   # turn left
+if badge.held(BUTTON_C): angle += TURN * dt   # turn right
 ```
 
 # Walking forward
 
-To walk, we step the position along the way we're facing. We've met this move already — the facing direction is `(cos(angle), sin(angle))`, and scaling it by a small `MOVE` distance gives one frame's worth of stride:
+To walk, we step the position along the way we're facing. We've met this move already — the facing direction is `(cos(angle), sin(angle))`, and scaling it by our `MOVE` speed (and the same `dt`) gives this frame's stride:
 
 ```python-raw
 dirx, diry = math.cos(angle), math.sin(angle)
 if badge.held(BUTTON_UP):
-  # move to px + dirx * MOVE, py + diry * MOVE
+  # move to px + dirx * MOVE * dt, py + diry * MOVE * dt
 ```
 
 Walking backward is the same step with the sign flipped. But we can't just assign the new position — first we have to make sure we're not stepping into a wall.
@@ -73,8 +74,8 @@ W, H = screen.width, screen.height
 px, py = 3.5, 4.5
 angle = 0.0
 
-MOVE = 0.04       # cells travelled per frame while walking
-TURN = 0.03       # radians turned per frame
+MOVE = 2.4        # cells travelled per second while walking
+TURN = 1.8        # radians turned per second
 
 # move each axis only if its target cell is empty — so we slide along walls
 def try_move(nx, ny):
@@ -123,12 +124,16 @@ def render():
 screen.font = font.nope
 
 while True:
+  # scale movement by frame time, so speed is the same at any framerate
+  dt = badge.ticks_delta / 1000
+  move, turn = MOVE * dt, TURN * dt
+
   # turn and walk from the buttons, blocked by walls
   dirx, diry = math.cos(angle), math.sin(angle)
-  if badge.held(BUTTON_UP):   try_move(px + dirx * MOVE, py + diry * MOVE)
-  if badge.held(BUTTON_DOWN): try_move(px - dirx * MOVE, py - diry * MOVE)
-  if badge.held(BUTTON_A):    angle -= TURN
-  if badge.held(BUTTON_C):    angle += TURN
+  if badge.held(BUTTON_UP):   try_move(px + dirx * move, py + diry * move)
+  if badge.held(BUTTON_DOWN): try_move(px - dirx * move, py - diry * move)
+  if badge.held(BUTTON_A):    angle -= turn
+  if badge.held(BUTTON_C):    angle += turn
 
   screen.pen = color.rgb(28, 28, 38); screen.clear()
   render()

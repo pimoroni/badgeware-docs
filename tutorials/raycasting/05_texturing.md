@@ -85,11 +85,12 @@ screen.alpha = 255                      # reset for everything else
 
 # The textured world
 
-Here's the full program — the walkable room from Part 4, now in brick. Wander up to the pillar and watch the bricks resolve as you approach and dissolve into fog as they recede.
+Here's the full program — the walkable room from Part 4, now in brick. With more happening per column, we tuck the DDA back into the `cast()` helper from Part 2 (now also returning which wall face we hit), so `render()` reads straight down the column's work: cast the ray, turn its distance into a slice, find the texture column, paint it, then fog it. Wander up to the pillar and watch the bricks resolve as you approach and dissolve into fog as they recede.
 
 ```python {expanded}
 import math
 
+# the level, laid out as text: '#' is a wall, ' ' is empty floor
 MAP = [
   "################",
   "#      #       #",
@@ -104,7 +105,7 @@ MAP = [
   "#      #      ##",
   "################",
 ]
-W, H = screen.width, screen.height
+W, H = screen.width, screen.height   # one ray — and one wall slice — per column
 
 # build a 64x64 brick texture once, into an off-screen image
 TS = 64
@@ -118,16 +119,44 @@ for r in range(TS // 16):
   for x in range(off, TS + 32, 32):
     tex.rectangle(x, r * 16, 2, 16)
 
-FOG = color.rgb(28, 28, 38)
-px, py = 3.5, 4.5
-angle = 0.0
-MOVE = 0.04
-TURN = 0.03
+# player state and movement speeds
+FOG = color.rgb(28, 28, 38)     # the murk distant walls fade into
+px, py = 3.5, 4.5               # player position, in cells
+angle = 0.0                     # direction the player faces, in radians
+MOVE = 2.4                      # cells moved per second while walking
+TURN = 1.8                      # radians turned per second
 
+# move on each axis only if its target cell is empty, so we slide along walls
 def try_move(nx, ny):
   global px, py
   if MAP[int(py)][int(nx)] == " ": px = nx
   if MAP[int(ny)][int(px)] == " ": py = ny
+
+# the DDA from Part 2 — walk the grid until we hit a wall — now also
+# returning which face we struck, so we can map and shade it
+@micropython.native
+def cast(rayx, rayy):
+  mapx, mapy = int(px), int(py)
+  ddx = abs(1 / rayx) if rayx != 0 else 1e30
+  ddy = abs(1 / rayy) if rayy != 0 else 1e30
+  if rayx < 0:
+    stepx = -1; sidex = (px - mapx) * ddx
+  else:
+    stepx = 1;  sidex = (mapx + 1 - px) * ddx
+  if rayy < 0:
+    stepy = -1; sidey = (py - mapy) * ddy
+  else:
+    stepy = 1;  sidey = (mapy + 1 - py) * ddy
+  side = 0
+  while True:
+    if sidex < sidey:
+      sidex += ddx; mapx += stepx; side = 0
+    else:
+      sidey += ddy; mapy += stepy; side = 1
+    if MAP[mapy][mapx] != " ":
+      break
+  dist = (sidex - ddx) if side == 0 else (sidey - ddy)
+  return dist, side
 
 @micropython.native
 def render():
@@ -137,30 +166,13 @@ def render():
     camera = 2 * x / W - 1
     rayx = dirx + planex * camera
     rayy = diry + planey * camera
-    mapx, mapy = int(px), int(py)
-    ddx = abs(1 / rayx) if rayx != 0 else 1e30
-    ddy = abs(1 / rayy) if rayy != 0 else 1e30
-    if rayx < 0:
-      stepx = -1; sidex = (px - mapx) * ddx
-    else:
-      stepx = 1;  sidex = (mapx + 1 - px) * ddx
-    if rayy < 0:
-      stepy = -1; sidey = (py - mapy) * ddy
-    else:
-      stepy = 1;  sidey = (mapy + 1 - py) * ddy
-    side = 0
-    while True:
-      if sidex < sidey:
-        sidex += ddx; mapx += stepx; side = 0
-      else:
-        sidey += ddy; mapy += stepy; side = 1
-      if MAP[mapy][mapx] != " ":
-        break
-    dist = (sidex - ddx) if side == 0 else (sidey - ddy)
+
+    dist, side = cast(rayx, rayy)              # how far to the wall, and which face
     if dist < 0.0001: dist = 0.0001
-    height = H / dist
+    height = H / dist                          # nearer wall -> taller slice
     top = (H - height) / 2
 
+    # where along the wall the ray struck -> texture column u (0..1)
     if side == 0:
       u = py + dist * rayy
     else:
@@ -169,12 +181,12 @@ def render():
     if side == 0 and rayx > 0: u = 1 - u
     if side == 1 and rayy < 0: u = 1 - u
 
-    # snap the span to whole rows (a touch too tall, clipped for free) and give
-    # the exact texture v at each end, so the brick stays locked and can't comb
+    # paint that column down the slice, snapped to whole rows so it can't comb
     y0 = math.floor(top)
     y1 = math.ceil(top + height)
     screen.blit_vspan(tex, x, y0, y1 - y0, u, (y0 - top) / height, u, (y1 - top) / height)
 
+    # fog: a translucent wash over the slice that thickens with distance
     fog = int(dist * 26)
     if side == 1: fog += 40
     if fog > 205: fog = 205
@@ -186,15 +198,22 @@ def render():
 screen.font = font.nope
 
 while True:
-  dirx, diry = math.cos(angle), math.sin(angle)
-  if badge.held(BUTTON_UP):   try_move(px + dirx * MOVE, py + diry * MOVE)
-  if badge.held(BUTTON_DOWN): try_move(px - dirx * MOVE, py - diry * MOVE)
-  if badge.held(BUTTON_A):    angle -= TURN
-  if badge.held(BUTTON_C):    angle += TURN
+  # scale movement by frame time, so speed is the same at any framerate
+  dt = badge.ticks_delta / 1000
+  move, turn = MOVE * dt, TURN * dt
 
+  # drive the player from the buttons: A/C turn, UP/DOWN walk (blocked by walls)
+  dirx, diry = math.cos(angle), math.sin(angle)
+  if badge.held(BUTTON_UP):   try_move(px + dirx * move, py + diry * move)
+  if badge.held(BUTTON_DOWN): try_move(px - dirx * move, py - diry * move)
+  if badge.held(BUTTON_A):    angle -= turn
+  if badge.held(BUTTON_C):    angle += turn
+
+  # clear to the fog colour, then draw the 3D view over it
   screen.pen = FOG; screen.clear()
   render()
 
+  # a small on-screen controls hint
   screen.pen = color.white
   screen.text("A/C turn   UP/DOWN move", 6, 108)
   badge.update()
