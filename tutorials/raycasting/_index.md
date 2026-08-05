@@ -2,8 +2,9 @@
 title: Raycasting a 3D world
 summary: Build a Wolfenstein-style 3D engine, one ray at a time — from a flat map to textured walls under a sky.
 icon: deployed_code
-sort: 2
+sort: 9
 publish: true
+level: advanced
 ---
 # Raycasting a 3D world
 
