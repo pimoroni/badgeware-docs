@@ -7,17 +7,17 @@ sort: 2
 ---
 # Let's write some code
 
-Now you've met the hardware, let's build a small app — and do it a step at a time. A Badgeware app is just a Python script: you write it from top to bottom, and call `badge.update()` whenever you want to show what you've drawn and refresh the buttons. Draw, update, repeat — that's the whole idea, and it makes screens and menus a breeze.
+Now you've met the hardware, let's build a small app one step at a time. A Badgeware app is just a Python script: you write it from top to bottom, and call `badge.update()` whenever you want to show what you've drawn and refresh the buttons. Draw, update, repeat, making screens and menus a breeze.
 
-We'll write each part as its own little **function** — one for the loading screen, one for the menu, one for the action — then wire them together at the end. Breaking it up this way keeps each piece simple, and the final program ends up reading almost like a to-do list.
+We'll write each part as its own little **function** — one for the loading screen, one for the menu, one for the action — then wire them together at the end. Breaking up your code this way keeps each piece simple, and the final program ends up reading almost like a to-do list.
 
 > This one's written for **Tufty** and its full-colour screen. The ideas carry across to **Badger** and **Blinky** too, but the specifics won't — Badger's e-paper redraws differently, and Blinky's LED matrix is a lower resolution.
 
 # 1. Basic setup
 
-Every app starts by setting the stage. First, imports. For convenience, `screen`, `badge`, `color`, `font` and other essentials are **always available** — they're needed by every badge app, so Badgeware imports them for you. Anything else — `time`, networking, and so on — you import yourself, just like normal Python.
+Every app starts by setting the stage. First, imports. For convenience, `screen`, `badge`, `color`, `font` and other essentials are **always available** — they're needed by every badge app, so Badgeware builds them in for you. Anything else — `time`, networking, and so on — you import yourself, just like normal Python.
 
-We only need `time` here, for the pause on the loading screen. While we're at it, we'll choose a pen colour and font once, up front, so the rest of the app can just draw without repeating itself:
+We only need `time` here, for the pause on the loading screen. While we're at it, we'll choose a pen colour and font; once, up front, so the rest of the app can just draw without repeating itself:
 
 ```python-raw
 import time                     # for the pause on the loading screen
@@ -41,11 +41,11 @@ def loading_screen():
   time.sleep(1.5)     # ...and hold it for a moment and a half
 ```
 
-See how linear it is: draw, `badge.update()` to show it, then `time.sleep()` to pause. Because you're in charge of the flow, timing things is as simple as sleeping. And handily, `badge.update()` also wipes the framebuffer clean ready for the next frame — so you just draw what you want to see, with no need to clear the screen yourself.
+See how linear it is?: draw, `badge.update()` to show it, then `time.sleep()` to pause. Because you're in charge of the flow, timing things is as simple as sleeping. And handily, `badge.update()` also wipes the framebuffer clean ready for the next frame — so you just draw what you want to see, with no need to clear the screen yourself.
 
 # 3. A menu
 
-Next, a menu you can move through with **UP** and **DOWN**, picking an item with **A**. We'll write it to *return* the chosen item's number, so whoever calls it knows what was picked.
+Next, a menu you can navigate with **UP** and **DOWN**, picking an item with **A**. We'll write it to *return* the chosen item's number, so whoever calls it knows what was picked.
 
 ```python-raw
 def menu(items):
@@ -155,3 +155,5 @@ while True:
 # Run it on your badge
 
 No need to save this to the badge yet — the quickest way to try it is to run it **straight onto the device** from an editor. Open it in [Thonny](https://thonny.org) or VS Code (with the [MicroPico](https://github.com/paulober/MicroPico) extension), plug your badge in over USB, and hit run. Your code runs live on the badge — no copying files, no reboot — so you can tweak and re-run in seconds.
+
+If you don't have a badge yet, [try.badgewa.re](https://try.badgewa.re) has you covered!

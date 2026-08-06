@@ -7,7 +7,7 @@ publish: true
 
 # Update your firmware
 
-Before you start coding, it's worth making sure your badge is running the latest firmware. New releases bring bug fixes, performance improvements and new features — so if something isn't behaving the way the docs describe, out-of-date firmware is a common culprit.
+Before you start coding, it's worth making sure your badge is running the latest firmware. New releases bring bug fixes, performance improvements and new features. If something isn't behaving the way the docs describe, out-of-date firmware is a common culprit.
 
 # Latest firmware
 

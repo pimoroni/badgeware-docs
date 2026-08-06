@@ -134,7 +134,8 @@ while True:
 ```
 
 ## A tiny snake game
-This example steers a snake around the screen: **UP** and **DOWN** move it vertically, **A** and **C** move it left and right. The snake advances on its own — the buttons only change its direction, and it can't turn straight back on itself. It wraps around the edges of the display.
+
+This example steers a snake around the screen: **UP** and **DOWN** move it vertically, **A** and **C** move it left and right. The snake advances on its own — the buttons only change its direction - and it can't turn straight back on itself. It also wraps around the edges of the display.
 
 The snake moves on an 8-pixel grid, so its position is tracked in grid cells rather than pixels. Its body is just a list of cells; each step we add a new head and drop the tail, which slides it forward at a fixed length.
 

@@ -7,11 +7,11 @@ sort: 1
 ---
 # Meet your badge
 
-Before you write a line of code, let's take a tour of the hardware — what every part does, and why it's there.
+Before you write a line of code, let's take a tour of the hardware. You'll learn what every part does, and why it's there.
 
 # Display
 
-Every badge is built around its display — and it's the one feature that really sets the three apart. Each has a completely different kind of screen, so the badge you choose shapes how your apps look and feel. The good news: you draw to all of them with the same commands, so code written for one mostly runs on the others — see **[Coding for the different badges](/guides/badge-differences.md)** for more specific information on how to deal with their differences.
+Every badge is built around its display, the one feature that sets the three apart. Each has a completely different kind of screen, so the badge you choose shapes how your apps look and feel. The good news: you draw to all of them with the same commands, so code written for one mostly runs on the others — see **[Coding for the different badges](/guides/badge-differences.md)** for more specific information on how to deal with their differences.
 
 | Tufty | Badger | Blinky |
 |---|---|---|
@@ -33,7 +33,7 @@ In short: reach for **Tufty** when you want colour, motion, and rich graphics; *
 <figcaption>Five soft-touch buttons — everything your apps need to feel interactive.</figcaption>
 </figure>
 
-Five tactile buttons on the front — **A**, **B**, **C**, **UP**, and **DOWN** — are how people talk to your apps: scroll a menu, flip a page, fire a shot, cast a vote.
+Five tactile buttons on the front — **A**, **B**, **C**, **UP**, and **DOWN** — are how people interact with your apps: scroll a menu, flip a page, fire a shot, cast a vote.
 
 <figure class="feature-callout">
 <div class="callout-media">
@@ -41,7 +41,7 @@ Five tactile buttons on the front — **A**, **B**, **C**, **UP**, and **DOWN** 
 </div>
 </figure>
 
-On the back sit two more buttons — **RESET** and **HOME**. Look closely and each carries smaller secondary labels: RESET also reads **DISK** and **SLEEP**, and HOME also reads **BOOT**. That's because the function depends on how you press them.
+On the back are two more buttons — **RESET** and **HOME**. Look closely and each carries smaller secondary labels: RESET also reads **DISK** and **SLEEP**, and HOME also reads **BOOT**. That's because the function depends on how you press them.
 
 | Action | What it does |
 |---|---|
@@ -60,23 +60,23 @@ On the back sit two more buttons — **RESET** and **HOME**. Look closely and ea
 <figcaption>USB-C — the badge's one connection for power, charging, and moving your code and files.</figcaption>
 </figure>
 
-A single USB-C port on the left-hand edge does it all: it powers the badge, tops up the battery, and carries your code across from your computer.
+A single USB-C port on the left-hand edge does it all: powers the badge, tops up the battery, and carries your code across from your computer.
 
-It keeps a built-in **1,000mAh rechargeable LiPo battery** charged, so your badge carries on running for hours after you unplug it — and for days at a time on Badger's ultra-low-power E Ink display.
+When plugged in your badge keeps a built-in **1,000mAh rechargeable LiPo battery** charged, and carries on running for hours after you unplug it. Or for days on Badger's ultra-low-power E Ink display.
 
-Double-tap **RESET** and the badge mounts as an ordinary USB drive — just drag your files on and eject. No toolchains, no drivers, no fuss.
+Double-tap **RESET** and the badge mounts as an ordinary USB disk. Drag your apps and assets over and eject. No toolchains, no drivers, no fuss.
 
-Prefer a live workflow? You can also use an editor like **VS Code** (with the [MicroPico](https://github.com/paulober/MicroPico) extension) or [Thonny](https://thonny.org) to write, run, and debug code on your badge in real time. Thonny is especially beginner-friendly and a great way to get started.
+Prefer a live workflow? You can also use an editor like **VS Code** (with the [MicroPico](https://github.com/paulober/MicroPico) extension) or [Thonny](https://thonny.org) to write, run, and debug code on your badge in real time. Thonny is especially beginner friendly and a great way to get started.
 
 # Wearable
 
-The lanyard slot and mounting holes are part of the PCB itself, which extends up beyond the top of the clear polycarbonate case — a rugged, secure fixing point rather than a flimsy moulded tab, so your badge is ready to wear from the moment you power it on.
+The lanyard slot and mounting holes are part of the PCB itself, which extends up beyond the top of the clear polycarbonate case for a secure anchor point. Your badge is ready to wear from the moment you power it on.
 
 But it doesn't have to hang around your neck. The shape of the case also lets Badgeware stand upright on any flat surface — ideal for turning it into a tiny internet-connected display for your desk.
 
 # Wi-Fi & Bluetooth
 
-Built-in **2.4GHz WiFi** and **Bluetooth 5.2** mean your badge is connected from the moment it powers on. Pull live data over the air, sync your details, show announcements, or have badges talk to each other — perfect for networking games, shared experiences, and dashboards that keep themselves up to date.
+Built-in **2.4GHz WiFi** and **Bluetooth 5.2** let you pull live data over the air, sync your details, show announcements, or have badges talk to each other — perfect for networking games, shared experiences, and dashboards that keep themselves up to date.
 
 # Expansion & debugging
 
@@ -117,4 +117,4 @@ We've covered the headlines — the display, buttons, ports, and wireless. Here'
 
 # That's your badge
 
-And that's the whole thing — a bright display, a handful of buttons, wireless, expansion ports, and a genuinely capable computer, all in a case that's ready to wear or stand on your desk. It's rugged, it's hackable, and every part of it is yours to play with. Now you know your way around the hardware, let's write some code and bring it to life.
+And that's Badgeware — your choice of display served with a handful of buttons, wireless, expansion ports, and a genuinely capable computer, all in a case that's ready to wear or stand on your desk. It's rugged, it's hackable, and every part of it is yours to play with. Now you know your way around the hardware, let's write some code and bring it to life.

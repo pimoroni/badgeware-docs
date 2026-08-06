@@ -7,7 +7,7 @@ sort: 2
 
 # The three badges
 
-Tufty, Badger, and Blinky run near-identical hardware — the same processor, memory, buttons, and API. What really sets them apart is the display, and that shapes what each badge is best at. You draw to all three with exactly the same commands, so most code runs anywhere; this page covers where they differ, and how to make the most of each.
+Tufty, Badger, and Blinky are built around the same processor, memory, buttons, and API. What really sets them apart is the display. Three distinct technologies, each shaping what each badge is best at. You draw to all three with exactly the same commands, so most code runs anywhere. This page covers where they differ, and how to make the most of each.
 
 | | Badger | Tufty | Blinky |
 |---|---|---|---|
@@ -17,13 +17,15 @@ Tufty, Badger, and Blinky run near-identical hardware — the same processor, me
 | Refresh | On demand, sleeps between | Continuous | Continuous |
 | Best for | Text, dashboards, e-readers | Games, animation, rich UIs | Scrolling text, pixel art |
 
-You draw to every badge the same way. Anything drawn outside the physical screen simply doesn't appear — run a layout designed for Tufty on Blinky and you'll just see its top-left 39 × 26 pixels.
+You draw to every badge the same way, and anything drawn outside the physical screen simply doesn't appear. Run a layout designed for Tufty on Blinky and you'll just see its top-left 39 × 26 pixels.
 
-Colour is handled for you too: colour images are quantised to Badger's greys, or reduced to greyscale on Blinky, automatically. If you want fine control over grey levels, work in greyscale yourself. You can also [dither](/api/image.md#dither) on any badge — most useful on Badger's E Ink display, where a repeating pattern creates intermediate shades of grey.
+Colour is handled for you too: colour images are quantised to Badger's greys, or reduced to greyscale on Blinky, automatically. If you want fine control over grey levels, work in greyscale yourself. You can also [dither](/api/image.md#dither) on any badge — most useful on Badger's E Ink display, where a repeating pattern creates the illusion of intermediate shades of grey.
+
+Three badges, three screens, three very different sizes and styles. Below you'll learn what each is great at, and get a taste for how you might write a clock app for each.
 
 # Tufty
 
-A full-colour IPS LCD that redraws continuously, Tufty is the one to reach for when you want colour, motion, and rich graphics. It runs at 160 × 120 by default, or switch to a crisp 320 × 240 with [`mode(HIRES)`](/api/badge.md#mode) — sharp for detailed interfaces, while the lower resolution frees up frame rate for animation.
+Tufty sports a full-colour IPS LCD that redraws continuously. This is the badge to reach for when you want colour, motion, and rich graphics. It runs at 160 × 120 by default, freeing up the framerate for fluid animation. Switch to a crisp 320 × 240 with [`mode(HIRES)`](/api/badge.md#mode) for detailed interfaces.
 
 <figure class="feature-callout">
 <div class="callout-media" style="--callout-aspect: 2.5 / 1">
@@ -32,7 +34,7 @@ A full-colour IPS LCD that redraws continuously, Tufty is the one to reach for w
 <figcaption>Tufty's full colour LCD display is ideal for fluid animated graphics.</figcaption>
 </figure>
 
-Because it redraws continuously and works in full colour, a Tufty clock is just a loop that draws the time fresh every frame. Pixel text is drawn through the current brush just like vector text, so here the built-in absolute font is scaled up 2× (the fourth argument to [`text()`](/api/image.md#text) is an integer scale for pixel fonts) and filled with a gradient brush — rebuilt each frame with a rotating matrix so a bright highlight sweeps around the clock, passing horizontal exactly as each second ticks over:
+Because it redraws continuously and works in full colour, a Tufty clock is just a loop that draws the time fresh every frame. For a big bold clock we scale the built-in absolute font up 2× (the fourth argument to [`text()`](/api/image.md#text) is an integer scale for pixel fonts). Pixel text is drawn through the current brush just like vector text, so we can fill it with a gradient brush. Rebuild this each frame with a rotating matrix and a bright highlight sweeps around the clock, appearing horizontal exactly as each second ticks over:
 
 ```python
 import time
@@ -72,7 +74,7 @@ while True:
 
 # Badger
 
-Badger's E Ink display only draws power when it changes, which makes it superb for low-power, always-on apps. To exploit that, Badger sleeps between updates and wakes on a timer or a button press. Waking restarts your program from the top — so anything you haven't saved is lost — which means a Badger app typically draws once, then sleeps until it next needs to change.
+Badger's E Ink display only draws power when it changes, which makes it superb for low-power, always-on apps. To exploit that, Badger sleeps between updates and wakes on a timer or a button press. Waking restarts your program from the top — so anything you haven't saved is lost — which means a Badger app typically draws once, saves its state, then sleeps until it next needs to change.
 
 <figure class="feature-callout">
 <div class="callout-media" style="--callout-aspect: 2.5 / 1">
@@ -81,7 +83,7 @@ Badger's E Ink display only draws power when it changes, which makes it superb f
 <figcaption>For low power projects that need to run for months you can't beat Badger.</figcaption>
 </figure>
 
-So rather than a continuous loop, a Badger clock draws the time, then sleeps until the next minute:
+In lieu of a continuous loop a Badger clock draws the time and sleeps until the next minute:
 
 ```python
 # Badger restarts from the top each time it wakes, so this runs once per minute

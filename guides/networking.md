@@ -43,24 +43,32 @@ Once you're finished with the network, `wifi.disconnect()` drops the connection 
 
 # Fetching data from the web
 
-Once you're connected, you can make HTTP requests with the `requests` module, which works much like the popular library of the same name on desktop Python:
+Having a game loop-style application isn't always sunshine and roses. Sometimes you want to do something that takes time, like fetch some data from a server, and you're stuck trying to hide the delay somewhere nobody will notice.
+
+To make this easier we've include `fetch`, a handy little library that will trot off and fetch your earthquake list or weather data while you're busy doing something else. It slices the cost of connecting, negotiating and fetching data over your loop rather than stalling it for one big long block:
 
 ```python-raw
-import requests
+import fetch
 
-r = requests.get("https://api.example.com/data")
-data = r.json()      # parse a JSON response into a dict/list
-print(data)
+feed = fetch.url("https://api.example.com")
+
+while True:
+    if fetch:  # pump fetch and check its status in one go
+        data = fetch.json()
 ```
 
-Use `r.json()` for JSON responses, or `r.text` for plain text. It's a good idea to wrap requests in a `try`/`except` block, since anything can go wrong on a network:
+To make `fetch` do it's work, you need to ask if it's done with `if fetch` or `if fetch.done`.
+
+If you're fetching a larger file or an image, you might want to fetch it to disk like so:
 
 ```python-raw
-try:
-    r = requests.get(API_URL)
-    data = r.json()
-except (OSError, ValueError):
-    data = None   # request failed or the response wasn't valid JSON
+import fetch
+
+feed = fetch.url("https://api.example.com/parrot.jpg").to("/cache.jpg")
+
+while True:
+    if fetch:
+        file_path = fetch.path
 ```
 
 # Syncing the time
