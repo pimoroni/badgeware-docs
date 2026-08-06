@@ -371,17 +371,20 @@ run(update)
 ```
 
 # Filters
-Filters are applied to an entire image's clipping area.
+A filter rewrites the pixels that are already in an image, across the whole of its clipping area — so draw your scene first, then filter it. Most of them have a [brush](/api/brush.md#effect-brushes) equivalent that applies the same effect through a vector shape instead, for when you want it in one part of the frame only.
+
+Several take an optional `strength` that scales the effect, which is the easiest way to fade one in and out over time. None of them can write to an image loaded from an indexed (palette) PNG — on those they do nothing at all.
 
 ## blur()
 Blurs the contents of the image.
 
 ### Usage
-`.blur(radius)`
+`.blur(radius, strength)`
 
 | Parameter | Type | Description |
 |---|---|---|
-| `radius` | `int` | The radius of the blur filter (higher = stronger) |
+| `radius` | `float` | The radius of the blur filter (higher = stronger) |
+| `strength` | `float` | *Optional.* Scales `radius`. Defaults to `1.0` |
 
 ```python
 import math
@@ -392,6 +395,119 @@ def update():
   screen.circle(80, 60, 20)
   screen.blit(sprite, vec2(40, 50))
   screen.blur((math.sin(badge.ticks / 500) + 1) * 5)
+
+run(update)
+```
+
+## bloom()
+Wraps the brightest parts of the image in a soft halo: everything above `threshold` is blurred into a glow, then added back over the original. This is the filter behind glowing neon, hot highlights and light bleeding around a bright sprite.
+
+### Usage
+`.bloom(threshold, intensity, radius, strength)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `threshold` | `int` | *Optional.* The brightness a pixel needs before it glows, `0`–`255`. Defaults to `180` |
+| `intensity` | `int` | *Optional.* How strongly the halo is added back. `256` adds it at full brightness and higher over-drives it. Defaults to `150` |
+| `radius` | `float` | *Optional.* How far the glow spreads. Defaults to `4.0` |
+| `strength` | `float` | *Optional.* Scales `intensity`. Defaults to `1.0` |
+
+```python
+import math
+
+skull = image.load("/system/assets/skull.png")
+sunset = brush.gradient(brush.LINEAR, 0, 0, 0, 120,
+                        [(0.0, color.rgb(16, 8, 48)), (1.0, color.rgb(255, 128, 32))])
+
+def update():
+  screen.pen = sunset
+  screen.clear()
+  screen.pen = color.yellow
+  screen.circle(112, 34, 14)                    # a bright sun for the bloom to catch
+  screen.blit(skull, vec2(56, 64))
+
+  # breathe the glow in and out
+  screen.bloom(180, 200, 4, (math.sin(badge.ticks / 600) + 1) / 2)
+
+run(update)
+```
+
+## zoom()
+Smears the image outward from its centre in radial streaks, like a camera zooming during the exposure. Pairs well with `bloom()` for a warp-speed look.
+
+### Usage
+`.zoom(strength)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `strength` | `int` | *Optional.* How long the streaks are. Defaults to `200` |
+
+```python
+skull = image.load("/system/assets/skull.png")
+
+def update():
+  screen.pen = color.navy
+  screen.clear()
+  screen.pen = color.cyan
+  screen.blit(skull, vec2(64, 48))
+  screen.zoom(220)
+
+  # the streaks come from the centre, so anything drawn after stays sharp
+  screen.pen = color.white
+  screen.text("warp", 60, 96)
+
+run(update)
+```
+
+## wave()
+Warps the image with a sine wobble that animates by itself from `badge.ticks` — a heat haze, a dream sequence, or an underwater ripple. `horizontal` slides each row sideways and `vertical` slides each column up and down; set either to `0` to leave that axis alone.
+
+### Usage
+`.wave(horizontal, vertical, strength, bilinear)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `horizontal` | `int` | *Optional.* Sideways amplitude in pixels. Defaults to `4` |
+| `vertical` | `int` | *Optional.* Vertical amplitude in pixels. Defaults to `4` |
+| `strength` | `float` | *Optional.* Scales both amplitudes. Defaults to `1.0` |
+| `bilinear` | `bool` | *Optional.* Interpolate each displaced sample for a smoother, sub-pixel warp, at the cost of some speed. Defaults to `False` |
+
+```python
+skull = image.load("/system/assets/skull.png")
+
+def update():
+  screen.pen = color.grape
+  screen.clear()
+  screen.pen = color.white
+  screen.text("dream sequence", 8, 20)
+  screen.blit(skull, vec2(64, 60))
+
+  # sideways only, smoothly sampled
+  screen.wave(6, 0, 1.0, True)
+
+run(update)
+```
+
+## edgeglow()
+Traces the edges in the image as glowing coloured lines on black, leaving the flat areas dark. The edges keep the colour of what they came from, with the saturation pushed up and a bloom over the top.
+
+### Usage
+`.edgeglow(strength)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `strength` | `int` | *Optional.* Scales the edge sensitivity, so higher picks out fainter detail. Defaults to `220` |
+
+```python
+skull = image.load("/system/assets/skull.png")
+
+def update():
+  screen.pen = color.smoke
+  screen.clear()
+  screen.blit(skull, vec2(40, 50))
+  screen.pen = color.orange
+  screen.circle(110, 60, 24)
+  screen.edgeglow(220)
 
 run(update)
 ```
@@ -434,6 +550,414 @@ def update():
   screen.circle(80, 60, 20)
   screen.blit(sprite, vec2(40, 50))
   screen.monochrome()
+
+run(update)
+```
+
+## invert()
+Photonegative — flips every colour channel of the image (`255 - value`).
+
+```python
+sprite = image.load("/system/assets/skull.png")
+
+def update():
+  screen.circle(80, 60, 20)
+  screen.blit(sprite, vec2(40, 50))
+  screen.invert()
+
+run(update)
+```
+
+## saturation()
+Pushes the colours toward or away from grey without changing their brightness.
+
+### Usage
+`.saturation(amount)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `amount` | `int` | `0` leaves the colours unchanged; positive values boost the colour, negative values drain it. `-256` gives a fully greyscale result |
+
+```python
+import math
+
+skull = image.load("/system/assets/skull.png")
+
+def update():
+  screen.pen = color.brown
+  screen.clear()
+  screen.blit(skull, vec2(64, 48))
+
+  # sweep from drained to over-saturated and back
+  screen.saturation(int(math.sin(badge.ticks / 800) * 256))
+
+run(update)
+```
+
+## contrast()
+Expands or compresses the image around mid-grey.
+
+### Usage
+`.contrast(amount)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `amount` | `int` | `0` leaves the pixels unchanged; positive values increase contrast, negative values flatten it. `-256` collapses everything to mid-grey |
+
+```python
+skull = image.load("/system/assets/skull.png")
+
+def update():
+  screen.pen = color.taupe
+  screen.clear()
+  screen.blit(skull, vec2(64, 48))
+  screen.contrast(160)
+
+run(update)
+```
+
+## threshold()
+Hard two-tone posterisation: every pixel becomes one of two colours depending on how bright it is. `onebit()` is this filter with black and white at mid-grey.
+
+### Usage
+`.threshold(level, lo, hi)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `level` | `int` | The brightness cut-off, `0`–`255`. Pixels brighter than this become `hi`, the rest become `lo` |
+| `lo` | `color` | The colour used for pixels at or below `level` |
+| `hi` | `color` | The colour used for pixels above `level` |
+
+```python
+skull = image.load("/system/assets/skull.png")
+
+def update():
+  screen.circle(80, 60, 24)
+  screen.blit(skull, vec2(40, 50))
+  screen.threshold(128, color.navy, color.lime)
+
+run(update)
+```
+
+## duotone()
+Maps brightness onto a two-colour ramp — dark areas take the `shadow` colour, bright areas the `highlight` colour, with a smooth blend between. Good for sepia and other tinted looks.
+
+### Usage
+`.duotone(shadow, highlight)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `shadow` | `color` | The colour the darkest pixels map to |
+| `highlight` | `color` | The colour the brightest pixels map to |
+
+```python
+skull = image.load("/system/assets/skull.png")
+
+def update():
+  screen.circle(80, 60, 24)
+  screen.blit(skull, vec2(40, 50))
+  screen.duotone(color.rgb(40, 20, 10), color.rgb(255, 230, 180))
+
+run(update)
+```
+
+## palette_dither()
+Ordered-dithers the image down to a palette of your own choosing. The dither spreads the error between neighbouring pixels, so a handful of colours still reads as a full range of tones — this is what the retro presets below are built on.
+
+### Usage
+`.palette_dither(palette, strength)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `palette` | `list` | The colours to map to, up to 64 of them |
+| `strength` | `int` | *Optional.* How much dithering to apply. `0` clamps every pixel to its nearest solid colour, `64` is subtle, `128` medium and `255` heavy. Defaults to `64` |
+
+```python
+skull = image.load("/system/assets/skull.png")
+
+# a four-colour ramp, in the style of an old handheld
+shades = [color.rgb(16, 24, 8), color.rgb(48, 72, 16),
+          color.rgb(112, 128, 32), color.rgb(190, 190, 64)]
+
+def update():
+  screen.pen = color.blue
+  screen.clear()
+  screen.blit(skull, vec2(64, 48))
+  screen.palette_dither(shades, 64)
+
+run(update)
+```
+
+## vignette()
+Darkens the image by distance from its centre, drawing the eye inward.
+
+### Usage
+`.vignette(strength)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `strength` | `int` | How dark the corners get, `0`–`255` |
+
+```python
+skull = image.load("/system/assets/skull.png")
+
+def update():
+  screen.pen = color.latte
+  screen.clear()
+  screen.blit(skull, vec2(64, 48))
+  screen.vignette(200)
+
+run(update)
+```
+
+## crt()
+Lays scanlines over the image and rounds off the corners, like the face of a CRT tube.
+
+### Usage
+`.crt(spacing, darkness, strength)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `spacing` | `int` | Scanline spacing — every `spacing`-th row is darkened (`1` or more) |
+| `darkness` | `int` | How hard the scanlines darken, `0`–`255` |
+| `strength` | `float` | *Optional.* Scales `darkness`. Defaults to `1.0` |
+
+```python
+skull = image.load("/system/assets/skull.png")
+
+def update():
+  screen.pen = color.navy
+  screen.clear()
+  screen.pen = color.lime
+  screen.text("READY.", 8, 20)
+  screen.blit(skull, vec2(64, 60))
+  screen.crt(2, 80)
+
+run(update)
+```
+
+## grid()
+Darkens every `spacing`-th row *and* column, leaving the cell interiors alone — a gentle pixel grid, like an LCD seen up close. Subtler than `crt()`, which only draws lines one way.
+
+### Usage
+`.grid(spacing, darkness, strength)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `spacing` | `int` | Grid spacing — every `spacing`-th row and column is darkened (`1` or more) |
+| `darkness` | `int` | How hard the grid lines darken, `0`–`255` |
+| `strength` | `float` | *Optional.* Scales `darkness`. Defaults to `1.0` |
+
+```python
+skull = image.load("/system/assets/skull.png")
+
+def update():
+  screen.pen = color.green
+  screen.clear()
+  screen.blit(skull, vec2(64, 48))
+  screen.grid(3, 60)
+
+run(update)
+```
+
+## phosphor()
+The full phosphor-screen treatment: maps the image to a single glowing tint, adds scanlines, then blooms the result. Where the [brush](/api/brush.md#phosphor) only tints, this filter gives you the whole tube.
+
+### Usage
+`.phosphor(tint)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `tint` | `color` | The phosphor colour the glow is tinted toward, for example a green or an amber |
+
+```python
+skull = image.load("/system/assets/skull.png")
+
+def update():
+  screen.blit(skull, vec2(64, 40))
+  screen.text("SYSTEM READY", 20, 80)
+  screen.phosphor(color.rgb(180, 120, 0))       # amber terminal
+
+run(update)
+```
+
+## chromatic()
+Splits the red and blue channels apart, as a cheap lens would — chromatic aberration.
+
+### Usage
+`.chromatic(offset, strength)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `offset` | `int` | How far, in pixels, to split the red and blue channels apart |
+| `strength` | `float` | *Optional.* Scales `offset`. Defaults to `1.0` |
+
+```python
+import math
+
+skull = image.load("/system/assets/skull.png")
+
+def update():
+  screen.pen = color.white
+  screen.text("out of focus", 30, 40)
+  screen.blit(skull, vec2(64, 60))
+
+  # drift the split in and out
+  screen.chromatic(4, (math.sin(badge.ticks / 500) + 1) / 2)
+
+run(update)
+```
+
+## noise()
+Adds per-pixel film grain.
+
+### Usage
+`.noise(amount, interval, strength)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `amount` | `int` | The most the grain can lighten or darken a pixel |
+| `interval` | `int` | *Optional.* How often the grain refreshes, in milliseconds. `0` (the default) holds a single static pattern |
+| `strength` | `float` | *Optional.* Scales `amount`. Defaults to `1.0` |
+
+```python
+skull = image.load("/system/assets/skull.png")
+
+def update():
+  screen.pen = color.grey
+  screen.clear()
+  screen.blit(skull, vec2(64, 48))
+  screen.noise(40, 80)                          # regrain about 12 times a second
+
+run(update)
+```
+
+## glitch()
+Breaks the image into bands and slides them sideways, VHS-style, with the occasional flashed line.
+
+### Usage
+`.glitch(amount, strength)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `amount` | `int` | How much glitching, `0`–`255` — scales how many bands break up, how far they slide, and how often the lines flash |
+| `strength` | `float` | *Optional.* Scales `amount`. Defaults to `1.0` |
+
+```python
+skull = image.load("/system/assets/skull.png")
+
+def update():
+  screen.pen = color.red
+  screen.clear()
+  screen.pen = color.white
+  screen.text("SIGNAL LOST", 24, 30)
+  screen.blit(skull, vec2(64, 60))
+
+  # mostly clean, with a burst of interference every few seconds
+  screen.glitch(200 if (badge.ticks // 400) % 8 == 0 else 20)
+
+run(update)
+```
+
+## oilpaint()
+Replaces each pixel with the dominant colour of its neighbourhood, flattening detail into brush-stroke blobs.
+
+### Usage
+`.oilpaint(radius, strength)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `radius` | `int` | The size of the neighbourhood each pixel looks at, `1`–`4`. Larger is chunkier (and slower) |
+| `strength` | `int` | *Optional.* How strongly the painted result replaces the original, `0`–`255`. Defaults to `255` (fully painted) |
+
+```python
+skull = image.load("/system/assets/skull.png")
+
+def update():
+  screen.pen = color.orange
+  screen.clear()
+  screen.blit(skull, vec2(64, 48))
+  screen.oilpaint(2, 200)
+
+run(update)
+```
+
+## nightvision()
+Amplifies the image into a green night-vision scope: grain, boosted gain and darkened edges.
+
+```python
+skull = image.load("/system/assets/skull.png")
+
+def update():
+  screen.blit(skull, vec2(64, 48))
+  screen.text("03:14", 8, 12)
+  screen.nightvision()
+
+run(update)
+```
+
+## gameboy()
+Maps the image to the four olive greens of an original Game Boy, then lays a soft pixel grid over the top for the LCD look.
+
+```python
+skull = image.load("/system/assets/skull.png")
+
+def update():
+  screen.pen = color.rgb(120, 140, 60)
+  screen.clear()
+  screen.blit(skull, vec2(64, 48))
+  screen.gameboy()
+
+run(update)
+```
+
+## cga()
+The four-colour CGA high-intensity palette — black, cyan, magenta and white — with a glow and scanlines to match the monitor it came on.
+
+```python
+skull = image.load("/system/assets/skull.png")
+
+def update():
+  screen.pen = color.grape
+  screen.clear()
+  screen.blit(skull, vec2(64, 48))
+  screen.cga()
+
+run(update)
+```
+
+## c64()
+The Commodore 64's 16 colours. The image is saturated first, so its colours actually reach the vivid ones in the palette.
+
+```python
+skull = image.load("/system/assets/skull.png")
+
+def update():
+  screen.pen = color.blue
+  screen.clear()
+  screen.pen = color.latte
+  screen.text("64K RAM SYSTEM", 12, 20)
+  screen.blit(skull, vec2(64, 60))
+  screen.c64()
+
+run(update)
+```
+
+## synthwave()
+Neon sunset: dithers the image to a magenta, purple and cyan palette, then blooms the bright colours into a glow.
+
+```python
+skull = image.load("/system/assets/skull.png")
+sunset = brush.gradient(brush.LINEAR, 0, 0, 0, 120,
+                        [(0.0, color.rgb(16, 8, 48)), (1.0, color.rgb(255, 128, 32))])
+
+def update():
+  screen.pen = sunset
+  screen.clear()
+  screen.pen = color.white
+  screen.circle(80, 46, 26)
+  screen.blit(skull, vec2(64, 76))
+  screen.synthwave()
 
 run(update)
 ```

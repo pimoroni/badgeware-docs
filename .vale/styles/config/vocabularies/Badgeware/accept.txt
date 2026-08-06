@@ -40,6 +40,7 @@ voxel
 
 # Software and platform
 bluetooth
+gifs?
 highscore
 ingame
 LEDs
