@@ -312,7 +312,7 @@ def draw_drop_shadow(shape, colour, matrix):
     screen.pen = old_pen
 ```
 
-Let's go through this line by line. First, we're remembering whtever colour the pen was set to, so the method can clean up after itself. Next we're applying the matrix to the shape - both of these, as well as the colour, get passed in using the method's parameters. Then we're setting the pen to the shadow colour, drawing the shape to the screen, and then we're cleaning up after ourselves by setting the pen back to what it was and setting the shape's transformation back to a blank matrix.
+Let's go through this line by line. First, we're remembering whatever colour the pen was set to, so the method can clean up after itself. Next we're applying the matrix to the shape - both of these, as well as the colour, get passed in using the method's parameters. Then we're setting the pen to the shadow colour, drawing the shape to the screen, and then we're cleaning up after ourselves by setting the pen back to what it was and setting the shape's transformation back to a blank matrix.
 
 This is a pretty simple method, and there are a couple of things which you could customise to improve it. For example, this would currently only work on something that didn't already have a transformation applied to it. It also always draws to `screen` - both of these things are fixable, but they're not necessary for what we're doing here so let's move on.
 

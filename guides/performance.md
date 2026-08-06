@@ -10,7 +10,7 @@ publish: true
 
 Badgeware's drawing methods — `rectangle()`, `circle()`, `blit()` and friends — are written in C and are very fast, so reach for them first. But sometimes you want an effect no primitive gives you: a plasma, a fire, a rippling reflection. That means touching pixels one at a time, and doing that from ordinary MicroPython is *slow* — the interpreter's per-operation overhead piles up when you're looping over thousands of pixels every frame.
 
-The fix is to compile that hot loop to native machine code. MicroPython gives you two decorators for it: **`@micropython.native`**, a drop-in speed-up that needs no code changes, and **`@micropython.viper`**, which trades Python's safety for raw, typed pointers and the most performance. A per-pixel loop that crawls in plain Python can run in real time under Viper. This guide builds up to a rippling water reflection — and, just as importantly, shows how to keep it usable by working over **small areas**.
+The fix is to compile that hot loop to native machine code. MicroPython gives you two decorators for it: **`@micropython.native`**, a drop-in speed-up that needs no code changes, and **`@micropython.viper`**, which trades Python's safety for raw, typed pointers and the most performance. A per-pixel loop that crawls in plain Python can run in real time under Viper. This guide builds up to a rippling water reflection and shows how to keep it usable by working over **small areas**.
 
 # The pixel buffer
 
@@ -60,7 +60,7 @@ def fill(buf, width, height, r, g, b, a):
             buf[i + 3] = a
 ```
 
-That speed-up comes from removing the interpreter's biggest cost — the fetch-decode-dispatch it runs for every bytecode. What it *doesn't* remove is the object model: the index arithmetic and the four stores still go through MicroPython's runtime, with the usual type and bounds checks. Shedding those too is what Viper does next.
+That speed-up comes from removing the interpreter's biggest cost — the fetch-decode-dispatch it runs for every bytecode. What it *doesn't* remove is the object model: the index arithmetic and the four stores still go through MicroPython's runtime, with the usual type and bounds checks. Shedding those is what gives Viper its edge.
 
 # The fast lane: @viper
 
@@ -77,7 +77,7 @@ def gradient(buf: ptr32, w: int, h: int):
             i += 1
 ```
 
-Each pixel is a single 32-bit store, and nothing inside the loop allocates a Python object — that's where the speed comes from. You only keep it while the loop stays pure integers and pointers, though: call back into Python or allocate an object inside it and you slide back toward native speeds.
+Each pixel is a single 32-bit store, and nothing inside the loop allocates a Python object — that's where the speed comes from. You only keep that performance while the loop stays pure integers and pointers, though: call back into Python or allocate an object inside your Viper function and you slide back toward native speeds.
 
 Note the `int(...)` casts. Viper is strict about types, and the literal `0xff000000` is too big to be a Viper machine word, so it counts as a Python *object*. Wrapping each piece in `int()` keeps the whole expression a machine integer; leave it out and you'll hit `ViperTypeError: can't store 'object'`.
 

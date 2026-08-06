@@ -1,0 +1,5 @@
+[codespell]
+skip = ./.git,./patterns,./assets,*/assets,./tut4_res,./fonts,*.png,*.jpg,*.gif,*.bin
+# welp: deliberate; inout: tween easing name; co-ordinate: accepted UK spelling
+ignore-words-list = welp,inout,co-ordinate,co-ordinates
+check-filenames =

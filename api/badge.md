@@ -172,8 +172,8 @@ Changes the display mode of the badge. You can apply more than one mode at once,
 | `modes` | `binary` | One or more display mode constants, combined with the pipe symbol |
 
 The available modes are:
-- `LORES` (Tufty only) - puts the badge into 160x120 low resolution mode.
-- `HIRES` (Tufty only) - puts the badge into 320x240 high resolution mode.
+- `LORES` (Tufty only) - puts the badge into 160×120 low resolution mode.
+- `HIRES` (Tufty only) - puts the badge into 320×240 high resolution mode.
 - `VSYNC` (Tufty only) - enables vertical sync, preventing screen tearing.
 - `FAST_UPDATE` (Badger only) - sets the badge to update quickly at the cost of slight ghosting
 - `FULL_UPDATE` (Badger only) - sets the badge to update fully each time at the cost of speed.

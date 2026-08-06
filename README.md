@@ -10,7 +10,7 @@ Badgeware is a MicroPython-powered platform for our family of programmable badge
 
 Your badge comes preloaded with a set of apps, but the real fun starts when you write your own. Everything is built around a simple loop: draw to the screen, call `badge.update()` to show the frame and read the buttons, then go round again — and you've got an app. If you've ever written a few lines of Python, you already have everything you need to get started.
 
-This site is your guide. You'll find step-by-step tutorials to get you up and running, feature guides that go deeper on topics like sprites, text, and vector shapes, and a full API reference for when you need the details. Whether you're building a name badge for a conference, a tiny game to pass the time, or a dashboard that pulls live data over WiFi — it all starts here.
+This site is your guide. You'll find step-by-step tutorials to get you up and running, feature guides that go deeper on topics like sprites, text, and vector shapes, and a full API reference for when you need the details. Whether you're building a name badge for a conference, a tiny game to pass the time, or a dashboard that pulls live data over Wi-Fi — it all starts here.
 
 New here? Head straight to **[Meet your badge](/introduction/meet-your-badge.md)** to get acquainted with the hardware.
 
@@ -36,7 +36,7 @@ Despite their different displays, all three badges share the same core hardware 
 |---|---|
 | **Processor** | RP2350 dual-core ARM Cortex-M33 @ 200MHz with hardware floating point |
 | **Memory** | 16MB flash for firmware, code, and assets, plus 8MB PSRAM for runtime use |
-| **Connectivity** | 2.4GHz WiFi and Bluetooth 5 for downloading data, syncing, or communicating between badges |
+| **Connectivity** | 2.4GHz Wi-Fi and Bluetooth 5 for downloading data, syncing, or communicating between badges |
 | **Power** | 1000mAh rechargeable battery with USB-C charging |
 | **Expansion** | Qw/ST port for connecting breakout accessories, SWD port for debugging |
 | **Inputs** | Five front-facing buttons, plus RESET and BOOTSEL on the back |

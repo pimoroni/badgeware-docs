@@ -45,7 +45,7 @@ Interpreted Python on a microcontroller is much slower than on your desktop. For
 Hitting a smooth frame rate often takes real care, but a few techniques go a long way when you've a need for speed:
 
 - **Profile first.** Don't guess — time the slow parts with `time.ticks_us()` and `time.ticks_diff()` to find the real bottleneck before optimising anything.
-- **Cache lookups in locals.** Local variables are faster to reach than globals or attributes, so pull frequently-used functions and objects into local names before a hot loop — e.g. `text = screen.text`.
+- **Cache lookups in locals.** Local variables are faster to reach than globals or attributes, so pull frequently used functions and objects into local names before a hot loop — e.g. `text = screen.text`.
 - **Allocate as little as possible.** Creating objects inside a tight loop triggers garbage collection, which causes pauses. Preallocate buffers once and reuse them, favour `array`, `bytearray` and in-place operations, and avoid building throwaway objects each frame.
 - **Control when the garbage collector runs.** Left to itself it collects whenever memory runs low, showing up as a random stutter. Calling `gc.collect()` yourself at a predictable point makes any pause regular rather than a surprise — though not allocating in the first place (above) is the real win.
 - **Use `const()` for fixed values.** Declaring integer constants with `const()` lets MicroPython inline them.

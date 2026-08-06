@@ -126,7 +126,7 @@ run(update)
 
 As you can see, you're getting two squares. First, you're setting the top left corner of the box to be at `80, 60` - the centre of the screen, and you're drawing it. Then you're setting the bottom right corner to be at the same coordinates, and drawing it again. When you're setting `r` and `b` there, it's calculating what `x` and `y` need to be to put it in the right place.
 
-We'll be making lots of other methods in `player_base`, but for now let's move on. This program is structured so that the things that effect each type of entity in the game are handled and processed by that entity, so the player class will be doing all of the calculations for moving the player, the platform class will do all the calculations for placing platforms, and so on. We'll make two new classes called `platform_base` and `acorn_base` and set them up with very simiilar properties to `player_base`. You could give them setters for `r` and `b` as you did for `player_base`, but it's not necessary, it doesn't get used.
+We'll be making lots of other methods in `player_base`, but for now let's move on. This program is structured so that the things that effect each type of entity in the game are handled and processed by that entity, so the player class will be doing all of the calculations for moving the player, the platform class will do all the calculations for placing platforms, and so on. We'll make two new classes called `platform_base` and `acorn_base` and set them up with very similar properties to `player_base`. You could give them setters for `r` and `b` as you did for `player_base`, but it's not necessary, it doesn't get used.
 
 ```python-raw
 class platform_base:
@@ -175,7 +175,7 @@ class acorn_base:
         screen.shape(player_box)
 ```
 
-The `acorn_base` class is basically the same as `player_base` at the moment. Given that all these properties are common between them you could potentially make a parent class which all of these are subclasses of, but that's beyond the scope of this tutorial. Here's an example of each one being created with fairly abitrary positions, then drawn to the screen:
+The `acorn_base` class is basically the same as `player_base` at the moment. Given that all these properties are common between them you could potentially make a parent class which all of these are subclasses of, but that's beyond the scope of this tutorial. Here's an example of each one being created with fairly arbitrary positions, then drawn to the screen:
 
 ```python
 import random
@@ -490,7 +490,7 @@ platforms = []
 acorns = []
 ```
 
-That list is empty right now, but we're about to make a little method that fills it with three platforms in default starting positions. Although this is so short, we're making it a separate method so we can call on it later from elsewhere in the program. Dont forget to call `init_platforms()` in your main program, right before the `update()` loop.
+That list is empty right now, but we're about to make a little method that fills it with three platforms in default starting positions. Although this is so short, we're making it a separate method so we can call on it later from elsewhere in the program. Don't forget to call `init_platforms()` in your main program, right before the `update()` loop.
 
 ```python-raw
 def init_platforms():
@@ -1709,7 +1709,7 @@ Looking good. But what we've got right now is a gameplay snippet, nothing more. 
 
 To start off with, we're going to introduce three basic states - the title screen, gameplay, and the game over screen. The loop will be that the game starts at the title screen, switches to the gameplay screen when any button is pressed, switches to the game over screen when you die, then switches back to the title screen when you press any button on the game over screen.
 
-First, let's do some setup. We'll make a little mini class to define our game states. At the very top of the file, right below the imports and and before `player_base`, we're going to add the following class:
+First, let's do some setup. We'll make a little mini class to define our game states. At the very top of the file, right below the imports and before `player_base`, we're going to add the following class:
 
 ```python-raw
 class game_state:

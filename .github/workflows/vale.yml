@@ -1,0 +1,22 @@
+name: Vale
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  VALE_VERSION: 3.17.1
+
+jobs:
+  vale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install vale
+        run: |
+          curl -sSfL "https://github.com/errata-ai/vale/releases/download/v${VALE_VERSION}/vale_${VALE_VERSION}_Linux_64-bit.tar.gz" | tar -xz -C /usr/local/bin vale
+
+      - name: Lint prose
+        run: vale .

@@ -1,0 +1,7 @@
+extends: substitution
+message: "Use '%s' instead of '%s'."
+level: warning
+ignorecase: false
+swap:
+  'WiFi': Wi-Fi
+  'Wifi': Wi-Fi

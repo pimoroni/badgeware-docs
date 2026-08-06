@@ -55,7 +55,7 @@ Turn an image into a spritesheet by calling [`spritesheet(cols, rows)`](#sprites
 ![A grid of sprite cells, with column numbers along the top and row numbers down the side, showing the cell at column 3 row 1 pulled out with sprite(3, 1)](/guides/assets/sprite-grid.svg)
 
 ## spritesheet()
-Turns the image into a spritesheet by dividing it into a grid of `cols` × `rows` equally-sized cells, ready to pull sprites from with [`sprite()`](#sprite). Making the grid explicit this way is clearer than baking it into `load()` or the constructor.
+Turns the image into a spritesheet by dividing it into a grid of `cols` × `rows` equally sized cells, ready to pull sprites from with [`sprite()`](#sprite). Making the grid explicit this way is clearer than baking it into `load()` or the constructor.
 
 ### Usage
 `.spritesheet(cols, rows)`

@@ -343,7 +343,7 @@ The first thing we're going to add is a background, and for that we'll need artw
 
 You might notice that this and the other images we'll get into look a lot like the ones already found on your Tufty in the `assets/squirrel-sprites` folder, and they are indeed very similar. But we've made some alterations to those files for use in this game, so you'll want to use the versions provided here. For example, the above background image is extended by 20 pixels and seamlessly tiles with itself horizontally. That's a really good thing for this game, as we're going to have the background scroll past at a different rate to the platforms, to give a parallax effect.
 
-To do that, we'll first load in the image. We'll need to do this with quite a few assets, so let's load them all in in the same place, right after we've defined all the methods and before initialising the gamepad and controls:
+To do that, we'll first load in the image. We'll need to do this with quite a few assets, so let's load them all in one place, right after we've defined all the methods and before initialising the gamepad and controls:
 
 ```python-raw
 background = image.load("assets/background.png")
@@ -881,7 +881,7 @@ sqirl_run_sheet = SpriteSheet("assets/running.png", 7, 1)
 sqirl_die_sheet = SpriteSheet("assets/death.png", 4, 1)
 ```
 
-You'll see a difference in the images - they're each a full sprite sheet, showing every frame in an animation. That's why, when we load them in using `SpriteSheet()`, we supply them with how many sprites the sheet contains as the number of columns followed by the munber of rows. So you can see above that the running and death animations have seven and four columns respectively, in just a single row each.
+You'll see a difference in the images - they're each a full sprite sheet, showing every frame in an animation. That's why, when we load them in using `SpriteSheet()`, we supply them with how many sprites the sheet contains as the number of columns followed by the number of rows. So you can see above that the running and death animations have seven and four columns respectively, in just a single row each.
 
 We can access sprites within a `SpriteSheet` by using `SpriteSheet.sprite()` and supplying it with the coordinates of the sprite you want. This will then return an `image`. Let's apply this to the `draw()` method of `player_base` as follows:
 
@@ -1355,7 +1355,7 @@ Tufty is running great, but let's improve on those animations. Right now, when y
         screen.blit(sqirl_run.frame(frame), rect(self.x, self.y + 2, self.w, self.h))
 ```
 
-And now Tufty strikes a Dynamic Action Pose whener you jump! But it's still not quite right when we die, and as you may have suspected when we imported sprites for it, we've got another animation for that.
+And now Tufty strikes a Dynamic Action Pose whenever you jump! But it's still not quite right when we die, and as you may have suspected when we imported sprites for it, we've got another animation for that.
 
 The setup we need to do for this involves making the player's current animation a variable in the class - that way, by changing that variable between different sprites we can change Tufty's animation. So we'll just add `self.animation = sqirl_run` in at the end of the player's `__init__()` method, after we set `self.dead`. Then we can alter `draw()` to use that variable:
 
@@ -3017,7 +3017,7 @@ Similarly, where we just were on the game over screen, right after putting the n
 
 # The end
 
-And that's it! By'eck, it's been a litle while, but we got there. You should have a fully fledged platform game for Tufty. Here's the final code for the game. Well done for getting this far and happy coding in the future!
+And that's it! By'eck, it's been a little while, but we got there. You should have a fully fledged platform game for Tufty. Here's the final code for the game. Well done for getting this far and happy coding in the future!
 
 ```python
 import qwstpad

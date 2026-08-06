@@ -12,7 +12,7 @@ Across Badgeware's displays, your sprites will usually be small, and you'll ofte
 
 # What is a spritesheet?
 
-Storing every sprite in its own file quickly gets unwieldy, and loading dozens of files is slow. Instead, related sprites are packed together into a single image called a **spritesheet** — a grid of equally-sized cells. Here's the one we'll use: an entire deck of cards — every rank and suit, plus card backs and jokers — on a single image.
+Storing every sprite in its own file quickly gets unwieldy, and loading dozens of files is slow. Instead, related sprites are packed together into a single image called a **spritesheet** — a grid of equally sized cells. Here's the one we'll use: an entire deck of cards — every rank and suit, plus card backs and jokers — on a single image.
 
 <figure style="text-align: center; margin: 1.5em auto;">
   <img src="/docs/guides/assets/cards.png" alt="A pixel-art deck-of-cards spritesheet: thirteen columns of ranks across four suit rows, then a row of patterned card backs, then a row of jokers" style="display: block; margin: 0 auto; width: 650px; max-width: 100%; height: auto; image-rendering: pixelated;">

@@ -1,0 +1,7 @@
+extends: existence
+message: "'%s' doesn't need a hyphen."
+level: warning
+nonword: true
+tokens:
+  # -ly adverb followed by a hyphen; the exclusions are verbs, not adverbs
+  - '\s(?!multiply|apply|supply|reply|imply|comply)[^\s-]+ly-[^\s-]+'

@@ -76,7 +76,7 @@ But it doesn't have to hang around your neck. The shape of the case also lets Ba
 
 # Wi-Fi & Bluetooth
 
-Built-in **2.4GHz WiFi** and **Bluetooth 5.2** let you pull live data over the air, sync your details, show announcements, or have badges talk to each other — perfect for networking games, shared experiences, and dashboards that keep themselves up to date.
+Built-in **2.4GHz Wi-Fi** and **Bluetooth 5.2** let you pull live data over the air, sync your details, show announcements, or have badges talk to each other — perfect for networking games, shared experiences, and dashboards that keep themselves up to date.
 
 # Expansion & debugging
 

@@ -13,13 +13,13 @@ In this tutorial, we're going to demonstrate how to do the basic setup of graphi
 
 # Setting Up
 
-First, let's set up your virtual coding space. You can code straight onto the badge, or you can do your work in a folder on your own computer and then copy it across onto the badge. This tutorial will asume you're coding straight onto the badge, but it goes just the same if you're working locally - you'll just need to copy the files across to the badge to see it working.
+First, let's set up your virtual coding space. You can code straight onto the badge, or you can do your work in a folder on your own computer and then copy it across onto the badge. This tutorial will assume you're coding straight onto the badge, but it goes just the same if you're working locally - you'll just need to copy the files across to the badge to see it working.
 
 Plug your badge in, and go into Disk Mode by either going to the menu option on the home screen or by double-tapping the `RESET` button. Now, find it in your file manager. It should come up as BADGER, TUFTY or BLINKY. Open it and navigate into the `/apps/` folder.
 
 You should see the folders for each app. Create a new one and call it `my_badge`. Once it's created, open it up. You'll need three things in here - an `assets` folder, a menu icon and `__init__.py`, which is the file that will contain your code.
 
-Let's create that `assets` folder inside your app folder, and then check out the icon. This has to be named `icon.png`, and should be a 24 x 24 pixel PNG file. It can have transparency if you want. You can either find or create a suitable icon yourself, or alternatively you could make a copy of `icon.png` from one of the other apps on the badge.
+Let's create that `assets` folder inside your app folder, and then check out the icon. This has to be named `icon.png`, and should be a 24×24 pixel PNG file. It can have transparency if you want. You can either find or create a suitable icon yourself, or alternatively you could make a copy of `icon.png` from one of the other apps on the badge.
 
 Finally it's time to get coding and create `__init__.py`. First, make a text file in your app folder and rename it to `__init__.py`. Then you can open it in whatever software you want to use to edit. Any text editor will do, although dedicated code editors like Thonny or Visual Studio Code as well as advanced text editors like Sublime Text or Notepad++ have the benefit of highlighting different parts of your code in different colours to make it easier to see what everything is. The main thing that's not recommended is a full fledged word processor like Microsoft Word or OpenOffice. These are geared toward layout on a page rather than pure text, so as well as being harder to read they'll often put extra features and characters into your code that might have adverse effects.
 
@@ -105,7 +105,7 @@ run(update)
 
 Now let's add a picture to our badge. For this example we're going to decide on the size of the image in pixels, and position it centred, butting up against our top border. The image file should be called `avatar.png` stored in the assets folder inside your app folder, so make sure to copy it over there. You can use any PNG for this, but for this example it should ideally be square. It doesn't have to be the exact size that you'll be using it at in your program, but it's a little nicer quality if you do, and also a little bit faster if you're dealing with lots of images.
 
-> Note: Badger users may want to make the picture a fair bit bigger, as their screens are are higher resolution than Tufty in its default Lores mode. Similarly Blinky users might want to skip the image entirely for reasons of space.
+> Note: Badger users may want to make the picture a fair bit bigger, as their screens are higher resolution than Tufty in its default Lores mode. Similarly Blinky users might want to skip the image entirely for reasons of space.
 
 ```python
 screen_border = 5
