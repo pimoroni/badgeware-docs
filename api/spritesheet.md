@@ -35,7 +35,7 @@ An `image` viewing the requested grid cell. As it shares the sheet's pixel data,
 
 ```python
 # an 8x4 spritesheet of 16x16 tiles
-tiles = image.load("/system/assets/tiles.png").spritesheet(8, 4)
+tiles = image.load("/system/assets/cards.png").spritesheet(13, 6)
 
 def update():
   # draw the tile in column 2, row 1
@@ -63,7 +63,7 @@ Loads an image from the specified file path and returns it as a new `spritesheet
 ```python
 import time
 
-gif = spritesheet.load("animation.gif")
+gif = spritesheet.load("/system/assets/squirrel.gif")
 
 for i in range(gif.sprites):
   screen.blit(gif.sprite(i), vec2(0, 0))

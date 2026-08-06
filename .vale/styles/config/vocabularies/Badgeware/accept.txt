@@ -12,6 +12,7 @@ Photoshop
 Ivano('s)?
 
 # Graphics and rendering
+fBm
 antialias(ed|ing)?
 billboarded
 blit(s|ted|ting)?
