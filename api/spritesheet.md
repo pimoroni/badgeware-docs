@@ -65,10 +65,11 @@ import time
 
 gif = spritesheet.load("/system/assets/squirrel.gif")
 
-for i in range(gif.sprites):
-  screen.blit(gif.sprite(i), vec2(0, 0))
-  badge.update()
-  time.sleep(gif.timings[i] / 1000)
+while True:
+  for i in range(gif.sprites):
+    screen.blit(gif.sprite(i), rect(48, 28, 64, 64))
+    badge.update()
+    time.sleep(gif.timings[i] / 1000)
 ```
 
 # Properties
