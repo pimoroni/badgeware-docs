@@ -209,7 +209,7 @@ while True:
   badge.update()
 ```
 
-Because the motion comes from `badge.ticks`, the speed stays a true pixels-per-second whatever the frame rate. Widen the `+ 20` to space the repeats further apart, or draw into a [`window()`](/api/image.md#window) to scroll within just part of the screen.
+Because the motion comes from `badge.ticks`, the speed stays a true pixels-per-second whatever the framerate. Widen the `+ 20` to space the repeats further apart, or draw into a [`window()`](/api/image.md#window) to scroll within just part of the screen.
 
 # Rich text
 

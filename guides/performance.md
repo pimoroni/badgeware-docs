@@ -142,7 +142,7 @@ while True:
     badge.update()
 ```
 
-Because `off` is read from `(ry + t)`, each row is displaced by a different amount. The `t` we pass in comes straight from `badge.ticks`, so the ripple advances in real time — dividing the clock down (here `>> 6`) sets how fast it scrolls, independent of frame rate. Each copied pixel is then halved with `(p >> 1) & 0x7f7f7f7f`; because alpha is premultiplied, that scales red, green, blue *and* alpha together, giving a translucent, dimmer reflection that reads like water over the dark background.
+Because `off` is read from `(ry + t)`, each row is displaced by a different amount. The `t` we pass in comes straight from `badge.ticks`, so the ripple advances in real time — dividing the clock down (here `>> 6`) sets how fast it scrolls, independent of framerate. Each copied pixel is then halved with `(p >> 1) & 0x7f7f7f7f`; because alpha is premultiplied, that scales red, green, blue *and* alpha together, giving a translucent, dimmer reflection that reads like water over the dark background.
 
 This is the whole point of keeping the work small: the reflection buffer is only 32 × 24 (768 pixels), so rebuilding it from scratch every frame is cheap, and the C `blit()` then scales it up to fill the screen for free. Reach for a bigger buffer only where you actually need the detail.
 

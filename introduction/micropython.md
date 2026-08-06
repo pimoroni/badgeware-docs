@@ -42,7 +42,7 @@ These are the differences you're most likely to run into. If you want the exhaus
 
 Interpreted Python on a microcontroller is much slower than on your desktop. For static or lightly interactive apps that's rarely a problem — but anything animation-heavy, games in particular, can push the badge hard. 
 
-Hitting a smooth frame rate often takes real care, but a few techniques go a long way when you've a need for speed:
+Hitting a smooth framerate often takes real care, but a few techniques go a long way when you've a need for speed:
 
 - **Profile first.** Don't guess — time the slow parts with `time.ticks_us()` and `time.ticks_diff()` to find the real bottleneck before optimising anything.
 - **Cache lookups in locals.** Local variables are faster to reach than globals or attributes, so pull frequently used functions and objects into local names before a hot loop — e.g. `text = screen.text`.

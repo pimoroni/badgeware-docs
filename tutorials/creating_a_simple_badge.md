@@ -80,7 +80,7 @@ def update():
     rect_width = screen.width - (screen_border * 2)
     rect_height = screen.height - (screen_border * 2)
 
-    # x and y will just be our border thickness. Remember, co-ordinates 0, 0
+    # x and y will just be our border thickness. Remember, coordinates 0, 0
     # are at the top left of the screen, with X increasing as you go left to
     # right and Y increasing as you go top to bottom.
     rect_x = screen_border
@@ -151,7 +151,7 @@ def update():
 run(update)
 ```
 
-If you run your app now, you'll see the picture displaying. If you're a Badger user, you may find it doesn't look ideal, as a full colour picture broken down to the black/grey/grey/white screen of the Badger doesn't always look good. One thing you could do is edit your picture in GIMP or Photoshop, but a quick and easy way to improve things is to run `picture.dither()` right below `picture = image.load("assets/avatar.png")`. This will alter the image using an algorithm in the same way a newspaper photograph displays shades of grey using only black ink. You can see an example [here](/api/image.md#dither).
+If you run your app now, you'll see the picture displaying. If you're a Badger user, you may find it doesn't look ideal, as a full-colour picture broken down to the black/grey/grey/white screen of the Badger doesn't always look good. One thing you could do is edit your picture in GIMP or Photoshop, but a quick and easy way to improve things is to run `picture.dither()` right below `picture = image.load("assets/avatar.png")`. This will alter the image using an algorithm in the same way a newspaper photograph displays shades of grey using only black ink. You can see an example [here](/api/image.md#dither).
 
 # Adding text
 

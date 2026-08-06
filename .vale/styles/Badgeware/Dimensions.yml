@@ -3,4 +3,4 @@ message: "Use '×' for dimensions, not 'x' (as in '%s')."
 level: warning
 nonword: true
 tokens:
-  - '\b\d+ ?x ?\d+\b'
+  - '\b\d+ ?x ?\d+(?:px)?\b'

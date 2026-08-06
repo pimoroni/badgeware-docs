@@ -31,7 +31,7 @@ Tufty sports a full-colour IPS LCD that redraws continuously. This is the badge 
 <div class="callout-media" style="--callout-aspect: 2.5 / 1">
 <tufty-model float shadow lighting="150" position="-7 -18 0" camera="0deg 90deg 61%"></tufty-model>
 </div>
-<figcaption>Tufty's full colour LCD display is ideal for fluid animated graphics.</figcaption>
+<figcaption>Tufty's full-colour LCD display is ideal for fluid animated graphics.</figcaption>
 </figure>
 
 Because it redraws continuously and works in full colour, a Tufty clock is just a loop that draws the time fresh every frame. For a big bold clock we scale the built-in absolute font up 2× (the fourth argument to [`text()`](/api/image.md#text) is an integer scale for pixel fonts). Pixel text is drawn through the current brush just like vector text, so we can fill it with a gradient brush. Rebuild this each frame with a rotating matrix and a bright highlight sweeps around the clock, appearing horizontal exactly as each second ticks over:

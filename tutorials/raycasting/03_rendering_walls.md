@@ -126,6 +126,6 @@ def render():
   ...
 ```
 
-We'll keep that decorator on `render()` from here on. It's the gentlest of the speed-ups covered in the [Pushing pixels](../guides/performance.md) guide — worth a read if you want to understand what it's doing, or push the frame rate further.
+We'll keep that decorator on `render()` from here on. It's the gentlest of the speed-ups covered in the [Pushing pixels](../guides/performance.md) guide — worth a read if you want to understand what it's doing, or push the framerate further.
 
 Next we'll stop the room spinning on its own and [take the controls](04_moving_around.md) — walking and turning with the buttons, without strolling straight through the walls.

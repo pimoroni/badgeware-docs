@@ -1348,7 +1348,7 @@ First though, we need to make them scroll in the first place. Just like `player_
 
 Don't forget to change the call in the main `update()` loop to `platform.update()` instead of `platform.draw()`.
 
-Scrolling is pretty easy. Let's set a global `foreground_scroll_speed` variable with a value of 4, so that if we need to change it we only have to change it in one place. Let's put it right after `controls = {}`. Then, we just need to subtract this value from the platform's x co-ordinate every frame, and voila! Scrolling platforms. It should look like this:
+Scrolling is pretty easy. Let's set a global `foreground_scroll_speed` variable with a value of 4, so that if we need to change it we only have to change it in one place. Let's put it right after `controls = {}`. Then, we just need to subtract this value from the platform's x coordinate every frame, and voila! Scrolling platforms. It should look like this:
 
 ```python-raw
     def update(self):

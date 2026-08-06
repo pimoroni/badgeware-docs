@@ -16,9 +16,9 @@ Every badge is built around its display, the one feature that sets the three apa
 | Tufty | Badger | Blinky |
 |---|---|---|
 | <tufty-model shadow lighting="150" position="-3 30 0" model-offset="-0.002m 0m 0m" camera="0deg 90deg 45%" style="aspect-ratio:1 / 1"></tufty-model> | <badger-model shadow lighting="150" position="-3 30 0" model-offset="-0.002m 0m 0m" camera="0deg 90deg 45%" style="aspect-ratio:1 / 1"></badger-model> | <blinky-model shadow lighting="150" position="-3 30 0" model-offset="-0.002m 0m 0m" camera="0deg 90deg 45%" style="aspect-ratio:1 / 1"></blinky-model> |
-| Full-colour IPS LCD | E Ink display | Greyscale LED matrix |
-| 320 × 240 | 264 × 176 | 39 × 26 |
-| Full RGB colour | Black, white + 2 greys | Bright white greyscale |
+| Full-colour IPS LCD | E-paper display | Greyscale LED matrix |
+| 320×240 (or 160×120) | 264×176 | 39×26 |
+| Full RGB colour | Black, white + 2 greys | Bright white LEDs |
 | Redraws continuously | Updates on demand, sleeps between | Redraws continuously |
 | Games, animation, and rich UIs | Name badges, dashboards, and e-readers | Scrolling text, pixel art, and notifications |
 

@@ -343,7 +343,7 @@ The first thing we're going to add is a background, and for that we'll need artw
 
 You might notice that this and the other images we'll get into look a lot like the ones already found on your Tufty in the `assets/squirrel-sprites` folder, and they are indeed very similar. But we've made some alterations to those files for use in this game, so you'll want to use the versions provided here. For example, the above background image is extended by 20 pixels and seamlessly tiles with itself horizontally. That's a really good thing for this game, as we're going to have the background scroll past at a different rate to the platforms, to give a parallax effect.
 
-To do that, we'll first load in the image. We'll need to do this with quite a few assets, so let's load them all in one place, right after we've defined all the methods and before initialising the gamepad and controls:
+To do that, we'll first load in the image. We'll need to do this with quite a few assets, so let's load them in the same place, right after we've defined all the methods and before initialising the gamepad and controls:
 
 ```python-raw
 background = image.load("assets/background.png")
@@ -881,7 +881,7 @@ sqirl_run_sheet = SpriteSheet("assets/running.png", 7, 1)
 sqirl_die_sheet = SpriteSheet("assets/death.png", 4, 1)
 ```
 
-You'll see a difference in the images - they're each a full sprite sheet, showing every frame in an animation. That's why, when we load them in using `SpriteSheet()`, we supply them with how many sprites the sheet contains as the number of columns followed by the number of rows. So you can see above that the running and death animations have seven and four columns respectively, in just a single row each.
+You'll see a difference in the images - they're each a full spritesheet, showing every frame in an animation. That's why, when we load them in using `SpriteSheet()`, we supply them with how many sprites the sheet contains as the number of columns followed by the number of rows. So you can see above that the running and death animations have seven and four columns respectively, in just a single row each.
 
 We can access sprites within a `SpriteSheet` by using `SpriteSheet.sprite()` and supplying it with the coordinates of the sprite you want. This will then return an `image`. Let's apply this to the `draw()` method of `player_base` as follows:
 
@@ -892,18 +892,18 @@ We can access sprites within a `SpriteSheet` by using `SpriteSheet.sprite()` and
 
 And voila, one squirrel bouncing around the level. Now in fairness it's not the most animated squirrel yet, but we can change that. You might also notice in the code above that we're not drawing it exactly on the player's collision box, but actually two pixels lower so that Tufty's feet appear to sit nicely on the branch.
 
-Instead of getting our image from the spritesheet directly, we're going to make it into an animated sprite. That means we select a range of sprites from the spritesheet, and we tell the software that they form a single animated image. Let's put the following lines in right below where you load the sprite sheets in:
+Instead of getting our image from the spritesheet directly, we're going to make it into an animated sprite. That means we select a range of sprites from the spritesheet, and we tell the software that they form a single animated image. Let's put the following lines in right below where you load the spritesheets in:
 
 ```python-raw
 sqirl_run = AnimatedSprite(sqirl_run_sheet, 0, 0, 7)
 sqirl_die = AnimatedSprite(sqirl_die_sheet, 1, 0, 2)
 ```
 
-To explain what we're doing with these, we'll just run through the parameters one by one. The first is obviously the name of the sprite sheet you want to pull an animation from. The next two integers refer to the column and row of the first frame. Then, the number of frames to count from there. There is another True/False parameter which decides whether the frames should go across or down from the starting frame, but since that defaults to True (horizontal) and that's what we want, we've not included it here.
+To explain what we're doing with these, we'll just run through the parameters one by one. The first is obviously the name of the spritesheet you want to pull an animation from. The next two integers refer to the column and row of the first frame. Then, the number of frames to count from there. There is another True/False parameter which decides whether the frames should go across or down from the starting frame, but since that defaults to True (horizontal) and that's what we want, we've not included it here.
 
-From this, you can see that for the running sprite, it's starting from the top left sprite in the sprite sheet, and counting seven frames horizontally including the starting frame, which in this case is every sprite in the sheet. It returns an `AnimatedSprite` object which we'll be using to draw Tufty.
+From this, you can see that for the running sprite, it's starting from the top left sprite in the spritesheet, and counting seven frames horizontally including the starting frame, which in this case is every sprite in the sheet. It returns an `AnimatedSprite` object which we'll be using to draw Tufty.
 
-You might also notice that the death sprite is being done a little differently. Instead of the first one, we're starting counting frames from the second sprite along, and we're only using two frames. So although the death sprite sheet has four frames, we're only going to be using the middle two for the animation.
+You might also notice that the death sprite is being done a little differently. Instead of the first one, we're starting counting frames from the second sprite along, and we're only using two frames. So although the death spritesheet has four frames, we're only going to be using the middle two for the animation.
 
 To get a frame from an `AnimatedSprite` object, we just use its `frame()` method, which we just pass the frame number we want. If the frame number is outside the number of frames in the `AnimatedSprite`, it just wraps around, which is a really useful feature because it means that if we've got a 'frame number' variable somewhere, we can just increase it to loop the animation without worrying about resetting it.
 
@@ -945,7 +945,7 @@ Of course this won't do anything unless we apply it, so there's another change t
         screen.blit(sqirl_run.frame(frame_counter), rect(self.x, self.y + 2, self.w, self.h))
 ```
 
-Run the program now, and Tufty is animated! But hoo boy, that's one squirrely squirrel - that frame rate is clearly way too fast. We can fix it though - how about, instead of updating the frame every `update()`, we actually time it?
+Run the program now, and Tufty is animated! But hoo boy, that's one squirrely squirrel - that framerate is clearly way too fast. We can fix it though - how about, instead of updating the frame every `update()`, we actually time it?
 
 We're going to set up another global variable called `last_frame` and set it to the badge's `ticks` value - that is, the number of milliseconds that have passed from the badge starting up to the beginning of the current `update()` loop. Then in `update()`, we can check the current `badge.ticks` and see if a specified amount of time has passed since `last_frame`. If it has, we'll update the frame counter and set `last_frame` to be the current `badge.ticks`, ready for the next frame.
 
@@ -1344,7 +1344,7 @@ run(update)
 
 # Other animation states
 
-Tufty is running great, but let's improve on those animations. Right now, when you jump you're running through the air, frantically pedalling your little squirrel limbs. We can take a page from the book of classic platformers of the past and just freeze on a single frame when you jump. It looks like the third frame along on the sprite sheet (numbered 2) would be good, so let's just put in a little check in the player's `draw()` method that checks if you're in gameplay and airborne, and if so just displays frame 2, otherwise displaying whichever frame the frame counter tells us to.
+Tufty is running great, but let's improve on those animations. Right now, when you jump you're running through the air, frantically pedalling your little squirrel limbs. We can take a page from the book of classic platformers of the past and just freeze on a single frame when you jump. It looks like the third frame along on the spritesheet (numbered 2) would be good, so let's just put in a little check in the player's `draw()` method that checks if you're in gameplay and airborne, and if so just displays frame 2, otherwise displaying whichever frame the frame counter tells us to.
 
 ```python-raw
     def draw(self):
@@ -1865,7 +1865,7 @@ Once that's done, let's get Tufty grabbing those acorns. Like we mentioned above
             acorns.remove(self)
 ```
 
-The more we get through this, the more we find that the mechanisms we need are already there. If you try playing now you can pick up the acorns and add to the score! There's just one last thing to do. You might notice that it's a bit easy to pick up the acorns - you don't really have to touch them to pick them up, and it's pretty easy to see why. Remember the red square we had for our player before adding the Tufty sprite? It's a lot bigger than the sprite itself, 32x32px, and as soon as any part of it hits an acorn that acorn's picked up.
+The more we get through this, the more we find that the mechanisms we need are already there. If you try playing now you can pick up the acorns and add to the score! There's just one last thing to do. You might notice that it's a bit easy to pick up the acorns - you don't really have to touch them to pick them up, and it's pretty easy to see why. Remember the red square we had for our player before adding the Tufty sprite? It's a lot bigger than the sprite itself, 32×32px, and as soon as any part of it hits an acorn that acorn's picked up.
 
 Fixing this isn't too complicated. The player's `bounding_box` property is used in just one place in the program - checking for collision with the acorns. That means that we can fine tune the size and location of that bounding box to better fit Tufty's actual dimensions. The property as it stands is calculated with
 
