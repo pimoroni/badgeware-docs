@@ -29,10 +29,7 @@ Badgeware provides some help handling sprites via a few options on the [`image`]
 
 ```python
 # load the sheet: 13 columns x 6 rows
-deck = image.load("/system/assets/cards.png")
-
-# convert the loaded image into a spritesheet
-deck.spritesheet(13, 6)
+cards = image.load("/system/assets/cards.png").spritesheet(13, 6)
 
 # pull out one cell (the Ace of Hearts)
 ace = deck.sprite(0, 1)
@@ -77,10 +74,10 @@ To put a sprite on the screen you `blit()` it — passing the sprite and a posit
 
 ```python
 # load the sheet: 13 columns x 6 rows
-deck = image.load("/system/assets/cards.png")
+cards = image.load("/system/assets/cards.png")
 
 # convert the loaded image into a spritesheet
-deck.spritesheet(13, 6)
+deck = cards.spritesheet(13, 6)
 
 shadow = deck.sprite(12, 4)
 shadow.alpha = 100
@@ -116,8 +113,8 @@ Nothing on the badge stays still for long. `badge.ticks` counts upwards in milli
 ```python
 import random
 
-deck = image.load("/system/assets/cards.png")
-deck.spritesheet(13, 6)
+cards = image.load("/system/assets/cards.png")
+deck = cards.spritesheet(13, 6)
 
 shadow = deck.sprite(12, 4)     # the silhouette we draw under every card
 shadow.alpha = 100              # softened so it reads as a shadow
@@ -190,11 +187,10 @@ Because each card carries its own `pos`, drawing gets simple: `draw_scene()` cle
 Blitting into a `rect` stretches the sprite to fill it, so you can draw a sprite at any size. Let's flick through the hand as if picking cards — the fan sits in the centre with its shadows, and each card in turn zooms up out of it:
 
 ```python
-deck = image.load("/system/assets/cards.png")
-deck.spritesheet(13, 6)
+cards = image.load("/system/assets/cards.png")
+deck = cards.spritesheet(13, 6)
 
 shadow = deck.sprite(12, 4)   # a dark silhouette, drawn under each card
-shadow.alpha = 100
 
 CARD_W, CARD_H = 25, 35       # the size of one card
 hand = [(0, 1), (12, 0), (11, 2), (10, 3), (9, 1)]   # A♥  K♠  Q♦  J♣  10♥
@@ -214,7 +210,9 @@ def draw_card(i, scale):
   w, h = int(CARD_W * scale), int(CARD_H * scale)
   x = FAN_X + i * SPACING - (w - CARD_W) // 2     # centre on its slot
   y = FAN_Y + CARD_H - h - int(6 * (scale - 1))   # grow upward, lifted
+  screen.alpha = 100                              # make the shadow transparent
   screen.blit(shadow, rect(x + 3, y + 3, w, h))
+  screen.alpha = 255
   screen.blit(deck.sprite(rank, suit), rect(x, y, w, h))
 
 # the picked card eases from its normal size up to a crisp 2x
@@ -249,8 +247,8 @@ The loop reads top to bottom: pick the next card, then zoom it up and hold for 1
 ```python
 import math
 
-deck = image.load("/system/assets/cards.png")
-deck.spritesheet(13, 6)
+cards = image.load("/system/assets/cards.png")
+deck = cards.spritesheet(13, 6)
 card = deck.sprite(0, 0)     # the Ace of Spades
 cw = card.width
 ch = card.height
