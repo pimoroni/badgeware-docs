@@ -94,20 +94,25 @@ def update():
 run(update)
 ```
 
-To use `[sprite:name]`, register an image against a name first:
+To use `[sprite:name]`, register an image against a name first. A cell pulled from a [spritesheet](/api/spritesheet.md) works, since `sprite()` hands back an ordinary `image`:
 
 ```python
 screen.font = font.sins
 
-heart = image.load("/system/assets/heart.png")
-add_sprite("heart", heart)
+cards = image.load("/system/assets/cards.png").spritesheet(13, 6)
+
+# row picks the suit, column picks the rank
+add_sprite("ace", cards.sprite(0, 0))     # ace of spades
+add_sprite("king", cards.sprite(12, 1))   # king of hearts
 
 def update():
     bounds = rect(10, 10, 140, 110)
-    screen.text("I [sprite:heart] Badgeware!", bounds)
+    screen.text("Dealt [sprite:ace] and [sprite:king]", bounds)
 
 run(update)
 ```
+
+A sprite reserves horizontal space only, so one taller than the font overlaps the line below. Raise `line_height` to make room for it.
 
 ## Defining your own
 A glyph renderer is a function defined as follows:
