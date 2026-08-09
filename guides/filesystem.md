@@ -20,7 +20,7 @@ with open("/notes.txt", "r") as f:
 
 The second argument to `open()` is the *mode*: `"r"` to read, `"w"` to write (replacing whatever was there), or `"a"` to append to the end of an existing file.
 
-This is how your app remembers things between runs - the user's settings, a high score, a cached download, a screenshot. There's one catch: while your code is running it can only write to the root volume `/` (paths like `/notes.txt` above). The other volumes are read-only to Badgeware, as the [next section](#volumes) explains. Anything you save under `/` persists across resets, so it's the right home for settings, caches, save games and logs.
+This is how your app keeps data between runs - the user's settings, a high score, a cached download, a screenshot. There's one catch: while your code is running it can only write to the root volume `/` (paths like `/notes.txt` above). The other volumes are read-only to Badgeware, as the [next section](#volumes) explains. Anything you save under `/` persists across resets, so it's the right home for settings, caches, save games and logs.
 
 # Saving your app's data
 
@@ -74,7 +74,7 @@ The remaining flash is reserved for Badgeware's firmware and isn't visible as a 
 
 ## `/system` and disk mode
 
-`/system` is a 12MB FAT filesystem, and it's the only volume the host computer can write to. When Badgeware is connected in **disk mode** it appears as a USB drive (labelled after your device, such as `TUFTY`, `BADGER` or `BLINKY`), and you can add, remove, rename and edit files freely - although remember, no filesystem is perfect, so always keep an off-device backup of anything you're working on.
+`/system` is a 12MB FAT filesystem, and it's the only volume the host computer can write to. When Badgeware is connected in **disk mode** it appears as a USB drive (labelled after your device, such as `TUFTY`, `BADGER` or `BLINKY`), and you can add, remove, rename and edit files freely. No filesystem is perfect, so always keep an off-device backup of anything you're working on.
 
 Importantly, `/system` is **read-only to code running on Badgeware**. The host can change it over USB in disk mode, but an app cannot write to its own folder at runtime. This split keeps the user software safe from corruption while a program is running.
 
@@ -82,7 +82,7 @@ Importantly, `/system` is **read-only to code running on Badgeware**. The host c
 
 `/rom` is a genuinely read-only, 1MB volume baked into the firmware. It holds the built-in fonts that apps can load without shipping their own font files. Neither Badgeware nor the host can write to it.
 
-# Limitations to keep in mind
+# Limitations
 
 Flash storage on Badgeware is small and works a little differently to a hard drive or SD card. None of this is anything to worry about - you just get better results if you keep a few things in mind while designing your app.
 

@@ -1,6 +1,6 @@
 ---
 title: shape
-summary: Easily create primitive vector shapes as well as custom shapes, then modify them to build more complex vector graphics.
+summary: Create primitive vector shapes as well as custom shapes, then modify them to build more complex vector graphics.
 icon: shapes
 publish: true
 ---

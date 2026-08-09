@@ -17,7 +17,7 @@ Tufty, Badger, and Blinky are built around the same processor, memory, buttons, 
 | Refresh | On demand, sleeps between | Continuous | Continuous |
 | Best for | Text, dashboards, e-readers | Games, animation, rich UIs | Scrolling text, pixel art |
 
-You draw to every badge the same way, and anything drawn outside the physical screen simply doesn't appear. Run a layout designed for Tufty on Blinky and you'll just see its top-left 39 × 26 pixels.
+You draw to every badge the same way, and anything drawn outside the physical screen doesn't appear. Run a layout designed for Tufty on Blinky and you'll see only its top-left 39 × 26 pixels.
 
 Colour is handled for you too: colour images are quantised to Badger's greys, or reduced to greyscale on Blinky, automatically. If you want fine control over grey levels, work in greyscale yourself. You can also [dither](/api/image.md#dither) on any badge — most useful on Badger's E Ink display, where a repeating pattern creates the illusion of intermediate shades of grey.
 
@@ -102,7 +102,7 @@ Refresh speed trades crispness against ghosting; tune it with [`FAST_UPDATE`, `M
 
 # Blinky
 
-Blinky's 39 × 26 LED matrix is bright and bold — perfect for scrolling text, pixel art, and notifications you can read across a room. Like Tufty, it redraws continuously. It also has cutouts for the case corners and buttons, but you don't need to account for them: anything drawn into those pixels is simply ignored.
+Blinky's 39 × 26 LED matrix is bright and bold — perfect for scrolling text, pixel art, and notifications you can read across a room. Like Tufty, it redraws continuously. It also has cutouts for the case corners and buttons, but you don't need to account for them: anything drawn into those pixels is ignored.
 
 <figure class="feature-callout">
 <div class="callout-media" style="--callout-aspect: 2.5 / 1">

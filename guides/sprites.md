@@ -108,7 +108,7 @@ Because each `sprite()` is a cheap view onto the loaded sheet, drawing a whole h
 
 # Animation
 
-Nothing on the badge stays still for long. `badge.ticks` counts upwards in milliseconds, so by working out *where* to draw from it you can move things around. Let's **deal a hand for real** — five random cards, one at a time, each sliding out of a face-down deck into its slot. Every card becomes a small **`Card`** object that carries its own value, sprite and position, and `hand` starts empty and fills up as they're dealt:
+Nothing on the badge stays still for long. `badge.ticks` counts upwards in milliseconds, so by working out *where* to draw from it you can move things around. Let's **deal a hand for real** — five random cards, one at a time, each sliding out of a face-down deck into its slot. Every card becomes a small **`Card`** object that carries its own value, sprite, and position. `hand` starts empty and fills up as they're dealt:
 
 ```python
 import random

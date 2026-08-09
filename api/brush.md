@@ -246,7 +246,7 @@ while True:
 # Effect brushes
 The brushes above paint new content into a shape. A second family instead *transforms the pixels already on the target* beneath the shape — the shape becomes a mask for an effect. They're ideal for spotlights, frosted-glass panels, pixelated censor boxes and vignettes, and all have antialiased edges.
 
-The effect brushes on this page fall into a few groups: the simple masks below, then the [colour and tone brushes](#colour-and-tone-brushes), the [retro and screen brushes](#retro-and-screen-brushes), and the [artistic brushes](#artistic-brushes). Every one of them reads whatever is already on the target and rewrites it, so remember to draw your scene *first* — the effect only shows where there is something underneath it.
+The effect brushes on this page fall into a few groups: the simple masks below, then the [colour and tone brushes](#colour-and-tone-brushes), the [retro and screen brushes](#retro-and-screen-brushes), and the [artistic brushes](#artistic-brushes). Every one of them reads whatever is already on the target and rewrites it, so draw your scene *first* — the effect only shows where there is something underneath it.
 
 ## pixelate()
 Mosaics the area under the shape into blocks.

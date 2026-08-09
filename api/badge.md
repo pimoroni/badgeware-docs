@@ -16,7 +16,7 @@ The `badge` class offers access to the badge's hardware. Using this class you ca
 | `ticks_delta` | `int` | The number of ticks (milliseconds) since the previous time `update()` was called. Useful for timing animations where the framerate isn't completely stable |
 | `uid` | `hex` | A unique ID for the badge |
 | `resolution` | `tuple` | The display resolution of the badge as a tuple containing pixel width and height as ints |
-| `update` | `function` | Allows you to set and switch between custom methods for the badge to replace `update()`. This allows you to, for example, easily flip between multiple screens, using a different method to draw each one |
+| `update` | `function` | Allows you to set and switch between custom methods for the badge to replace `update()`. This allows you to, for example, flip between multiple screens, using a different method to draw each one |
 
 # Buttons
 There are two main ways to handle button input.
@@ -136,7 +136,7 @@ This resets the framebuffer, clearing the `screen` image to the colour specified
 If you are creating your own program without the use of the Badgeware menu and app system, you will need to poll the badge using this method to get updated status on the buttons and other features. If you're working within the Badgeware menu system, `badge.poll()` is called automatically every update and you don't need to use this.
 
 ## update()
-This is a convenient method which simply runs `screen.update()`, `badge.clear()` and `badge.poll()` together.
+This is a convenient method which runs `screen.update()`, `badge.clear()` and `badge.poll()` together.
 
 # Battery status
 Badgeware includes several methods to allow you to monitor the battery.
@@ -159,7 +159,7 @@ Returns a boolean reflecting whether the battery is currently charging.
 This represents the colour the display will be cleared to before each `update()` loop. You can set this to `None` to disable clearing the screen between updates.
 
 ## default_pen()
-The default colour that `screen.pen` will be set to at the start of every `update()`. Note that this will not accept `None`, only a colour.
+The default colour that `screen.pen` will be set to at the start of every `update()`. This will not accept `None`, only a colour.
 
 ## mode()
 Changes the display mode of the badge. You can apply more than one mode at once, where applicable, by using the pipe symbol, e.g. `badge.mode(HIRES | VSYNC)`.
