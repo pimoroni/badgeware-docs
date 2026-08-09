@@ -138,12 +138,12 @@ A drop shadow is the same idea with a single offset — draw the string once in 
 
 # Wrapping text to fit
 
-`screen.text()` draws a single line and lets it run off the edge. For a paragraph, `text.draw()` flows a string into a rectangle, breaking it onto new lines as it fills the width:
+Given an `x, y`, `screen.text()` draws a single line and lets it run off the edge. Give it a `rect` instead and it flows the string into that rectangle, breaking it onto new lines as it fills the width:
 
 ```python
 screen.font = font.sins
 
-message = ("Badgeware wraps long text for you: hand text.draw a "
+message = ("Badgeware wraps long text for you: hand screen.text a "
            "rectangle and it flows the words onto as many lines "
            "as it needs to fit the width.")
 
@@ -152,16 +152,16 @@ while True:
   screen.clear()
 
   screen.pen = color.white
-  text.draw(screen, message, rect(10, 10, 140, 100))
+  screen.text(message, rect(10, 10, 140, 100))
 
   badge.update()
 ```
 
-The `rect` is the area to fill; text that runs past the bottom is simply clipped. You can also tune the line and word spacing — see the [`text` API](/api/text.md#draw).
+The `rect` is the area to fill; text that runs past the bottom is clipped. You can also tune the line and word spacing, covered in the [`text` API](/api/text.md#text-in-a-box).
 
 # Aligning a block
 
-`text.draw()` can position the whole block for you, so you rarely need to measure by hand. Pass `align` to line each row up horizontally, and `valign` to place the block vertically within the rectangle:
+Drawing into a `rect` positions the block for you, so you rarely need to measure by hand. Pass `align` a pair of constants, one for the horizontal and one for the vertical:
 
 ```python
 screen.font = font.sins
@@ -177,12 +177,12 @@ while True:
   screen.shape(shape.rectangle(10, 10, 140, 100))
 
   screen.pen = color.white
-  text.draw(screen, message, rect(10, 10, 140, 100), align="center", valign="middle")
+  screen.text(message, rect(10, 10, 140, 100), align=(image.CENTER, image.MIDDLE))
 
   badge.update()
 ```
 
-`align` is `"left"` (the default), `"center"` or `"right"`; `valign` is `"top"`, `"middle"` or `"bottom"`. Either can take a pixel offset instead of a keyword. Set `ellipsis=True` and text that's too tall to fit is cut off with a trailing `…` rather than clipped mid-line. `text.draw()` also returns the `rect` it actually filled, which is handy for placing something right after it.
+The horizontal constant is `image.LEFT` (the default), `image.CENTER` or `image.RIGHT`; the vertical one is `image.TOP`, `image.MIDDLE` or `image.BOTTOM`. Pass `overflow=image.ELLIPSES` and text that's too tall to fit is cut off with a trailing `...` rather than clipped mid-line. `screen.text()` also returns the `rect` it filled, which is handy for placing something right after it.
 
 # Scrolling text
 
@@ -224,11 +224,13 @@ while True:
   screen.pen = color.navy
   screen.clear()
   screen.pen = color.rgb(230, 240, 230)
-  text.draw(screen, message, rect(10, 40, 140, 60))
+  screen.text(message, rect(10, 40, 140, 60))
   badge.update()
 ```
 
-To make your own, write a function taking `(image, parameters, measure)` and hand it to `tokenise()` under the name you'll call it by. When `measure` is `True` it just returns the width it occupies (and `image` is `None`, since nothing is drawn); otherwise it draws, reading `image.cursor` — a `vec2` — for the position the text has reached:
+Markup is read only when you draw into a `rect`. Pass an `x, y` and the brackets appear on screen as written.
+
+To make your own, write a function taking `(image, parameters, measure)` and register it with `add_glyph()` under the name you'll call it by. Layout runs it twice. When `measure` is `True` it returns the width it occupies and draws nothing. Otherwise it draws, reading `image.cursor`, a `vec2`, for the position the text has reached:
 
 ```python
 screen.font = font.sins
@@ -241,7 +243,7 @@ def box(image, parameters, measure):
   image.shape(shape.rectangle(image.cursor.x, image.cursor.y, 8, 8))
   return None
 
-renderers = {"box": box}
+add_glyph("box", box)
 message = "tick the [box] and carry on"
 
 while True:
@@ -249,10 +251,9 @@ while True:
   screen.clear()
   screen.pen = color.white
 
-  tokens = text.tokenise(screen, message, renderers)
-  text.draw(screen, tokens, rect(10, 40, 140, 60))
+  screen.text(message, rect(10, 40, 140, 60))
 
   badge.update()
 ```
 
-A renderer can do anything — draw an image, a shape, adjust spacing — which makes it easy to mix icons and coloured highlights into a line of text. The [`text` API](/api/text.md#glyph-renderers) covers the full set of parameters, registering renderers globally, and more examples.
+A renderer can do anything — draw an image, a shape, adjust spacing — which makes it easy to mix icons and coloured highlights into a line of text. The [`text` API](/api/text.md#glyph-renderers) covers the full set of parameters and more examples.

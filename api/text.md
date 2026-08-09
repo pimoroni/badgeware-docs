@@ -1,43 +1,30 @@
 ---
 title: text
-summary: Provides methods for advanced drawing of text to the screen.
+summary: Wrap and align text inside a box, style it inline with glyph renderers, and scroll it across the screen.
 icon: format_align_left
 publish: true
 ---
 # Introduction
-While `image.text()` will provide basic functionality to draw text onto the screen, more advanced features can be found in the text class — word wrapping, alignment, inline markup and scrolling.
+[`image.text()`](/api/image.md#text) draws a single run of text wherever you point it. Hand it a `rect` instead and it does rather more: wrapping the words onto new lines, aligning the block, truncating what doesn't fit, and rendering inline `[markup]`. This page covers those features, plus the `text` module, which adds a scrolling helper.
 
-## A note on size
-Everywhere in this article the optional `size` argument works the same way, and it depends on the kind of font you've assigned to `image.font`:
-
-- **Vector fonts** (`.af`, loaded with `font.load()`) take a **point size** — any value you like. The default is `12`.
-- **Pixel fonts** (the ROM fonts, e.g. `font.sins`) take an **integer scale** — `1` (default) is native size, `2` doubles every glyph pixel, `3` triples it, and so on.
-
-Leaving `size` at its default (`0`) uses the font's own size. Always measure and draw with the *same* `size` so your layout matches what's rendered.
-
-# Drawing text
-In its simplest form, text can be drawn to the screen at a specific location using `image.text()`. But this has several limitations - the text will extend out of the screen area, and it does not wrap. The `text` class offers more functionality.
-
-## draw()
-This method writes text into a specified area, wrapping onto new lines when it reaches the boundary of that area. It can align each line, align the whole block vertically, and truncate overflowing text with an ellipsis. It accepts either a plain string or the output of `tokenise()`, so inline `[glyph]` markup (see [glyph renderers](#glyph-renderers)) is rendered either way.
+# Text in a box
+Pass a `rect` as the position and the text is laid out inside it, breaking onto a new line each time it fills the width. Anything that runs past the bottom is clipped.
 
 ### Usage
-`text.draw(image, text, bounds, line_spacing, word_spacing, size, align, valign, ellipsis)`
+`.text(message, bounds, size, align, overflow, line_height, word_spacing)`
 
 | Parameter | Type | Description |
 |---|---|---|
-| `image` | `image` | The `image` to draw the text onto |
-| `text` | `list` \| `string` | The text to draw. This can be the output of `tokenise()`, or a simple string |
-| `bounds` | `rect` | *Optional.* A rectangle describing the area in which the text is drawn. Defaults to the whole image |
-| `line_spacing` | `float` | *Optional.* Line height multiplier. Defaults to `1` |
-| `word_spacing` | `float` | *Optional.* Space width multiplier. Defaults to `1` |
-| `size` | `int` | *Optional.* Point size for a vector font (default `12`), or integer scale for a pixel font (default `1`). See [A note on size](#a-note-on-size) |
-| `align` | `string` \| `int` | *Optional.* Horizontal alignment of each line: `"left"` (default), `"center"`, `"right"`, or an x offset in pixels |
-| `valign` | `string` \| `int` | *Optional.* Vertical alignment of the block within `bounds`: `"top"` (default), `"middle"`, `"bottom"`, or a y offset in pixels |
-| `ellipsis` | `bool` | *Optional.* When `True`, text that overflows `bounds` vertically is truncated with a trailing `"..."`. Defaults to `False` |
+| `message` | `string` | The text to draw |
+| `bounds` | `rect` | The area to lay the text out within |
+| `size` | `int` | *Optional.* Point size for a vector font, or integer scale for a pixel font. See [font size](/api/font.md#introduction). As a keyword it's spelled `font_size` |
+| `align` | `tuple` | *Optional.* Keyword only. Horizontal and vertical alignment, as a pair of constants. Defaults to `(image.LEFT, image.TOP)` |
+| `overflow` | `int` | *Optional.* Keyword only. `image.CLIP` (default) or `image.ELLIPSES` |
+| `line_height` | `float` | *Optional.* Keyword only. Line height multiplier. Defaults to `1` |
+| `word_spacing` | `float` | *Optional.* Keyword only. Space width multiplier. Defaults to `1` |
 
 ### Returns
-A `rect` describing the bounding box that was actually drawn — handy for laying out further content beneath or beside the text.
+A `rect` describing the bounding box that was drawn, handy for laying out further content beneath or beside the text.
 
 ```python
 screen.font = font.sins
@@ -46,44 +33,38 @@ screen.pen = color.rgb(0, 0, 255)
 def update():
     bounds = rect(10, 10, 140, 110)
     message = "Well hello there, world! This is a nice long message that's designed to split over several lines, so I'm just going to ramble on for a little while."
-    text.draw(screen, message, bounds, align="center", valign="middle")
+    screen.text(message, bounds)
 
 run(update)
 ```
 
-## tokenise()
-This method breaks down a string into its component parts, allowing the `draw()` method to draw it to the screen. If you pass a raw string straight into `draw()`, it'll actually use `tokenise()` behind the scenes before rendering the text.
+## Alignment
+`align` takes a pair: a horizontal constant and a vertical one. The horizontal one positions each line within the width, the vertical one positions the block as a whole within the height.
 
-Tokenising up front is worth doing when you want to reuse the same text across many frames (so it isn't re-parsed each time), or when you're supplying custom glyph renderers.
+| Constant | Use |
+|---|---|
+| `image.LEFT`, `image.CENTER`, `image.RIGHT` | Horizontal alignment |
+| `image.TOP`, `image.MIDDLE`, `image.BOTTOM` | Vertical alignment |
 
-`tokenise()` returns a list of tokens.
-
-### Usage
-`text.tokenise(image, text, glyph_renderers, size)`
-
-| Parameter | Type | Description |
-|---|---|---|
-| `image` | `image` | The `image` the tokenised text will be drawn onto |
-| `text` | `string` | The string to be tokenised |
-| `glyph_renderers` | `dict` | *Optional.* Extra glyph renderers (see below), merged on top of the built-in ones for this call |
-| `size` | `int` | *Optional.* The size to measure glyphs at — point size for a vector font, integer scale for a pixel font. See [A note on size](#a-note-on-size) |
-
-### Returns
-A `list` containing the individual text tokens.
+Pass a single constant on its own to set the horizontal alignment and leave the vertical at `image.TOP`.
 
 ```python
 screen.font = font.sins
 screen.pen = color.rgb(0, 0, 255)
 
-# tokenise once, outside update(), so the string is only parsed a single time
-message = "Well hello there, world!"
-tokens = text.tokenise(screen, message)
-
 def update():
     bounds = rect(10, 10, 140, 110)
-    text.draw(screen, tokens, bounds)
+    message = "Well hello there, world! This is a nice long message that's designed to split over several lines."
+    screen.text(message, bounds, align=(image.CENTER, image.MIDDLE))
 
 run(update)
+```
+
+## Overflow
+By default text taller than `bounds` is clipped wherever it happens to fall. Pass `overflow=image.ELLIPSES` and the last line that fits is truncated with a trailing `...` instead.
+
+```python-raw
+screen.text(message, bounds, overflow=image.ELLIPSES)
 ```
 
 # Glyph renderers
@@ -91,15 +72,15 @@ You can customise text to a great extent by using glyph renderers - these are li
 
 To include a literal `[` in your text, write it twice: `[[`.
 
+Markup is only read when you draw into a `rect`. Give `text()` a point instead and the brackets are drawn as written.
+
 ## Built-in glyph renderers
 A couple of renderers are always available, with no setup required:
 
 | Markup | Effect |
 |---|---|
 | `[pen:r,g,b]` | Sets the pen colour for the following text, e.g. `[pen:255,0,0]`. Takes up no space |
-| `[sprite:name]` | Draws a sprite previously registered with `register_sprite(name, image)`, taking up the sprite's width |
-
-Because these are built in, they work even when you pass a plain string straight to `draw()`:
+| `[sprite:name]` | Draws a sprite registered with `add_sprite(name, image)`, taking up the sprite's width |
 
 ```python
 screen.font = font.sins
@@ -108,7 +89,7 @@ def update():
     screen.pen = color.rgb(0, 0, 255)
     bounds = rect(10, 10, 140, 110)
     message = "I'm written in blue... [pen:255,0,0]or am I?"
-    text.draw(screen, message, bounds)
+    screen.text(message, bounds)
 
 run(update)
 ```
@@ -119,11 +100,11 @@ To use `[sprite:name]`, register an image against a name first:
 screen.font = font.sins
 
 heart = image.load("/system/assets/heart.png")
-register_sprite("heart", heart)
+add_sprite("heart", heart)
 
 def update():
     bounds = rect(10, 10, 140, 110)
-    text.draw(screen, "I [sprite:heart] Badgeware!", bounds)
+    screen.text("I [sprite:heart] Badgeware!", bounds)
 
 run(update)
 ```
@@ -137,13 +118,17 @@ def XXXXX_glyph_renderer(image, parameters, measure):
 ```
 
 The parameters are always defined the same way, but some may not be used in your particular renderer.
-- `image` - The image the renderer draws onto. **When `measure` is `True` this is `None`** (nothing is being drawn, only measured), so don't touch it in the measure branch.
+- `image` - The image being drawn into.
 - `parameters` - A list of the parameters passed in the markup, always as strings (e.g. `[pen:255,0,0]` gives `["255", "0", "0"]`). Convert them as needed.
-- `measure` - `True` when the renderer is being asked how wide it is, `False` when it should actually draw.
+- `measure` - `True` when the renderer is being asked how wide it is, `False` when it should actually draw. Layout calls it both ways, so draw nothing in the measure pass.
 
-To find out *where* to draw, read `image.cursor` — a `vec2` that `draw()` sets to the current pen position just before calling your renderer.
+To find out *where* to draw, read `image.cursor`, a `vec2` holding the pen position at the point your renderer was reached.
 
 Your renderer must **return the advance width** (how many pixels of horizontal space it takes) when `measure` is `True`, and do its drawing and return `None` otherwise.
+
+Register it with `add_glyph(name, renderer)`, where `name` is what you'll call it by in the text. Registration is global and lasts for the life of the app; re-registering a name replaces it, and `add_glyph(name, None)` removes one.
+
+Registering a renderer is not enough on its own: draw with a `rect`, as the example below does. A registered `[square]` drawn at an `x, y` still comes out as the literal text `[square]`.
 
 Here's one called with `[square]`:
 
@@ -158,30 +143,17 @@ def square_glyph_renderer(image, parameters, measure):
     image.shape(shape.rectangle(image.cursor.x, image.cursor.y, 12, 12))
     return None
 
-glyph_renderers = {
-    "square": square_glyph_renderer
-}
+add_glyph("square", square_glyph_renderer)
 
 def update():
     bounds = rect(10, 10, 140, 110)
     message = "Come on, man, don't be a [square] all your life..."
-    tokens = text.tokenise(screen, message, glyph_renderers)
-    text.draw(screen, tokens, bounds)
+    screen.text(message, bounds)
 
 run(update)
 ```
 
 This draws a 12px × 12px square in the current pen colour. `parameters` isn't used here. `image.cursor` gives the position we're 'at' in the text, which we use as the top-left of the square. When `measure` is `True` we return the width we occupy - `12`.
-
-The keys of the `glyph_renderers` dictionary are the names you call from within the text, so `square_glyph_renderer` is invoked by placing `[square]` in the string.
-
-## Registering renderers globally
-Passing a `glyph_renderers` dict to `tokenise()` adds those renderers for that call only. If you'd rather make one available everywhere - including in plain strings passed straight to `draw()` - register it once against the built-in set:
-
-```python-raw
-register_glyph_renderer("square", square_glyph_renderer)
-register_sprite("heart", heart)   # for use as [sprite:heart]
-```
 
 # Scrolling text
 We've included a scrolling function to make this common activity quicker and easier.
@@ -189,7 +161,7 @@ We've included a scrolling function to make this common activity quicker and eas
 ## scroll()
 This generates a closure, a function which you can call every `update()` to scroll the specified text from right to left. This closure will draw the scrolling text to a target image, and advance the scroll, as well as returning a float which denotes how far through the scroll cycle it is.
 
-The text will always be drawn scrolling between both edges of the target image, so if you want to position the scrolling text within a larger image, you'll want to use `image.window()` to make a window onto that image in the appropriate place, and use that as your target image.
+The text is always drawn scrolling between both edges of the target image. To position the scrolling text within a larger image, use `image.window()` to make a window onto that image in the right place, and pass that as your target.
 
 ### Usage
 `text.scroll(text, font_face, font_size, target, speed, gap, align)`

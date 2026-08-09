@@ -11,9 +11,9 @@ publish: true
 - **Vector fonts** — scalable outlines stored in the Alright Font (`.af`) format. They can be drawn at any point size. Three are preloaded, and you can load your own.
 - **Pixel fonts** — crisp bitmap fonts in the Pixel Perfect Font (`.ppf`) format, rendered at integer sizes. Badgeware ships with over thirty of these as *ROM fonts*, always available by name.
 
-Whichever kind you use, the workflow is the same: get hold of a font (load it, or pick a ROM font), assign it with `screen.font = ...`, then draw with [`image.text()`](/api/image.md#text) or the [`text`](/api/text.md) module. Text is drawn using the currently selected brush, allowing for alpha blending and other visual effects.
+Whichever kind you use, the workflow is the same: get hold of a font (load it, or pick a ROM font), assign it with `screen.font = ...`, then draw with [`image.text()`](/api/image.md#text). Text is drawn using the currently selected brush, allowing for alpha blending and other visual effects.
 
-The two kinds differ in how the `size` argument behaves when you draw — a point size for vector fonts, a whole-number scale for pixel fonts. See [A note on size](/api/text.md#a-note-on-size) for the details.
+The two kinds differ in how the `size` argument behaves when you draw. A vector font takes a **point size** — any value you like, defaulting to `12`. A pixel font takes an **integer scale**: `1` (the default) is native size, `2` doubles every glyph pixel, `3` triples it. Leave `size` off, or pass `0`, to get the font's own size. Always measure and draw with the same `size`, so your layout matches what's rendered.
 
 # ROM fonts
 Badgeware includes over thirty high-quality, licensed pixel fonts, always available without loading anything. Reach them as attributes of `font`, using the font's name:

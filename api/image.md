@@ -80,6 +80,7 @@ deck = image.load("/system/assets/cards.png").spritesheet(13, 6)
 | `alpha` | `int` | Global alpha for drawing, 0–255 (0 = transparent, 255 = opaque) |
 | `pen` | `color` \| `brush` | Colour or brush used for drawing operations |
 | `font` | `font` | Font used for drawing text |
+| `cursor` | `vec2` | Text caret — where the next `text()` called without a position will draw |
 
 # Drawing
 The drawing API provides a collection of fast, low-level primitives for rendering simple shapes directly into an image’s pixel buffer. These methods are designed for speed and simplicity, making them suitable for real-time graphics, UI elements, and procedural drawing. They round position and dimension values to the nearest pixel for speed, and are not antialiased.
@@ -317,27 +318,51 @@ The text drawing API provides methods for rendering text to an image.
 Text is positioned relative to the top-left corner of its bounding box, and all text rendering operations use the current font and brush unless otherwise stated.
 
 ## text()
-Writes text to the image using the current font and brush at the specified position.
+Writes text to the image using the current font and brush.
 
-The `text()` method can be called in two forms: by passing a `vec2` that defines the position, or by specifying the position as individual `x` and `y` values.
+Where you write it depends on what you pass as the position:
+
+- **a point**, as `x, y` or a `vec2`, draws a single run starting there, then moves the cursor to the start of the next line.
+- **a `rect`** lays the text out inside those bounds, wrapping onto new lines as it fills the width.
+- **nothing at all** continues from the cursor, print-style. See [`cursor`](#properties).
+
+A `\n` starts a new line in every form.
+
+Word wrapping and [inline markup](/api/text.md#glyph-renderers) happen only in the `rect` form. Give a point and the string is drawn as one run, `[...]` markup and all.
 
 ### Usage
+`.text(message, size)` \
 `.text(message, x, y, size)` \
-`.text(message, p, size)`
+`.text(message, p, size)` \
+`.text(message, bounds, size, align, overflow, line_height, word_spacing)`
 
 | Parameter | Type | Description |
 |---|---|---|
 | `message` | `string` | The text to write |
 | `x`, `y` | `int` | Position of the top-left corner of the text |
 | `p` | `vec2` | Position of the top-left corner of the text |
-| `size` | `int` | *Optional.* For a vector font, the text size. For a pixel font, an integer scale factor — e.g. `3` draws the font at 3× its native size. |
+| `bounds` | `rect` | The area to lay the text out within |
+| `size` | `int` | *Optional.* For a vector font, the point size (default `12`). For a pixel font, an integer scale factor, so `3` draws the font at 3x its native size (default `1`). As a keyword it's spelled `font_size` |
+| `align` | `tuple` | *Optional.* Keyword only. Horizontal and vertical alignment within `bounds`, as a pair of constants. Defaults to `(image.LEFT, image.TOP)` |
+| `overflow` | `int` | *Optional.* Keyword only. `image.CLIP` (default) or `image.ELLIPSES` |
+| `line_height` | `float` | *Optional.* Keyword only. Line height multiplier. Defaults to `1` |
+| `word_spacing` | `float` | *Optional.* Keyword only. Space width multiplier. Defaults to `1` |
+
+The last four apply to the `rect` form only, and are ignored otherwise. The [`text`](/api/text.md) page lists the [alignment](/api/text.md#alignment) and [overflow](/api/text.md#overflow) constants.
+
+### Returns
+A `rect` describing the bounding box the text was drawn into, useful for laying out further content beneath or beside it.
 
 ```python
 def update():
   screen.pen = color.yellow
 
-  # using full coordinates
+  # a single run at a point
   screen.text("Hello, Badgeware!", 5, 5)
+
+  # wrapped and centred inside a box
+  screen.text("A longer message, wrapped to fit the space it's given.",
+              rect(5, 30, 150, 90), align=(image.CENTER, image.MIDDLE))
 
 run(update)
 ```
@@ -345,13 +370,19 @@ run(update)
 ## measure_text()
 Returns a tuple containing the width and height of the given text, when rendered using the current font.
 
+Pass `bounds` to measure the text wrapped inside a rectangle, as `text()` would lay it out. Leave it off to measure the string unwrapped, where a `\n` still breaks lines. Measure at the same `size` you draw at, or the layout won't match.
+
 ### Usage
-`.measure_text(message, size)`
+`.measure_text(message, size)` \
+`.measure_text(message, bounds, size, line_height, word_spacing)`
 
 | Parameter | Type | Description |
 |---|---|---|
 | `message` | `string` | The text to measure |
-| `size` | `int` | *Optional.* The font size, if the current font is a vector font |
+| `bounds` | `rect` | *Optional.* Measure the text wrapped within this area |
+| `size` | `int` | *Optional.* Point size for a vector font, or integer scale for a pixel font. As a keyword it's spelled `font_size` |
+| `line_height` | `float` | *Optional.* Keyword only. Line height multiplier. Defaults to `1` |
+| `word_spacing` | `float` | *Optional.* Keyword only. Space width multiplier. Defaults to `1` |
 
 ### Returns
 A `tuple` containing x and y dimensions in pixels
@@ -369,6 +400,8 @@ def update():
 
 run(update)
 ```
+
+For wrapping, alignment and inline markup in depth, see the [`text`](/api/text.md) page.
 
 # Filters
 A filter rewrites the pixels that are already in an image, across the whole of its clipping area — so draw your scene first, then filter it. Most of them have a [brush](/api/brush.md#effect-brushes) equivalent that applies the same effect through a vector shape instead, for when you want it in one part of the frame only.
