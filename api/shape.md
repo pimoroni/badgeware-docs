@@ -40,6 +40,30 @@ def update():
 run(update)
 ```
 
+## ellipse()
+Creates a new `shape` representing an ellipse, with a radius per axis.
+
+### Usage
+`shape.ellipse(x, y, rx, ry)` \
+`shape.ellipse(centre, rx, ry)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `x`, `y` | `int` \| `float` | Position of the centre point |
+| `centre` | `vec2` | Position of the centre point |
+| `rx`, `ry` | `int` \| `float` | Radius across and down, in pixels |
+
+### Returns
+A `shape` representing the created shape.
+
+```python
+def update():
+  screen.pen = color.cyan
+  screen.shape(shape.ellipse(80, 60, 60, 25))
+
+run(update)
+```
+
 ## rectangle()
 Creates a new `shape` representing a rectangle.
 
@@ -258,6 +282,39 @@ def update():
 run(update)
 ```
 
+## custom()
+Creates a new `shape` from points you supply, for geometry none of the primitives covers. Each argument is one contour, and the first is the outline: any that follow punch holes in it.
+
+A contour is either a list of `vec2`, or an `array('f')` of flat `x, y` pairs, which allocates no `vec2` objects and suits geometry you rebuild every frame. Points are joined in the order given and the contour closes itself, so there's no need to repeat the first point at the end.
+
+Holes rely on the even-odd fill rule, which is the default; see [`fill_rule`](/api/image.md#properties).
+
+### Usage
+`shape.custom(contour)` \
+`shape.custom(outline, hole, ...)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `contour` | `list` \| `array` | A list of `vec2`, or an `array('f')` of `x, y` pairs |
+
+### Returns
+A `shape` representing the created shape.
+
+```python
+from array import array
+
+# an arrow as one contour, and a square hole in the middle of it
+arrow = [vec2(20, 50), vec2(90, 50), vec2(90, 30), vec2(140, 60),
+         vec2(90, 90), vec2(90, 70), vec2(20, 70)]
+hole = array("f", [60, 55, 75, 55, 75, 65, 60, 65])
+
+def update():
+  screen.pen = color.orange
+  screen.shape(shape.custom(arrow, hole))
+
+run(update)
+```
+
 # Properties
 
 | Property | Type | Description |
@@ -269,23 +326,70 @@ The transform allows shapes to be translated, rotated, scaled, or skewed without
 # Methods
 
 ## stroke()
-Returns a new shape representing the outline (stroke) of this shape.
+Replaces this shape with a band along its outline, and returns the same shape so the call can be chained onto a factory. It's a **conversion, not a copy**: the filled shape you called it on is gone afterwards, so build a second one if you want the fill as well as the border.
 
-Stroking is useful for drawing borders around filled shapes, creating hollow outlines, or generating thicker versions of existing geometry. The original shape is not modified — instead, `stroke()` produces a new shape that can be drawn like any other.
+Stroking is how you get borders around filled shapes, hollow outlines, and thicker versions of existing geometry. The thickness controls where the band sits relative to the outline:
 
-The supplied thickness controls where the outline is placed:
+- If the thickness is positive, the stroke expands outward from the shape's edge.
+- If the thickness is negative, the stroke is applied inward, shrinking into the shape's interior.
 
-- If the thickness is positive, the stroke expands outward from the shape’s edge.
-- If the thickness is negative, the stroke is applied inward, shrinking into the shape’s interior.
+`flags` picks the alignment, path closure, join and cap, one value from each group combined with the pipe symbol — see [stroke flags](#stroke-flags). `miter_limit` caps how far a mitred join may spike out at a sharp corner before it's cut off flat, as a multiple of the thickness.
 
-This makes it possible to create both outer borders and inset outlines depending on the effect you want.
+The band is drawn as two contours filled even-odd, which is the default fill rule; if you've set [`fill_rule`](/api/image.md#properties) to `image.NON_ZERO` a stroke fills solid instead.
 
 ### Usage
-`.stroke(thickness)`
+`.stroke(thickness)` \
+`.stroke(thickness, flags, miter_limit)`
 
 | Parameter | Type | Description |
 |---|---|---|
-| `thickness` | `int` | Thickness of the stroke in pixels |
+| `thickness` | `int` | Thickness of the stroke in pixels. Negative strokes inward |
+| `flags` | `int` | *Optional.* One [stroke flag](#stroke-flags) per group, combined with the pipe symbol. Defaults to `0`, which is outer alignment, a closed path, mitre joins and butt caps |
+| `miter_limit` | `float` | *Optional.* How far a mitred corner may extend, as a multiple of the thickness. Defaults to `4.0` |
 
 ### Returns
-A `shape` representing the stroke of the previous shape.
+The same `shape`, now stroked.
+
+```python
+def update():
+  screen.pen = color.navy
+  screen.shape(shape.circle(50, 60, 30))
+
+  # a rounded, centred outline over the filled circle
+  screen.pen = color.cyan
+  screen.shape(shape.circle(50, 60, 30).stroke(4, shape.ALIGN_CENTER | shape.JOIN_ROUND))
+
+  # an open zigzag, capped round at both ends
+  zigzag = shape.custom([vec2(90, 40), vec2(110, 80), vec2(130, 40), vec2(150, 80)])
+  screen.pen = color.yellow
+  screen.shape(zigzag.stroke(3, shape.PATH_OPEN | shape.CAP_ROUND | shape.JOIN_ROUND))
+
+run(update)
+```
+
+## bounds()
+Returns the box the shape occupies on the image, with its [`transform`](#properties) applied. Useful for hit-testing one shape's box against another, or for placing something beside a shape you've moved.
+
+### Usage
+`.bounds()`
+
+### Returns
+A `rect`.
+
+```python-raw
+dial = shape.star(80, 60, 5, 40, 18)
+dial.transform = mat3().translate(20, 0).rotate(30)
+box = dial.bounds()      # where it actually landed
+```
+
+# Stroke flags
+[`stroke()`](#stroke) takes one flag from each of these groups, combined with the pipe symbol. Every group's default is its `0` value, so you only need to name the ones you're changing.
+
+| Group | Constants | Effect |
+|---|---|---|
+| Alignment | `shape.ALIGN_OUTER` (default), `shape.ALIGN_INNER`, `shape.ALIGN_CENTER` | Whether the band grows outward from the outline, inward, or straddles it |
+| Path closure | `shape.PATH_CLOSED` (default), `shape.PATH_OPEN` | Whether the outline is a closed loop, or an open line with two ends to cap |
+| Join | `shape.JOIN_MITER` (default), `shape.JOIN_ROUND`, `shape.JOIN_BEVEL` | How the band turns a corner: a sharp point, an arc, or a flat cut |
+| Cap | `shape.CAP_BUTT` (default), `shape.CAP_ROUND`, `shape.CAP_SQUARE` | How an open path's ends finish: flat on the endpoint, a semicircle past it, or squared off past it |
+
+Joins and caps only show up where they apply: a closed shape has no ends to cap, and a curve approximated by enough short segments has no corner sharp enough to tell one join from another.
