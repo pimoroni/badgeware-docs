@@ -22,6 +22,7 @@ Pass a `rect` as the position and the text is laid out inside it, breaking onto 
 | `overflow` | `int` | *Optional.* Keyword only. `image.CLIP` (default) or `image.ELLIPSES` |
 | `line_height` | `float` | *Optional.* Keyword only. Line height multiplier. Defaults to `1` |
 | `word_spacing` | `float` | *Optional.* Keyword only. Space width multiplier. Defaults to `1` |
+| `transform` | `mat3` | *Optional.* Keyword only. Matrix mapping the drawn text in image space, applied after the block is laid out. See [transforming text](/api/image.md#transforming-text) |
 
 ### Returns
 A `rect` describing the bounding box that was drawn, handy for laying out further content beneath or beside the text.

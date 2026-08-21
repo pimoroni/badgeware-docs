@@ -30,6 +30,7 @@ pixelated
 posteris(e|ed|ing|ation)
 premultiplied
 raycast(er|ers|ing)?
+resampl(e|ed|ing)?
 rotozoomer
 scanlines?
 smallcaps

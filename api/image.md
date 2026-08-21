@@ -323,7 +323,7 @@ Writes text to the image using the current font and brush.
 Where you write it depends on what you pass as the position:
 
 - **a point**, as `x, y` or a `vec2`, draws a single run starting there, then moves the cursor to the start of the next line.
-- **a `rect`** lays the text out inside those bounds, wrapping onto new lines as it fills the width.
+- **a `rect`** lays the text out inside those bounds, wrapping onto new lines as it fills the width, then leaves the cursor at `bounds.x`, one line below the last line drawn, whatever the alignment was.
 - **nothing at all** continues from the cursor, print-style. See [`cursor`](#properties).
 
 A `\n` starts a new line in every form.
@@ -336,6 +336,8 @@ Word wrapping and [inline markup](/api/text.md#glyph-renderers) happen only in t
 `.text(message, p, size)` \
 `.text(message, bounds, size, align, overflow, line_height, word_spacing)`
 
+`transform` can be passed with any of these forms.
+
 | Parameter | Type | Description |
 |---|---|---|
 | `message` | `string` | The text to write |
@@ -347,8 +349,9 @@ Word wrapping and [inline markup](/api/text.md#glyph-renderers) happen only in t
 | `overflow` | `int` | *Optional.* Keyword only. `image.CLIP` (default) or `image.ELLIPSES` |
 | `line_height` | `float` | *Optional.* Keyword only. Line height multiplier. Defaults to `1` |
 | `word_spacing` | `float` | *Optional.* Keyword only. Space width multiplier. Defaults to `1` |
+| `transform` | `mat3` | *Optional.* Keyword only. Matrix mapping the drawn text in image space. Defaults to `None` |
 
-The last four apply to the `rect` form only, and are ignored otherwise. The [`text`](/api/text.md) page lists the [alignment](/api/text.md#alignment) and [overflow](/api/text.md#overflow) constants.
+`align`, `overflow`, `line_height` and `word_spacing` apply to the `rect` form only, and are ignored otherwise. The [`text`](/api/text.md) page lists the [alignment](/api/text.md#alignment) and [overflow](/api/text.md#overflow) constants.
 
 ### Returns
 A `rect` describing the bounding box the text was drawn into, useful for laying out further content beneath or beside it.
@@ -366,6 +369,30 @@ def update():
 
 run(update)
 ```
+
+### Transforming text
+Pass a `mat3` as `transform` and the drawn glyphs are mapped through it. It applies after layout: the text is laid out at its position, or the cursor, as usual, and then the whole block is mapped. Rotation is about the matrix origin, so to turn a block about a point you choose, translate there, rotate, and translate back, just as with [`shape.transform`](/api/shape.md#properties):
+
+```python
+screen.font = font.load("/system/assets/fonts/MonaSans-Medium.af")
+screen.antialias = image.X4
+
+def update():
+  screen.pen = color.yellow
+
+  anchor = vec2(80, 60)
+  angle = badge.ticks / 10
+  spin = mat3().translate(anchor.x, anchor.y).rotate(angle).translate(-anchor.x, -anchor.y)
+
+  screen.text("Round we go", rect(20, 50, 120, 20), 16,
+              align=image.CENTER, transform=spin)
+
+run(update)
+```
+
+Layout, the cursor and [`measure_text()`](#measure_text) all stay in untransformed space, so wrap points don't move with the matrix. The returned `rect` is the axis-aligned bounding box of the transformed block.
+
+A vector font transforms exactly. A pixel font is resampled nearest-neighbour, which costs a good deal more than a plain blit and gives ragged edges at angles off the axis. Inline [glyph renderers](/api/text.md#glyph-renderers) draw at the untransformed cursor, so they are placed but not transformed.
 
 ## measure_text()
 Returns a tuple containing the width and height of the given text, when rendered using the current font.

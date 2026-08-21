@@ -184,6 +184,33 @@ while True:
 
 The horizontal constant is `image.LEFT` (the default), `image.CENTER` or `image.RIGHT`; the vertical one is `image.TOP`, `image.MIDDLE` or `image.BOTTOM`. Pass `overflow=image.ELLIPSES` and text that's too tall to fit is cut off with a trailing `...` rather than clipped mid-line. `screen.text()` also returns the `rect` it filled, which is handy for placing something right after it.
 
+# Rotating and scaling text
+
+Hand `screen.text()` a `mat3` as `transform` and the text is mapped through it as it's drawn. Layout happens first and the whole block is transformed afterwards, so wrapping, alignment and `measure_text()` behave exactly as they would without it. Rotation is about the matrix origin, so translate to the point you want to turn around, rotate, then translate back:
+
+```python
+screen.font = font.load("/system/assets/fonts/MonaSans-Medium.af")
+screen.antialias = image.X4
+
+message = "Round and round"
+w, h = screen.measure_text(message, 20)
+cx, cy = screen.width / 2, screen.height / 2
+
+while True:
+  screen.pen = color.navy
+  screen.clear()
+
+  angle = badge.ticks / 10
+  spin = mat3().translate(cx, cy).rotate(angle).translate(-cx, -cy)
+
+  screen.pen = color.white
+  screen.text(message, cx - w / 2, cy - h / 2, 20, transform=spin)
+
+  badge.update()
+```
+
+Scaling and shearing work the same way, and it applies to a `rect` full of wrapped text just as well as a single line. A vector font transforms exactly; a pixel font is resampled nearest-neighbour, so it stays crisp at right angles but goes ragged in between, and costs more to draw than a plain line does.
+
 # Scrolling text
 
 A single line sweeping across the screen suits a small display well, and there's no special trick to it: measure the text, then move it a little further left each frame based on the clock. Drawing a second copy one text-width behind makes it loop seamlessly:
