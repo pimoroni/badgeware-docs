@@ -1,6 +1,6 @@
 ---
 title: tween
-summary: Maps a progress value to an eased value between two endpoints — smooth animation that holds no clock of its own.
+summary: Maps a progress value to an eased value between two endpoints, driven by your clock or timing itself.
 icon: timeline
 publish: true
 ---
@@ -9,7 +9,7 @@ A `tween` smoothly moves a value from a **start** to an **end**. You give it a *
 
 What makes it more than plain arithmetic is *easing*. Instead of moving at a constant speed, the value can start slow and speed up, overshoot and settle, or bounce — so motion feels natural rather than mechanical. You pick the curve when you create the tween.
 
-A tween keeps no clock of its own: you decide the progress and read the value back with `at()`.
+A tween works either way: hand it a progress and read the value back with `at()`, or call `start()` and let it read the clock.
 
 ```python-raw
 # a value that eases from 0 to 100
@@ -20,7 +20,7 @@ fade.at(0.5)   # -> 75.0   eased, so already past halfway
 fade.at(1)     # -> 100.0  the end
 ```
 
-Usually the progress comes from the clock, which keeps the animation smooth and running at the same speed on any badge (see the example under [`at()`](#at) below). The start and end don't have to be numbers, either — they can be a `vec2`, `rect` or `mat3`, so one tween can animate a position, a rectangle, or a whole transformation.
+Usually the progress comes from the clock, which keeps the animation smooth and running at the same speed on any badge (see the example under [`at()`](#at) below), or a tween can read the clock itself (see [`start()`](#start)). The start and end don't have to be numbers, either — they can be a `vec2`, `rect` or `mat3`, so one tween can animate a position, a rectangle, or a whole transformation.
 
 # Constructor
 
@@ -35,7 +35,7 @@ Creates a tween between two endpoints, with an optional duration and easing curv
 |---|---|---|
 | `start` | `float` \| `vec2` \| `rect` \| `mat3` | The value at progress 0 |
 | `end` | `float` \| `vec2` \| `rect` \| `mat3` | The value at progress 1 |
-| `duration` | `float` | *Optional.* Duration in seconds. The default, `1.0`, means `at()` takes a progress from 0 to 1. |
+| `duration` | `float` | *Optional.* The span `at()` measures its argument against, in whatever unit you're counting time in. The default, `1.0`, means `at()` takes a progress from 0 to 1. |
 | `easing` | `int` | *Optional.* An easing constant (see below). Defaults to `tween.LINEAR`. |
 
 ### Returns
@@ -46,21 +46,25 @@ All properties are read-only.
 
 | Property | Type | Description |
 |---|---|---|
-| `start` | *endpoint* | The start endpoint |
-| `end` | *endpoint* | The end endpoint |
-| `duration` | `float` | The duration in seconds (`1.0` = a progress from 0 to 1) |
+| `from_` | *endpoint* | The start endpoint. The trailing underscore keeps it clear of Python's `from` keyword |
+| `to` | *endpoint* | The end endpoint |
+| `duration` | `float` | The span `at()` measures against (`1.0` = a progress from 0 to 1) |
+| `elapsed` | `float` | Milliseconds since `start()`, or `0` if the tween isn't running |
+| `now` | *endpoint* | The value at the current clock time. Needs a `start()` first |
+| `done` | `bool` | `True` once `duration` milliseconds have passed since `start()`, `False` until started |
+| `running` | `bool` | `True` between `start()` and `stop()` |
 
 # Methods
 
 ## at()
-Returns the eased value at progress `t`. With the default duration of `1.0`, `t` is a fraction from 0 to 1; if a duration in seconds was given, `t` is the elapsed time in seconds. Progress outside the range is clamped to the endpoints.
+Returns the eased value at progress `t`. With the default duration of `1.0`, `t` is a fraction from 0 to 1; if a duration was given, `t` is the elapsed time measured against it. Progress outside the range is clamped to the endpoints.
 
 ### Usage
 `.at(t)`
 
 | Parameter | Type | Description |
 |---|---|---|
-| `t` | `float` | Progress — a 0–1 fraction, or elapsed seconds if a duration was set |
+| `t` | `float` | Progress — a 0–1 fraction, or elapsed time if a duration was set |
 
 ### Returns
 The eased value, of the same type as the endpoints.
@@ -89,6 +93,47 @@ while True:
   screen.text("{:.2f}".format(p), x - 8, 104)
 
   badge.update()
+```
+
+## start()
+Starts the tween timing itself from the clock, and returns the tween so you can chain it onto the constructor. From then on `now` gives the value at the current moment, `elapsed` the time since this call, and `done` whether the duration has run out. Calling it again restarts from now.
+
+The clock is the same millisecond one behind [`badge.ticks`](/api/badge.md#properties), so a self-timed tween needs its `duration` in milliseconds: `1500` for a second and a half.
+
+### Usage
+`.start()` \
+`.start(t)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `t` | `float` | *Optional.* Start from this clock value. A past value starts the tween part-way through, a future one delays it |
+
+### Returns
+The tween, so `tween(...).start()` works in one line.
+
+## stop()
+Stops the tween timing itself. `elapsed` holds at `0` and `done` reads `False` until the next `start()`. The endpoints and `at()` are untouched, so a stopped tween still works by hand.
+
+### Usage
+`.stop()`
+
+A one-shot is tidier self-timed than counted by hand. Here a ball drops on a loop, restarted each time it lands:
+
+```python
+# 1200 milliseconds, because the self-timing clock counts in them
+drop = tween(16, 92, 1200, tween.BOUNCE_OUT).start()
+
+def update():
+  screen.pen = color.black
+  screen.clear()
+
+  screen.pen = color.orange
+  screen.circle(80, drop.now, 6)
+
+  if drop.done:
+    drop.start()
+
+run(update)
 ```
 
 # Easing constants
