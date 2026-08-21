@@ -16,7 +16,7 @@ The `badge` class offers access to the badge's hardware. Using this class you ca
 | `ticks_delta` | `int` | The number of ticks (milliseconds) since the previous time `update()` was called. Useful for timing animations where the framerate isn't completely stable |
 | `uid` | `hex` | A unique ID for the badge |
 | `resolution` | `tuple` | The display resolution of the badge as a tuple containing pixel width and height as ints |
-| `update` | `function` | Allows you to set and switch between custom methods for the badge to replace `update()`. This allows you to, for example, flip between multiple screens, using a different method to draw each one |
+| `model` | `string` | Which badge this is: `"tufty"`, `"badger"` or `"blinky"` |
 
 # Buttons
 There are two main ways to handle button input.
@@ -126,17 +126,17 @@ run(update)
 # Program flow
 The functions in this section are for use if you're 'rolling your own' software without the use of Badgeware's app and menu system.
 
-## screen.update()
-This method is on the `screen` image rather than in `badge`, but is listed here for completeness. This will take the current contents of the `screen` image, and update the physical display. Used if you are creating your own program loop without using the `update()` ecosystem and instead creating your own program loop - if you're working within the Badgeware menu system, `screen.update()` is called automatically every update and you don't need to use this.
+## update()
+Shows the frame and sets up the next one, all in one call: it pushes the `screen` image to the physical display, then runs `badge.clear()` and `badge.poll()`. One call at the end of your loop is all a hand-written app needs.
 
 ## clear()
-This resets the framebuffer, clearing the `screen` image to the colour specified by `badge.default_clear()` and setting `screen.pen` to the colour specified in `badge.default_pen()`. If the former is set to `None` the screen will not be cleared.
+This resets the framebuffer, clearing the `screen` image to the colour specified by `badge.default_clear` and setting `screen.pen` to the colour specified in `badge.default_pen`. If the former is set to `None` the screen will not be cleared.
 
 ## poll()
 If you are creating your own program without the use of the Badgeware menu and app system, you will need to poll the badge using this method to get updated status on the buttons and other features. If you're working within the Badgeware menu system, `badge.poll()` is called automatically every update and you don't need to use this.
 
-## update()
-This is a convenient method which runs `screen.update()`, `badge.clear()` and `badge.poll()` together.
+## display.update()
+This one is on the global `display` object rather than in `badge`, but is listed here for completeness. It pushes the framebuffer to the physical display and does no more: the screen keeps what you drew and the button state is left where it was. Use it to show a frame you then want to read back or draw on top of. `badge.update()` is the one for the rest of the time.
 
 # Battery status
 Badgeware includes several methods to allow you to monitor the battery.
@@ -155,16 +155,19 @@ Returns a boolean reflecting whether the battery is currently charging.
 
 # Graphics
 
-## default_clear()
-This represents the colour the display will be cleared to before each `update()` loop. You can set this to `None` to disable clearing the screen between updates.
+## default_clear
+The colour the display will be cleared to before each `update()` loop. Assign `None` to disable clearing the screen between updates.
 
-## default_pen()
-The default colour that `screen.pen` will be set to at the start of every `update()`. This will not accept `None`, only a colour.
+## default_pen
+The colour `screen.pen` will be set to at the start of every `update()`. This will not accept `None`, only a colour.
 
 ## mode()
 Changes the display mode of the badge. You can apply more than one mode at once, where applicable, by using the pipe symbol, e.g. `badge.mode(HIRES | VSYNC)`.
 
+Call it with nothing to read the mode currently set.
+
 ### Usage
+`.mode()` \
 `.mode(modes)`
 
 | Parameter | Type | Description |
@@ -219,7 +222,7 @@ Gets and sets the brightness value for the rear lighting on the badge.
 | `level1`, `level2`, `level3`, `level4` | `float` | Brightness to set for each rear LED individually (0-1) |
 
 ### Returns
-`None`, or a tuple if no parameter specified.
+A list of the four brightness levels, whether or not you passed any.
 
 ## light_level() [TUFTY ONLY]
 Returns the level detected by the light sensor as a raw u16 value.
@@ -243,3 +246,49 @@ Returns True if the badge was woken up by a button being pressed, False otherwis
 
 ## woken_by_reset()
 Returns True if the badge was woken by being reset, False otherwise.
+
+## pressed_to_wake()
+Returns True if the given button was among those held down as the badge woke, False otherwise. More than one can be down at once and `wake_reason()` reports only the first, so use this to check for a particular button.
+
+### Usage
+`.pressed_to_wake(button)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `button` | `input` | Button constant |
+
+### Returns
+A boolean.
+
+```python-raw
+if badge.pressed_to_wake(BUTTON_A):
+  show_shortcut()
+```
+
+## wake_reason()
+Returns what woke the badge, as one of the constants below. `woken_by_button()` and `woken_by_reset()` cover the common cases; use this to tell an RTC alarm from a USB cable being plugged in. The constants live in the `powman` module, so `import powman` to compare against them.
+
+| Constant | Woken by |
+|---|---|
+| `WAKE_BUTTON_A`, `WAKE_BUTTON_B`, `WAKE_BUTTON_C`, `WAKE_BUTTON_UP`, `WAKE_BUTTON_DOWN` | That button. Only the first is reported if several were down — see `pressed_to_wake()` |
+| `WAKE_DOUBLETAP` | RESET double-tapped |
+| `WAKE_USER_SW` | The switch on the back of the board |
+| `WAKE_VBUS_DETECT` | USB power appearing |
+| `WAKE_RTC` | An alarm set on the [`rtc`](/api/rtc.md) |
+| `WAKE_ALARM` | The `duration` given to `sleep()` running out |
+| `WAKE_RESET` | RESET pressed |
+| `WAKE_WATCHDOG` | A watchdog reboot |
+| `WAKE_UNKNOWN` | None of the above |
+
+### Usage
+`.wake_reason()`
+
+### Returns
+An int matching one of the `powman.WAKE_*` constants.
+
+```python-raw
+import powman
+
+if badge.wake_reason() == powman.WAKE_RTC:
+  refresh_from_the_network()
+```
