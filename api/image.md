@@ -12,36 +12,97 @@ The display is itself an image — a global instance called `screen` that maps t
 # Creating images
 
 ## image()
-Returns an `image` with the specified width and height.
+Returns an `image` with the specified width and height, backed by a buffer it allocates itself. Pass in an existing buffer and it wraps that instead, without copying. `screen` is made this way, over the display's memory.
 
 ### Usage
-`image(w, h)`
+`image(w, h)` \
+`image(w, h, buffer)`
 
 | Parameter | Type | Description |
 |---|---|---|
 | `w`, `h` | `int` | Width and height of the image to create |
+| `buffer` | `bytearray` \| `memoryview` | *Optional.* Existing memory to draw into, which must hold `w` × `h` × 4 bytes |
 
 ### Returns
 `image`
 
 ## load()
-Loads an image from the specified file path and returns it as a new `image` object. To use it as a spritesheet, call [`spritesheet()`](#spritesheet) on the result.
+Loads a PNG, JPEG or GIF and returns it as a new `image` object. To use it as a spritesheet, call [`spritesheet()`](#spritesheet) on the result.
+
+Pass `w` and `h` to load a PNG or JPEG at a size of your choosing, decoding straight to that size. A GIF has to composite at its native size, so it ignores them.
+
+A GIF arrives as a sheet of composited frames, one column per frame, with the file's timings attached. Call [`spritesheet()`](#spritesheet) with no arguments to get that grid.
+
+A palettised PNG stays palettised: one byte a pixel, which saves a good deal of memory but can't be drawn into and can't be filtered. Check [`palette`](#palettised-images) if it matters.
 
 ### Usage
-`image.load(path)`
+`image.load(path)` \
+`image.load(path, w, h)` \
+`image.load(buffer)`
 
 | Parameter | Type | Description |
 |---|---|---|
 | `path` | `string` | Path to the image file to load |
+| `buffer` | `bytes` | The file's bytes, for artwork you've fetched or embedded |
+| `w`, `h` | `int` | *Optional.* Decode at this size. PNG and JPEG only |
 
 ### Returns
-An `image` object the dimensions of the file.
+An `image` object the dimensions of the file, or of `w` and `h` if you gave them.
 
 ```python
 sprite = image.load("/system/assets/skull.png")
 
 def update():
   screen.blit(sprite, vec2(10, 10))
+
+run(update)
+```
+
+## load_into()
+Decodes a PNG or JPEG into an image you already have, reusing its buffer. The file needs to match the image's size.
+
+Use it to page through a lot of artwork, a gallery or a set of frames too big to hold at once, without a fresh allocation each time.
+
+### Usage
+`.load_into(path)` \
+`.load_into(buffer)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `path` | `string` | Path to the image file to load |
+| `buffer` | `bytes` | The file's bytes |
+
+### Returns
+Nothing. The image's pixels are replaced.
+
+```python-raw
+frame = image(64, 64)
+
+for path in frames:
+  frame.load_into(path)      # same buffer every time
+  screen.blit(frame, vec2(48, 28))
+  badge.update()
+```
+
+# Palettised images
+A PNG saved with a colour table loads as one byte a pixel with that table attached, which saves a good deal of memory. Rewriting one entry in the table changes every pixel using it, with no redraw and no per-pixel work.
+
+The trade is that a palettised image is read-only. You can blit *from* it, but not draw into it, and the [filters](#filters) do nothing on it.
+
+`palette` is the table as a mutable sequence — index it, slice it, `len()` it, `list()` it, or take a `memoryview` of its bytes. It reads as `None` on an ordinary image, so `if img.palette:` works as a test just as `has_palette` does. Assigning a sequence of colours overwrites the table, and because a table is shared by pointer, every window and every sprite cut from the same sheet follows along.
+
+```python
+badges = image.load("/system/assets/skull.png")
+
+def update():
+  screen.pen = color.black
+  screen.clear()
+
+  # cycle the whole image through a hue by rewriting entry 1
+  if badges.palette:
+    badges.palette[1] = color.oklch(180, 110, badge.ticks / 8 % 256)
+
+  screen.blit(badges, vec2(48, 28))
 
 run(update)
 ```
@@ -77,10 +138,18 @@ deck = image.load("/system/assets/cards.png").spritesheet(13, 6)
 | `height` | `int` | Height of the image in pixels (read-only) |
 | `clip` | `rect` | Clipping rectangle — all drawing is restricted to its bounds |
 | `antialias` | `int` | Antialiasing level for vector drawing. One of `image.OFF`, `image.X2`, or `image.X4` |
+| `fill_rule` | `int` | Which parts of a vector shape count as inside. `image.EVEN_ODD` (default) or `image.NON_ZERO` — see [fill rule](#fill-rule) |
 | `alpha` | `int` | Global alpha for drawing, 0–255 (0 = transparent, 255 = opaque) |
 | `pen` | `color` \| `brush` | Colour or brush used for drawing operations |
 | `font` | `font` | Font used for drawing text |
 | `cursor` | `vec2` | Text caret — where the next `text()` called without a position will draw |
+| `raw` | `bytearray` | The backing buffer, by reference (read-only) — see [raw](#raw) |
+| `stride` | `int` | Bytes from the start of one row of `raw` to the next (read-only) |
+| `palette` | `sequence` \| `None` | The colour table of a palettised image, or `None` — see [palettised images](#palettised-images) |
+| `has_palette` | `bool` | Whether this image is palettised (read-only) |
+| `palette_size` | `int` | Entries in the colour table, `0` if there isn't one (read-only) |
+
+`alpha` is a property of the image being drawn **into**, not of a source: it weights everything that goes in, shapes, text and blits alike. Setting it on a sprite does nothing, since a source carries no alpha. The [filters](#filters) are the exception: they rewrite the pixels they read, and take a `strength`.
 
 # Drawing
 The drawing API provides a collection of fast, low-level primitives for rendering simple shapes directly into an image’s pixel buffer. These methods are designed for speed and simplicity, making them suitable for real-time graphics, UI elements, and procedural drawing. They round position and dimension values to the nearest pixel for speed, and are not antialiased.
@@ -164,6 +233,32 @@ def update():
   r = rect(70, 50, 40, 40)
   screen.pen = color.red
   screen.rectangle(r)
+
+run(update)
+```
+
+## hspan() / vspan()
+Fills a single row or column of pixels in the current pen: `hspan()` draws `w` pixels across, `vspan()` draws `h` pixels down. They skip the span buffer the other primitives go through, so they're the quickest way to fill a shape line by line: a raycaster's walls, a bar chart, a scanline effect.
+
+### Usage
+`.hspan(x, y, w)` \
+`.vspan(x, y, h)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `x`, `y` | `int` | Where the run starts |
+| `w` | `int` | Length of the run across, for `hspan()` |
+| `h` | `int` | Length of the run down, for `vspan()` |
+
+```python
+import math
+
+def update():
+  # a column per x, height from a sine wave
+  for x in range(0, 160, 2):
+    h = int(40 + 30 * math.sin((x + badge.ticks / 20) / 12))
+    screen.pen = color.oklch(160, 100, x)
+    screen.vspan(x, 120 - h, h)
 
 run(update)
 ```
@@ -265,12 +360,14 @@ Vector drawing uses the currently selected brush for both stroke and fill unless
 ## shape()
 Draws a vector shape (see `shape`) to the image using the current brush and antialiasing settings.
 
+Pass a list and every shape in it is drawn in the current brush, in one call.
+
 ### Usage
 `.shape(s)`
 
 | Parameter | Type | Description |
 |---|---|---|
-| `s` | `shape` | The shape to draw |
+| `s` | `shape` \| `list` | The shape to draw, or a list of them |
 
 ```python
 def update():
@@ -290,6 +387,39 @@ def update():
 
 run(update)
 ```
+
+## shapes()
+Draws a list of shapes, with a brush per shape. Every entry is either a bare `shape`, drawn in the current pen, or a `(shape, brush)` tuple. A `color` works in place of the brush.
+
+The list is walked in C, so the per-shape cost of a MicroPython call and a `pen` assignment goes away. Worth it from a few tens of shapes a frame, as a tile map or a particle system draws.
+
+### Usage
+`.shapes(entries)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `entries` | `list` | Each entry a `shape`, or a `(shape, brush)` tuple |
+
+```python
+# a row of pips, alternating colours, drawn in one call
+pips = []
+for i in range(12):
+  pips.append((shape.circle(14 + i * 12, 60, 5),
+               color.cyan if i % 2 else color.grape))
+
+def update():
+  screen.antialias = image.X2
+  screen.shapes(pips)
+
+run(update)
+```
+
+## Fill rule
+The `fill_rule` property sets which parts of a shape count as inside when its contours overlap, and applies to vector drawing only.
+
+`image.EVEN_ODD`, the default, toggles at every edge it crosses, so an inner contour punches a hole in an outer one. The holes in [`shape.custom()`](/api/shape.md#custom) and the band from [`stroke()`](/api/shape.md#stroke) rely on it.
+
+`image.NON_ZERO` counts winding direction instead, filling anywhere the windings don't cancel. That fills those same holes solid, and suits a self-crossing outline that should read as one mass.
 
 ## Antialiasing
 The `antialias` property sets the antialiasing level applied to vector drawing. It also applies to text drawn with vector fonts, but has no effect on the raster primitives or pixel fonts.
@@ -1037,8 +1167,8 @@ Depending on the parameters provided, `blit` can:
 ### Usage
 `.blit(source, x, y)` \
 `.blit(source, p)` \
-`.blit(source, rect)` \
-`.blit(source, source_rect, dest_rect)`
+`.blit(source, rect, filter)` \
+`.blit(source, source_rect, dest_rect, filter)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -1048,6 +1178,7 @@ Depending on the parameters provided, `blit` can:
 | `rect` | `rect` | Destination rectangle to blit into — the source image is scaled to fit |
 | `source_rect` | `rect` | Source rectangle to blit from (crop region) |
 | `dest_rect` | `rect` | Destination rectangle to blit into — if a different size to `source_rect`, the blit is scaled |
+| `filter` | `int` | *Optional.* How the source is sampled when it's being scaled — see [filtering](#filtering). Defaults to `image.NEAREST` |
 
 > Note: If the width and height of the destination rectangle are negative then the blit will flip vertically and/or horizontally!
 
@@ -1071,8 +1202,8 @@ run(update)
 Blit (copy) a single span from a source image into this image, sampling along the way using UV texture coordinates. These are low-level helpers mainly used for scaled or warped texture rendering, where an image is drawn one line at a time — `blit_vspan()` draws a vertical span (column), `blit_hspan()` a horizontal one (row).
 
 ### Usage
-`.blit_vspan(source, x, y, c, u0, v0, u1, v1)` \
-`.blit_hspan(source, x, y, c, u0, v0, u1, v1)`
+`.blit_vspan(source, x, y, c, u0, v0, u1, v1, filter)` \
+`.blit_hspan(source, x, y, c, u0, v0, u1, v1, filter)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -1081,6 +1212,7 @@ Blit (copy) a single span from a source image into this image, sampling along th
 | `c` | `int` | The length of the span (number of pixels) to draw |
 | `u0`, `v0` | `float` | The start UV coordinate for sampling |
 | `u1`, `v1` | `float` | The end UV coordinate for sampling |
+| `filter` | `int` | *Optional.* How the source is sampled — see [filtering](#filtering). Defaults to `image.NEAREST` |
 
 UV coordinates are expressed in the range 0..1 across the width/height of the source image.
 
@@ -1112,6 +1244,54 @@ def update():
 run(update)
 ```
 
+## Filtering
+When a blit is scaled, the destination pixels fall between the source ones, and `filter` sets how they're sampled.
+
+| Constant | Sampling |
+|---|---|
+| `image.NEAREST` | Takes the closest source pixel. The default, the fastest, and right for pixel art |
+| `image.BILINEAR` | Blends the four surrounding pixels. Smooth, and a good deal slower |
+| `image.BICUBIC` | Blends a wider neighbourhood. Smoother again, and slower again |
+
+Scaling up pixel art with anything but `NEAREST` will blur it into mush; scaling a photograph down looks much better with `BILINEAR`. Neither costs anything at 1:1.
+
+# Batching
+
+## batch()
+Runs a list of drawing commands in a single C loop. Each command is a tuple of a method name and its arguments — `("circle", vec2(80, 60), 10)` — and they're carried out in order, on this image, exactly as the individual calls would be.
+
+It saves the interpreter overhead of one MicroPython call per command. The same idea as [`shapes()`](#shapes), across the whole drawing API. Build the list once, outside your loop, if it doesn't change from frame to frame.
+
+A two-part tuple can also assign a property, so `("pen", color.red)` sets the pen mid-batch. Note the comma in a no-argument command like `("clear",)`: without it that's a string, not a tuple, and `batch()` raises a `TypeError`.
+
+`batch()` accepts these commands: `clear`, `rectangle`, `line`, `circle`, `triangle`, `put`, `blur`, `dither`, `shape`, `text`, `blit`, `blit_vspan` and `blit_hspan`. Anything else raises a `ValueError`. Arguments are positional only, so `text()` takes no `align` or `transform` here.
+
+### Usage
+`.batch(commands)`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `commands` | `list` | Each entry a `(method, *args)` tuple, or `(property, value)` to assign one |
+
+### Returns
+Nothing.
+
+```python
+# built once: a grid of pips with a caption, as one call per frame
+commands = [("pen", color.navy), ("clear",)]
+for y in range(4):
+  for x in range(10):
+    commands.append(("pen", color.oklch(120 + y * 30, 90, x * 24)))
+    commands.append(("circle", vec2(12 + x * 15, 20 + y * 20), 5))
+commands.append(("pen", color.white))
+commands.append(("text", "batched", vec2(50, 100)))
+
+def update():
+  screen.batch(commands)
+
+run(update)
+```
+
 # Other
 
 ## window()
@@ -1139,5 +1319,10 @@ A bytearray that references the start of the image’s backing buffer (advanced/
 
 - Pixels are stored as 4 bytes per pixel: R, G, B, A
 - Values are premultiplied alpha (i.e. R/G/B have already been multiplied by A)
+- Rows are `stride` bytes apart, so a pixel is at `y * stride + x * 4`
+
+`stride` is the one to be careful with. A view inherits it from the image it came from, so a [`window()`](#window) or a sprite cut from a spritesheet strides by the whole sheet's pitch, not by the width of the view. Working out the offset as `y * width * 4` is right on a full image and wrong on every view, so use `stride`.
+
+A palettised image is one byte a pixel, and those bytes are indices into [`palette`](#palettised-images).
 
 > Note: Accessing pixels via the `raw` buffer from MicroPython can be slow. If you need per-pixel work, consider MicroPython’s @micropython.viper or @micropython.native decorators for a substantial speed boost. 🚀

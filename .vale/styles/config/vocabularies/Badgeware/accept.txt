@@ -25,6 +25,7 @@ greyscale
 Lores
 metaballs?
 mip
+palettis(e|ed|ing)?
 photonegative
 pixelated
 posteris(e|ed|ing|ation)
