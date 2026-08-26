@@ -24,28 +24,26 @@ The `wifi` module reads `WIFI_SSID` and `WIFI_PASSWORD` from here automatically.
 
 # Connecting to Wi-Fi
 
-Connecting is done through the `wifi` module. Importantly, connecting **doesn't happen instantly** - it can take a few seconds. You kick off the connection with `wifi.connect()`, then call `wifi.tick()` repeatedly until it reports you're online:
+Connecting is done through the `wifi` module. Importantly, connecting **doesn't happen instantly** - it can take a few seconds. Call `wifi.connect()` repeatedly in a loop until it reports you're online.
 
 ```python-raw
 import wifi
 
-wifi.connect()                  # start connecting, using the details from secrets.py
-
-while not wifi.is_connected():
-    wifi.tick()                 # keep the attempt moving until we're online
+while not wifi.connect():       # keep calling connect() until we're online
+    pass                        # you can do other things here whilst waiting to connect - such as displaying a 'connecting to wifi' message
 
 print("Connected! IP address:", wifi.ip())
 ```
 
-`wifi.connect()` starts the connection off, and `wifi.tick()` drives it along - handling retries and timeouts - so you call it in a loop until `wifi.is_connected()` returns `True`. With no arguments it uses the details from `secrets.py`, but you can also pass a network name and password directly, or tune the timeout and retry count - see the [`wifi` API reference](../api/wifi.md) for the full list of arguments.
+`wifi.connect()` is non-blocking, so it's also safe to call from within your main loop. It handles retries and timeouts internally, and returns `True` once connected. With no arguments it uses the details from `secrets.py`, but you can also pass a network name and password directly, or tune the timeout and retry count - see the [`wifi` API reference](/api/wifi.md) for the full list of arguments.
 
-Once you're finished with the network, `wifi.disconnect()` drops the connection and powers the radio down. It's worth doing when you no longer need to be online, since Wi-Fi uses a fair bit of battery. The module can also report the current connection status and your network addresses - the [API reference](../api/wifi.md) covers those too.
+Once you're finished with the network, `wifi.disconnect()` drops the connection and powers the radio down. It's worth doing when you no longer need to be online, since Wi-Fi uses a fair bit of battery. The module can also report the current connection status and your network addresses - the [API reference](/api/wifi.md) covers those too.
 
 # Fetching data from the web
 
 Having a game loop-style application isn't always sunshine and roses. Sometimes you want to do something that takes time, like fetch some data from a server, and you're stuck trying to hide the delay somewhere nobody will notice.
 
-To make this easier we've include `fetch`, a handy little library that will trot off and fetch your earthquake list or weather data while you're busy doing something else. It slices the cost of connecting, negotiating and fetching data over your loop rather than stalling it for one big long block:
+To make this easier we've included `fetch`, a handy little library that will trot off and fetch your earthquake list or weather data while you're busy doing something else. It slices the cost of connecting, negotiating and fetching data over your loop rather than stalling it for one big long block:
 
 ```python-raw
 import fetch
@@ -57,7 +55,7 @@ while True:
         data = fetch.json()
 ```
 
-To make `fetch` do it's work, you need to ask if it's done with `if fetch` or `if fetch.done`.
+To make `fetch` do its work, you need to ask if it's done with `if fetch` or `if fetch.done`.
 
 If you're fetching a larger file or an image, you might want to fetch it to disk like so:
 
