@@ -9,14 +9,14 @@ publish: true
 
 The `wifi` module handles connecting Badgeware to a wireless network. It wraps up the underlying MicroPython `network` calls - setting up the interface, connecting, retrying and timing out - so apps can get online in a couple of lines.
 
-Connecting is non-blocking: `connect()` starts the attempt and `tick()` moves it along, so your app can keep drawing while it waits. With no arguments, `connect()` reads `WIFI_SSID` and `WIFI_PASSWORD` from `secrets.py`.
+Connecting is non-blocking: calling `connect()` repeatedly both starts the attempt and moves it along, so your app can keep drawing while it waits. With no arguments, `connect()` reads `WIFI_SSID` and `WIFI_PASSWORD` from `secrets.py`.
 
-For a walkthrough of getting online and making requests, see the [Networking guide](../guides/networking.md).
+For a walkthrough of getting online and making requests, see the [Networking guide](/guides/networking.md).
 
 # Methods
 
 ## connect()
-Begins connecting to a Wi-Fi network, and reports whether the connection is up yet. Called with no arguments it uses the network details from `secrets.py`.
+Attempts to connect to a Wi-Fi network, and reports whether the connection is up yet. Called with no arguments it uses the network details from `secrets.py`.
 
 ### Usage
 `wifi.connect()` \
@@ -29,12 +29,6 @@ Begins connecting to a Wi-Fi network, and reports whether the connection is up y
 | `psk` | `str` | *Optional.* The network password. Defaults to `WIFI_PASSWORD` from `secrets.py`. |
 | `timeout` | `int` | *Optional.* Seconds to wait for each connection attempt. Default 60. |
 | `retries` | `int` | *Optional.* Number of times to retry before giving up. Default 5. |
-
-### Returns
-`True` if Badgeware is connected, otherwise `False`.
-
-## tick()
-Advances an in-progress connection, handling retries and timeouts. Call this regularly (for example once per frame) while waiting to connect.
 
 ### Returns
 `True` if Badgeware is connected, otherwise `False`.
