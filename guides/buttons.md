@@ -85,6 +85,53 @@ while True:
   badge.update()
 ```
 
+## Badger: read the buttons without redrawing
+
+Calling `badge.update()` to read the buttons works well on Tufty and Blinky, where the refresh is basically instant. Badger's E-Paper screen is slower, though - redrawing every iteration causes flickering and risks missing button events.
+
+`badge.poll()` polls the button state without touching the display, so you can call it every iteration and reserve `badge.update()` for when you actually need to redraw the screen. 
+
+Here's an example that keeps a running log of **pressed** and **released** events, only redrawing when a new one comes in:
+
+```python-raw
+screen.font = font.nope
+screen.pen = color.black
+
+# each button constant, paired with the label to show for it
+BUTTONS = [
+  (BUTTON_A,    "A"),
+  (BUTTON_B,    "B"),
+  (BUTTON_C,    "C"),
+  (BUTTON_UP,   "UP"),
+  (BUTTON_DOWN, "DOWN"),
+]
+
+log = ["press a button"]     # recent events, oldest first
+redraw = True                # draw once at the start
+
+while True:
+  badge.poll()     # refreshes button state without a screen redraw
+
+  for button, name in BUTTONS:
+    if badge.pressed(button):
+      log.append(name + " pressed")
+      redraw = True
+    if badge.released(button):
+      log.append(name + " released")
+      redraw = True
+
+  if not redraw:
+    continue     # nothing changed, skip the slow screen update
+
+  # draw the most recent lines, oldest at the top
+  log = log[-7:]
+  for i, line in enumerate(log):
+    screen.text(line, 10, 20 + i * 20)
+
+  badge.update()   # only refresh when something changed
+  redraw = False
+```
+
 # Examples
 
 ## A simple menu
