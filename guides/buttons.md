@@ -93,7 +93,7 @@ Calling `badge.update()` to read the buttons works well on Tufty and Blinky, whe
 
 Here's an example that keeps a running log of **pressed** and **released** events, only redrawing when a new one comes in:
 
-```python-raw
+```python
 screen.font = font.nope
 screen.pen = color.black
 
