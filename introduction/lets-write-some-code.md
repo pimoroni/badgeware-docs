@@ -11,7 +11,7 @@ Now you've met the hardware, let's build a small app one step at a time. A Badge
 
 We'll write each part as its own little **function** — one for the loading screen, one for the menu, one for the action — then wire them together at the end. Breaking up your code this way keeps each piece simple, and the final program ends up reading almost like a to-do list.
 
-> This one's written for **Tufty** and its full-colour screen. The ideas carry across to **Badger** and **Blinky** too, but the specifics won't — Badger's e-paper redraws differently, and Blinky's LED matrix is a lower resolution.
+> This one's written for **Tufty** and its full-colour screen. The ideas carry across to **Badger** and **Blinky** too, but the specifics won't — Badger's e-paper [redraws differently](/guides/buttons.md#badger-read-the-buttons-without-redrawing), and Blinky's LED matrix is a lower resolution.
 
 # 1. Basic setup
 
