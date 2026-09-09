@@ -9,15 +9,27 @@ publish: false
 So having followed the previous tutorial, you should have a working, if ugly and speedy, platformer made of coloured blocks. Let's get it looking really good. First of all, here's the code you should have in your app by the end of the last tutorial:
 
 ```simulator
-import qwstpad
 import random
+import qwstpad
+import time
 
 
 class game_state:
     TITLE = 0
     GAMEPLAY = 1
     DEATH_ANIM = 2
-    GAMEOVER = 3
+    GAME_OVER = 3
+
+
+class game:
+    platforms = []
+    acorns = []
+    controls = {}
+    gamepad = None
+    foreground_scroll_speed = 4
+    last_frame = 0
+    current_game_state = game_state.TITLE
+    score = 0
 
 
 class player_base:
@@ -68,7 +80,7 @@ class player_base:
 
     def is_airborne(self):
         airborne = True
-        for platform in platforms:
+        for platform in game.platforms:
             if self.is_standing(platform):
                 airborne = False
         self.airborne = airborne
@@ -76,29 +88,31 @@ class player_base:
     def update(self):
         self.is_airborne()
 
-        if self.airborne or self.dead or controls["DROP"]:
+        if self.airborne or self.dead or game.controls["DROP"]:
             self.vy += 1
         else:
-            if controls["JUMP"]:
+            if game.controls["JUMP"]:
                 self.vy = -10
 
-            if controls["JUMP_RIGHT"]:
+            if game.controls["JUMP_RIGHT"]:
                 self.vx = max(self.vx, 3)
 
-            elif controls["JUMP_LEFT"]:
+            elif game.controls["JUMP_LEFT"]:
                 self.vx = min(self.vx, -3)
 
-            elif controls["MOVE_RIGHT"]:
+            elif game.controls["MOVE_RIGHT"]:
                 self.vx += 1.5
 
-            elif controls["MOVE_LEFT"]:
+            elif game.controls["MOVE_LEFT"]:
                 self.vx -= 1.5
 
-            if self.vx > 0: self.vx -= 0.5
-            elif self.vx < 0: self.vx += 0.5
+            if self.vx > 0:
+                self.vx -= 0.5
+            elif self.vx < 0:
+                self.vx += 0.5
 
         if not self.dead:
-            for platform in platforms:
+            for platform in game.platforms:
                 if self.is_landing(platform):
                     self.b = platform.y
                     self.vy = 0
@@ -151,15 +165,13 @@ class platform_base:
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
 
     def update(self):
-        global score
-
-        self.x -= foreground_scroll_speed
+        self.x -= game.foreground_scroll_speed
 
         if self.r <= 0:
             self.reset()
             while self.check_collisions():
                 self.reset()
-            score += 1
+            game.score += 1
 
         self.draw()
 
@@ -169,8 +181,7 @@ class platform_base:
         self.w = random.randint(int(screen.width / 2), screen.width)
 
     def check_collisions(self):
-        global platforms
-        for platform in platforms:
+        for platform in game.platforms:
             if platform.id == self.id:
                 continue
             if self.bounding_box.intersects(platform.bounding_box):
@@ -209,131 +220,121 @@ class acorn_base:
 
 
 def draw_score():
-    global score
-    screen.text(str(score), 0, 0)
+    screen.text(str(game.score), 0, 0)
 
 
 def init_gamepad():
-    global gamepad
     gamepads = qwstpad.Gamepadhelper()
     for i in gamepads.pads:
         if i is not None:
-            gamepad = i
-            return i
-    return None
+            game.gamepad = i
+            return
+    game.gamepad = None
+    return
 
 
 def parse_controls():
-    global controls, gamepad
-
-    if gamepad:
+    if game.gamepad:
         try:
-            gamepad.update_buttons()
+            game.gamepad.update_buttons()
         except OSError:
-            gamepad = init_gamepad()
+            init_gamepad()
     else:
-        gamepad = init_gamepad()
+        init_gamepad()
 
-    if gamepad:
-        controls["MOVE_LEFT"] = gamepad.held("L")
-        controls["MOVE_RIGHT"] = gamepad.held("R")
-        controls["DROP"] = gamepad.held("D") and gamepad.pressed("A")
-        controls["JUMP"] = gamepad.pressed("A")
-        controls["JUMP_LEFT"] = gamepad.held("L") and gamepad.pressed("A")
-        controls["JUMP_RIGHT"] = gamepad.held("R") and gamepad.pressed("A")
-        controls["ANY_KEY"] = gamepad.pressed()
+    if game.gamepad:
+        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
+        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
+        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
+        game.controls["JUMP"] = game.gamepad.pressed("A")
+        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
+        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
+        game.controls["ANY_KEY"] = game.gamepad.pressed()
     else:
-        controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        controls["MOVE_RIGHT"] = badge.held(BUTTON_B)
-        controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_C)
-        controls["JUMP"] = badge.pressed(BUTTON_C)
-        controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_C)
-        controls["JUMP_RIGHT"] = badge.held(BUTTON_B) and badge.pressed(BUTTON_C)
-        controls["ANY_KEY"] = badge.pressed()
+        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
+        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
+        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
+        game.controls["JUMP"] = badge.pressed(BUTTON_B)
+        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
+        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
+        game.controls["ANY_KEY"] = badge.pressed()
 
 
 def init_platforms():
-    global platforms
-    platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
+    game.platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
 
-
-gamepad = None
-controls = {}
-
-foreground_scroll_speed = 4
-
-player = player_base(20, 0)
-platforms = []
-acorns = []
-current_game_state = game_state.TITLE
-score = 0
-
-init_gamepad()
-init_platforms()
 
 def title_loop():
-    global current_game_state
-
     screen.text("Title screen", 0, 0)
 
-    if controls["ANY_KEY"]:
-        current_game_state = game_state.GAMEPLAY
+    if game.controls["ANY_KEY"]:
+        game.current_game_state = game_state.GAMEPLAY
+
 
 def gameplay_loop():
-    global current_game_state
-
     player.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.update()
 
     draw_score()
 
     if player.b >= screen.height:
         player.death()
-        current_game_state = game_state.DEATH_ANIM
+        game.current_game_state = game_state.DEATH_ANIM
+
 
 def death_anim_loop():
-    global current_game_state
-
     player.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.draw()
 
     draw_score()
 
     if player.b >= screen.height:
-        current_game_state = game_state.GAMEOVER
+        game.current_game_state = game_state.GAME_OVER
+
 
 def game_over_loop():
-    global current_game_state, score
-
     screen.text("Game Over screen", 0, 0)
 
-    if controls["ANY_KEY"]:
+    if game.controls["ANY_KEY"]:
         player.reset()
         init_platforms()
-        score = 0
-        current_game_state = game_state.TITLE
-
-def update():
-    parse_controls()
-
-    if current_game_state == game_state.TITLE:
-        title_loop()
-    elif current_game_state == game_state.GAMEPLAY:
-        gameplay_loop()
-    elif current_game_state == game_state.DEATH_ANIM:
-        death_anim_loop()
-    elif current_game_state == game_state.GAMEOVER:
-        game_over_loop()
+        game.score = 0
+        game.current_game_state = game_state.TITLE
 
 
-run(update)
+player = player_base(20, 0)
+init_gamepad()
+init_platforms()
+
+while True:
+    ticks = time.ticks_ms()
+    frametime = ticks - game.last_frame
+
+    if frametime >= 33:
+        badge.clear()
+        badge.poll()
+        parse_controls()
+
+        if game.current_game_state == game_state.TITLE:
+            title_loop()
+        elif game.current_game_state == game_state.GAMEPLAY:
+            gameplay_loop()
+        elif game.current_game_state == game_state.DEATH_ANIM:
+            death_anim_loop()
+        elif game.current_game_state == game_state.GAME_OVER:
+            game_over_loop()
+
+        display.update()
+
+        game.last_frame = ticks
+
 ```
 
-If you've got that in `__init__.py` in your app folder, along with an `icon.png` and an `assets` folder, you're ready to go.
+If you've got that in `__init__.py` in your app folder, along with an `icon.png`, `qwstpad.py` and an `assets` folder, you're ready to go.
 
 # The Background
 
@@ -343,7 +344,7 @@ The first thing we're going to add is a background, and for that we'll need artw
 
 You might notice that this and the other images we'll get into look a lot like the ones already found on your Tufty in the `assets/squirrel-sprites` folder, and they are indeed very similar. But we've made some alterations to those files for use in this game, so you'll want to use the versions provided here. For example, the above background image is extended by 20 pixels and seamlessly tiles with itself horizontally. That's a really good thing for this game, as we're going to have the background scroll past at a different rate to the platforms, to give a parallax effect.
 
-To do that, we'll first load in the image. We'll need to do this with quite a few assets, so let's load them in the same place, right after we've defined all the methods and before initialising the gamepad and controls:
+To do that, we'll first load in the image. We'll need to do this with quite a few assets, so let's load them all in in the same place, in the `game` class:
 
 ```python-raw
 background = image.load("assets/background.png")
@@ -353,125 +354,114 @@ Now, let's create a method to draw that background. We'll put it right before `d
 
 ```python-raw
 def draw_background():
-    screen.blit(background, vec2(0, 0))
+    screen.blit(game.background, vec2(0, 0))
 ```
 
-Then finally we can call that in the gameplay loop method, right after the globals:
+Then finally we can call that in the gameplay loop method, right at the start since we want it drawn first:
 
 ```python-raw
 def gameplay_loop():
-    global current_game_state
 
     draw_background()
-
     player.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.update()
 
     draw_score()
 
     if player.b >= screen.height:
         player.death()
-        current_game_state = game_state.DEATH_ANIM
+        game.current_game_state = game_state.DEATH_ANIM
 ```
 
 ## Scrolling the background
 
-Now you'll see that the background displays behind the action when you're playing. But we don't want it to be static like that. Let's define a scroll speed for the background - the platforms are moving past at 4 pixels every frame, so let's have the background go at a leisurely one pixel per frame. We'll define this right after the foreground scroll speed. At the same time, we'll also want to put in a variable that keeps track of how much the background has scrolled, so we can loop it:
+Now you'll see that the background displays behind the action when you're playing. But we don't want it to be static like that. Let's define a scroll speed for the background - the platforms are moving past at 4 pixels every frame, so let's have the background go at a leisurely one pixel per frame. We'll define this, once again, in the `game` class. At the same time, we'll also want to put in a variable that keeps track of how much the background has scrolled, so we can loop it:
 
 ```python-raw
-background = image.load("assets/background.png")
-
-gamepad = None
-controls = {}
-
-foreground_scroll_speed = 4
-background_scroll_speed = 1
-background_scroll_amount = 0
-
-player = player_base(20, 0)
-platforms = []
-acorns = []
-current_game_state = game_state.TITLE
-score = 0
+class game:
+    platforms = []
+    acorns = []
+    controls = {}
+    gamepad = None
+    foreground_scroll_speed = 4
+    last_frame = 0
+    current_game_state = game_state.TITLE
+    score = 0
+    background = image.load("assets/background.png")
+    background_scroll_speed = 1
+    background_scroll_amount = 0
 ```
 
-And we'll alter `draw_background()` to utilise those:
+That class is starting to look a bit unwieldy. Let's rearrange those lines and add some gaps so we can better see what's going on:
+
+```python-raw
+class game:
+    background = image.load("assets/background.png")
+    platforms = []
+    acorns = []
+    controls = {}
+    gamepad = None
+
+    foreground_scroll_speed = 4
+    background_scroll_speed = 1
+    background_scroll_amount = 0
+
+    last_frame = 0
+    current_game_state = game_state.TITLE
+
+    score = 0
+```
+
+Now we've got them separated out into basic gameplay elements, settings for gameplay, game flow variables and our score.
+
+Anyway, now we've made our scrolling variables we'll alter `draw_background()` to utilise those. We're still painting the background in, but offset horizontally by `game.background_scroll_amount` pixels. Before that we're changing that value by the background scroll speed, subtracting so that it moves left:
 
 ```python-raw
 def draw_background():
-    global background_scroll_amount
-
-    background_scroll_amount -= background_scroll_speed
-
-    screen.blit(background, vec2(background_scroll_amount, 0))
+    game.background_scroll_amount -= game.background_scroll_speed
+    screen.blit(game.background, vec2(game.background_scroll_amount, 0))
 ```
 
-Now you'll see that the background scrolls, but of course it's just scrolling off the edge of the screen. You might notice as well how much the game speeds up once the background is off the screen - that's the processing cost of using full screen images, but as long as it stays smooth and consistent that's the most important thing we're looking for.
-
-We just need a single line of code to get the scroll to repeat - if we use the modulo operator (`%`), we can get it to loop around every time `background_scroll_amount` goes below minus 180, the width of the background image.
+Now you'll see that the background scrolls, but of course it's just scrolling off the edge of the screen. We just need a single line of code to get the scroll to repeat - if we use the modulo operator (`%`), we can get it to loop around every time `background_scroll_amount` goes below minus 180, the width of the background image.
 
 ```python-raw
 def draw_background():
-    global background_scroll_amount
-
-    background_scroll_amount -= background_scroll_speed
-    background_scroll_amount %= -background.width
-
-    screen.blit(background, vec2(background_scroll_amount, 0))
+    game.background_scroll_amount -= game.background_scroll_speed
+    game.background_scroll_amount %= -game.background.width
+    screen.blit(game.background, vec2(game.background_scroll_amount, 0))
 ```
 
 Now it's repeating, but obviously still scrolling off the edge of the screen. So what to do? Simple! Draw a second copy of the background exactly where the first one ends.
 
 ```python-raw
 def draw_background():
-    global background_scroll_amount
+    background_a_pos = game.background_scroll_amount
+    background_b_pos = game.background_scroll_amount + game.background.width
 
-    background_a_pos = background_scroll_amount
-    background_b_pos = background_scroll_amount + background.width
+    game.background_scroll_amount -= game.background_scroll_speed
+    game.background_scroll_amount %= -game.background.width
 
-    background_scroll_amount -= background_scroll_speed
-    background_scroll_amount %= -background.width
-
-    screen.blit(background, vec2(background_a_pos, 0))
-    screen.blit(background, vec2(background_b_pos, 0))
+    screen.blit(game.background, vec2(background_a_pos, 0))
+    screen.blit(game.background, vec2(background_b_pos, 0))
 ```
 
-Great, that's a repeating scrolling background. But you'll notice that it only appears in the gameplay loop, as soon as you die it'll disappear. So let's call the background method in the death animation loop.
-
-```python-raw
-def death_anim_loop():
-    global current_game_state
-
-    draw_background()
-
-    player.update()
-
-    for platform in platforms:
-        platform.draw()
-
-    draw_score()
-
-    if player.b >= screen.height:
-        current_game_state = game_state.GAMEOVER
-```
+Great, that's a repeating scrolling background. But you'll notice that it only appears in the gameplay loop, as soon as you die it'll disappear. So let's call the background method in the death animation loop, right at the top. Try running it now and you'll see we have a background on the death animation.
 
 That's good, but the platforms stop scrolling when you die and right now the background keeps on going. There's an easy fix for that, we'll just add a parameter to `draw_background()` to just set whether we want it to scroll or not. So we'll alter `draw_background()` as follows:
 
 ```python_raw
 def draw_background(scroll=True):
-    global background_scroll_amount
-
-    background_a_pos = background_scroll_amount
-    background_b_pos = background_scroll_amount + background.width
+    background_a_pos = game.background_scroll_amount
+    background_b_pos = game.background_scroll_amount + game.background.width
 
     if scroll:
-        background_scroll_amount -= background_scroll_speed
-        background_scroll_amount %= -background.width
+        game.background_scroll_amount -= game.background_scroll_speed
+        game.background_scroll_amount %= -game.background.width
 
-    screen.blit(background, vec2(background_a_pos, 0))
-    screen.blit(background, vec2(background_b_pos, 0))
+    screen.blit(game.background, vec2(background_a_pos, 0))
+    screen.blit(game.background, vec2(background_b_pos, 0))
 ```
 
 We've set `scroll` to default to True, so we only need to include it when called if we _don't_ want the background to scroll. The method then just checks `scroll` and only moves the background if it's True. Then all we have to do is change the line in our death animation loop:
@@ -483,15 +473,33 @@ We've set `scroll` to default to True, so we only need to include it when called
 And we're done - the background stops scrolling when the platform does. Here's the full code up to now.
 
 ```python
-import qwstpad
 import random
+import qwstpad
+import time
 
 
 class game_state:
     TITLE = 0
     GAMEPLAY = 1
     DEATH_ANIM = 2
-    GAMEOVER = 3
+    GAME_OVER = 3
+
+
+class game:
+    background = image.load("assets/background.png")
+    platforms = []
+    acorns = []
+    controls = {}
+    gamepad = None
+
+    foreground_scroll_speed = 4
+    background_scroll_speed = 1
+    background_scroll_amount = 0
+
+    last_frame = 0
+    current_game_state = game_state.TITLE
+
+    score = 0
 
 
 class player_base:
@@ -542,7 +550,7 @@ class player_base:
 
     def is_airborne(self):
         airborne = True
-        for platform in platforms:
+        for platform in game.platforms:
             if self.is_standing(platform):
                 airborne = False
         self.airborne = airborne
@@ -550,29 +558,31 @@ class player_base:
     def update(self):
         self.is_airborne()
 
-        if self.airborne or self.dead or controls["DROP"]:
+        if self.airborne or self.dead or game.controls["DROP"]:
             self.vy += 1
         else:
-            if controls["JUMP"]:
+            if game.controls["JUMP"]:
                 self.vy = -10
 
-            if controls["JUMP_RIGHT"]:
+            if game.controls["JUMP_RIGHT"]:
                 self.vx = max(self.vx, 3)
 
-            elif controls["JUMP_LEFT"]:
+            elif game.controls["JUMP_LEFT"]:
                 self.vx = min(self.vx, -3)
 
-            elif controls["MOVE_RIGHT"]:
+            elif game.controls["MOVE_RIGHT"]:
                 self.vx += 1.5
 
-            elif controls["MOVE_LEFT"]:
+            elif game.controls["MOVE_LEFT"]:
                 self.vx -= 1.5
 
-            if self.vx > 0: self.vx -= 0.5
-            elif self.vx < 0: self.vx += 0.5
+            if self.vx > 0:
+                self.vx -= 0.5
+            elif self.vx < 0:
+                self.vx += 0.5
 
         if not self.dead:
-            for platform in platforms:
+            for platform in game.platforms:
                 if self.is_landing(platform):
                     self.b = platform.y
                     self.vy = 0
@@ -625,15 +635,13 @@ class platform_base:
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
 
     def update(self):
-        global score
-
-        self.x -= foreground_scroll_speed
+        self.x -= game.foreground_scroll_speed
 
         if self.r <= 0:
             self.reset()
             while self.check_collisions():
                 self.reset()
-            score += 1
+            game.score += 1
 
         self.draw()
 
@@ -643,8 +651,7 @@ class platform_base:
         self.w = random.randint(int(screen.width / 2), screen.width)
 
     def check_collisions(self):
-        global platforms
-        for platform in platforms:
+        for platform in game.platforms:
             if platform.id == self.id:
                 continue
             if self.bounding_box.intersects(platform.bounding_box):
@@ -683,149 +690,132 @@ class acorn_base:
 
 
 def draw_background(scroll=True):
-    global background_scroll_amount
-
-    background_a_pos = background_scroll_amount
-    background_b_pos = background_scroll_amount + background.width
+    background_a_pos = game.background_scroll_amount
+    background_b_pos = game.background_scroll_amount + game.background.width
 
     if scroll:
-        background_scroll_amount -= background_scroll_speed
-        background_scroll_amount %= -background.width
+        game.background_scroll_amount -= game.background_scroll_speed
+        game.background_scroll_amount %= -game.background.width
 
-    screen.blit(background, vec2(background_a_pos, 0))
-    screen.blit(background, vec2(background_b_pos, 0))
+    screen.blit(game.background, vec2(background_a_pos, 0))
+    screen.blit(game.background, vec2(background_b_pos, 0))
 
 
 def draw_score():
-    global score
-    screen.text(str(score), 0, 0)
+    screen.text(str(game.score), 0, 0)
 
 
 def init_gamepad():
-    global gamepad
     gamepads = qwstpad.Gamepadhelper()
     for i in gamepads.pads:
         if i is not None:
-            gamepad = i
-            return i
-    return None
+            game.gamepad = i
+            return
+    game.gamepad = None
+    return
 
 
 def parse_controls():
-    global controls, gamepad
-
-    if gamepad:
+    if game.gamepad:
         try:
-            gamepad.update_buttons()
+            game.gamepad.update_buttons()
         except OSError:
-            gamepad = init_gamepad()
+            init_gamepad()
     else:
-        gamepad = init_gamepad()
+        init_gamepad()
 
-    if gamepad:
-        controls["MOVE_LEFT"] = gamepad.held("L")
-        controls["MOVE_RIGHT"] = gamepad.held("R")
-        controls["DROP"] = gamepad.held("D") and gamepad.pressed("A")
-        controls["JUMP"] = gamepad.pressed("A")
-        controls["JUMP_LEFT"] = gamepad.held("L") and gamepad.pressed("A")
-        controls["JUMP_RIGHT"] = gamepad.held("R") and gamepad.pressed("A")
-        controls["ANY_KEY"] = gamepad.pressed()
+    if game.gamepad:
+        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
+        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
+        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
+        game.controls["JUMP"] = game.gamepad.pressed("A")
+        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
+        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
+        game.controls["ANY_KEY"] = game.gamepad.pressed()
     else:
-        controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        controls["MOVE_RIGHT"] = badge.held(BUTTON_B)
-        controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_C)
-        controls["JUMP"] = badge.pressed(BUTTON_C)
-        controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_C)
-        controls["JUMP_RIGHT"] = badge.held(BUTTON_B) and badge.pressed(BUTTON_C)
-        controls["ANY_KEY"] = badge.pressed()
+        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
+        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
+        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
+        game.controls["JUMP"] = badge.pressed(BUTTON_B)
+        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
+        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
+        game.controls["ANY_KEY"] = badge.pressed()
 
 
 def init_platforms():
-    global platforms
-    platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
+    game.platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
 
-background = image.load("assets/background.png")
-
-gamepad = None
-controls = {}
-
-foreground_scroll_speed = 4
-background_scroll_speed = 1
-background_scroll_amount = 0
-
-player = player_base(20, 0)
-platforms = []
-acorns = []
-current_game_state = game_state.TITLE
-score = 0
-
-init_gamepad()
-init_platforms()
 
 def title_loop():
-    global current_game_state
-
     screen.text("Title screen", 0, 0)
 
-    if controls["ANY_KEY"]:
-        current_game_state = game_state.GAMEPLAY
+    if game.controls["ANY_KEY"]:
+        game.current_game_state = game_state.GAMEPLAY
+
 
 def gameplay_loop():
-    global current_game_state
-
     draw_background()
-
     player.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.update()
 
     draw_score()
 
     if player.b >= screen.height:
         player.death()
-        current_game_state = game_state.DEATH_ANIM
+        game.current_game_state = game_state.DEATH_ANIM
+
 
 def death_anim_loop():
-    global current_game_state
-
     draw_background(False)
-
     player.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.draw()
 
     draw_score()
 
     if player.b >= screen.height:
-        current_game_state = game_state.GAMEOVER
+        game.current_game_state = game_state.GAME_OVER
+
 
 def game_over_loop():
-    global current_game_state, score
-
     screen.text("Game Over screen", 0, 0)
 
-    if controls["ANY_KEY"]:
+    if game.controls["ANY_KEY"]:
         player.reset()
         init_platforms()
-        score = 0
-        current_game_state = game_state.TITLE
-
-def update():
-    parse_controls()
-
-    if current_game_state == game_state.TITLE:
-        title_loop()
-    elif current_game_state == game_state.GAMEPLAY:
-        gameplay_loop()
-    elif current_game_state == game_state.DEATH_ANIM:
-        death_anim_loop()
-    elif current_game_state == game_state.GAMEOVER:
-        game_over_loop()
+        game.score = 0
+        game.current_game_state = game_state.TITLE
 
 
-run(update)
+player = player_base(20, 0)
+init_gamepad()
+init_platforms()
+
+while True:
+    ticks = time.ticks_ms()
+    frametime = ticks - game.last_frame
+
+    if frametime >= 33:
+        badge.clear()
+        badge.poll()
+        parse_controls()
+
+        if game.current_game_state == game_state.TITLE:
+            title_loop()
+        elif game.current_game_state == game_state.GAMEPLAY:
+            gameplay_loop()
+        elif game.current_game_state == game_state.DEATH_ANIM:
+            death_anim_loop()
+        elif game.current_game_state == game_state.GAME_OVER:
+            game_over_loop()
+
+        display.update()
+
+        game.last_frame = ticks
+
 ```
 
 # Drawing the platforms
@@ -834,7 +824,7 @@ The background's checked off the list. Now we need to do the platforms, which we
 
 ![Acorn Highway platform](/tut4_res/branch.png)
 
-And we can add it in right below our background.
+And we can add it in right below our background in `game`.
 
 ```python-raw
 branch = image.load("assets/branch.png")
@@ -842,11 +832,11 @@ branch = image.load("assets/branch.png")
 
 So, to draw these we clearly need to change up the `platform_base` class's `draw()` method. We could just blit the above image onto the shape and size of the platform, but that would make it look squashed or stretched depending on the length of the platform, as `screen.blit()` would resize it to fit. Instead, since it looks pretty much the same all the way along its length, we want to just crop it to the right length.
 
-For this we can use the `brush` object, specifically `brush.image()`. This allows us to paint a shape with an image instead of a flat colour - in fact, behind the scenes flat colours work in just the same way as brushes. Once we have our brush we can set it as the pen and draw the exact same rectangle we were drawing before. We'll change `platform_base`'s `draw()` method as follows:
+For this we can use the `brush` object, specifically `brush.image()`. This allows us to paint a shape with an image instead of a flat colour - in fact, behind the scenes flat colours are their own kind of brush. Once we have our brush we can set it as the pen and draw the exact same rectangle we were drawing before. We'll change `platform_base`'s `draw()` method as follows:
 
 ```python-raw
     def draw(self):
-        screen.pen = brush.image(branch, mat3())
+        screen.pen = brush.image(game.branch, mat3())
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
 ```
@@ -859,7 +849,7 @@ At the moment it's just a plain bare `mat3()`, which means it's essentially a tr
 
 ```python-raw
     def draw(self):
-        screen.pen = brush.image(branch, mat3().translate(self.x, self.y))
+        screen.pen = brush.image(game.branch, mat3().translate(self.x, self.y))
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
 ```
@@ -877,124 +867,154 @@ The process for our player starts out similarly to the platforms and background,
 We'll load them in right after our other images, with the following code:
 
 ```python-raw
-sqirl_run_sheet = SpriteSheet("assets/running.png", 7, 1)
-sqirl_die_sheet = SpriteSheet("assets/death.png", 4, 1)
+    sqirl_run = image.load("assets/running.png").spritesheet(7, 1)
+    sqirl_die = image.load("assets/death.png").spritesheet(4, 1)
 ```
 
-You'll see a difference in the images - they're each a full spritesheet, showing every frame in an animation. That's why, when we load them in using `SpriteSheet()`, we supply them with how many sprites the sheet contains as the number of columns followed by the number of rows. So you can see above that the running and death animations have seven and four columns respectively, in just a single row each.
+You'll see that these images are different from the background or the platform - they're each a full sprite sheet, showing every frame in an animation. We're adding `.spritesheet()` to the end of our load command, which will turn them into a `spritesheet` object, splitting up the sheet into different images we can access using their coordinates on the sheet. We supply `spritesheet()` with how many sprites the sheet contains as the number of columns followed by the number of rows. So you can see above that the running and death animations have seven and four columns respectively, in just a single row each.
 
-We can access sprites within a `SpriteSheet` by using `SpriteSheet.sprite()` and supplying it with the coordinates of the sprite you want. This will then return an `image`. Let's apply this to the `draw()` method of `player_base` as follows:
+We can access sprites within a spritesheet by using `sprite()` and supplying it with the coordinates of the sprite you want. This will then return an `image`. Let's apply this to the `draw()` method of `player_base` as follows, removing what's there and replacing it with:
 
 ```python-raw
     def draw(self):
-        screen.blit(sqirl_run_sheet.sprite(0, 0), rect(self.x, self.y + 2, self.w, self.h))
+        screen.blit(game.sqirl_run.sprite(0, 0), rect(self.x, self.y + 2, self.w, self.h))
 ```
 
-And voila, one squirrel bouncing around the level. Now in fairness it's not the most animated squirrel yet, but we can change that. You might also notice in the code above that we're not drawing it exactly on the player's collision box, but actually two pixels lower so that Tufty's feet appear to sit nicely on the branch.
+And voila, one squirrel bouncing around the level. Now in fairness it's not the most animated squirrel yet, but we can change that. The `(0, 0)` is the coordinate of the frame we want to show. You can test it by replacing that first zero with other numbers and you'll see different frames appear.
 
-Instead of getting our image from the spritesheet directly, we're going to make it into an animated sprite. That means we select a range of sprites from the spritesheet, and we tell the software that they form a single animated image. Let's put the following lines in right below where you load the spritesheets in:
-
-```python-raw
-sqirl_run = AnimatedSprite(sqirl_run_sheet, 0, 0, 7)
-sqirl_die = AnimatedSprite(sqirl_die_sheet, 1, 0, 2)
-```
-
-To explain what we're doing with these, we'll just run through the parameters one by one. The first is obviously the name of the spritesheet you want to pull an animation from. The next two integers refer to the column and row of the first frame. Then, the number of frames to count from there. There is another True/False parameter which decides whether the frames should go across or down from the starting frame, but since that defaults to True (horizontal) and that's what we want, we've not included it here.
-
-From this, you can see that for the running sprite, it's starting from the top left sprite in the spritesheet, and counting seven frames horizontally including the starting frame, which in this case is every sprite in the sheet. It returns an `AnimatedSprite` object which we'll be using to draw Tufty.
-
-You might also notice that the death sprite is being done a little differently. Instead of the first one, we're starting counting frames from the second sprite along, and we're only using two frames. So although the death spritesheet has four frames, we're only going to be using the middle two for the animation.
-
-To get a frame from an `AnimatedSprite` object, we just use its `frame()` method, which we just pass the frame number we want. If the frame number is outside the number of frames in the `AnimatedSprite`, it just wraps around, which is a really useful feature because it means that if we've got a 'frame number' variable somewhere, we can just increase it to loop the animation without worrying about resetting it.
-
-Here's the new `draw()` method in `player_base`:
-
-```python-raw
-    def draw(self):
-        screen.blit(sqirl_run.frame(0), rect(self.x, self.y + 2, self.w, self.h))
-```
-
-That shouldn't play any different, but we've set the scene for our animation. You can test it by replacing that zero with other numbers and you'll see different frames appear.
+You might also notice in the code above that we're not drawing it exactly on the player's collision box, but actually two pixels lower so that Tufty's feet appear to sit nicely on the branch.
 
 Now, we're going to set up a variable to keep track of the frame we're showing, and increase it by 1 every time we run the main `update()` loop.
 
-Let's put the global variable `frame_counter = 0` just before creating the player instance and after setting the scrolling speeds. Then in `update()`, we'll just bring in `frame_counter` as a global variable and increment it by one at the end of the method:
+Let's put the variable `anim_frame_counter = 0` below the game state in the `game` class. Then in our main program loop, we'll just increment it by one at the end of the method:
 
 ```python-raw
-def update():
-    global frame_counter
+while True:
+    ticks = time.ticks_ms()
+    frametime = ticks - game.last_frame
 
-    parse_controls()
+    game.anim_frame_counter += 1
 
-    if current_game_state == game_state.TITLE:
-        title_loop()
-    elif current_game_state == game_state.GAMEPLAY:
-        gameplay_loop()
-    elif current_game_state == game_state.DEATH_ANIM:
-        death_anim_loop()
-    elif current_game_state == game_state.GAMEOVER:
-        game_over_loop()
+    if frametime >= 33:
+        badge.clear()
+        badge.poll()
+        parse_controls()
 
-    frame_counter += 1
+        if game.current_game_state == game_state.TITLE:
+            title_loop()
+        elif game.current_game_state == game_state.GAMEPLAY:
+            gameplay_loop()
+        elif game.current_game_state == game_state.DEATH_ANIM:
+            death_anim_loop()
+        elif game.current_game_state == game_state.GAME_OVER:
+            game_over_loop()
+
+        display.update()
+
+        game.last_frame = ticks
 ```
 
-Of course this won't do anything unless we apply it, so there's another change to `draw()` in `player_base`, to replace the hard coded frame number with `frame_counter`:
+Of course this won't do anything unless we apply it, so there's another change to `draw()` in `player_base`, to replace the hard coded frame number with `anim_frame_counter`. We're going to make it loop first though, so the counter can keep going up but the frame number for Tufty is always within range:
 
 ```python-raw
     def draw(self):
-        screen.blit(sqirl_run.frame(frame_counter), rect(self.x, self.y + 2, self.w, self.h))
+        frame_no = game.anim_frame_counter % 7
+        screen.blit(game.sqirl_run.sprite(frame_no, 0), rect(self.x, self.y + 2, self.w, self.h))
 ```
 
-Run the program now, and Tufty is animated! But hoo boy, that's one squirrely squirrel - that framerate is clearly way too fast. We can fix it though - how about, instead of updating the frame every `update()`, we actually time it?
+Run the program now, and Tufty is animated! But hoo boy, that's one squirrely squirrel - that frame rate is clearly way too fast. We can fix it though, and we've done this before. We can use the same technique we used to lock the whole game to 30fps to lock the animation to a lower framerate.
 
-We're going to set up another global variable called `last_frame` and set it to the badge's `ticks` value - that is, the number of milliseconds that have passed from the badge starting up to the beginning of the current `update()` loop. Then in `update()`, we can check the current `badge.ticks` and see if a specified amount of time has passed since `last_frame`. If it has, we'll update the frame counter and set `last_frame` to be the current `badge.ticks`, ready for the next frame.
+We're going to set up another variable in `game`, right after `last_frame`, called `anim_last_frame`. Then in our loop, we can check the current ticks and see if a specified amount of time has passed since `anim_last_frame`. If it has, we'll update the frame counter and set `anim_last_frame` to be the current ticks, just like we did before.
 
 ```python-raw
-frame_counter = 0
-player = player_base(20, 0)
-platforms = []
-acorns = []
-current_game_state = game_state.TITLE
-score = 0
-last_frame = badge.ticks
-```
+class game:
+    background = image.load("assets/background.png")
+    branch = image.load("assets/branch.png")
+    sqirl_run = image.load("assets/running.png").spritesheet(7, 1)
+    sqirl_die = image.load("assets/death.png").spritesheet(4, 1)
+    platforms = []
+    acorns = []
+    controls = {}
+    gamepad = None
 
-The last line there sets up the last frame time - now we just need to check it in `update()`.
+    foreground_scroll_speed = 4
+    background_scroll_speed = 1
+    background_scroll_amount = 0
+
+    last_frame = 0
+    anim_last_frame = 0
+    current_game_state = game_state.TITLE
+    anim_frame_counter = 0
+
+    score = 0
+```
 
 ```python-raw
-def update():
-    global frame_counter, last_frame
+while True:
+    ticks = time.ticks_ms()
+    frametime = ticks - game.last_frame
+    anim_frametime = ticks - game.anim_last_frame
 
-    parse_controls()
+    if anim_frametime >= 83:
+        game.anim_frame_counter += 1
+        game.anim_last_frame = ticks
 
-    if current_game_state == game_state.TITLE:
-        title_loop()
-    elif current_game_state == game_state.GAMEPLAY:
-        gameplay_loop()
-    elif current_game_state == game_state.DEATH_ANIM:
-        death_anim_loop()
-    elif current_game_state == game_state.GAMEOVER:
-        game_over_loop()
+    if frametime >= 33:
+        badge.clear()
+        badge.poll()
+        parse_controls()
 
-    if badge.ticks - last_frame > 83:
-        frame_counter += 1
-        last_frame = badge.ticks
+        if game.current_game_state == game_state.TITLE:
+            title_loop()
+        elif game.current_game_state == game_state.GAMEPLAY:
+            gameplay_loop()
+        elif game.current_game_state == game_state.DEATH_ANIM:
+            death_anim_loop()
+        elif game.current_game_state == game_state.GAME_OVER:
+            game_over_loop()
+
+        display.update()
+
+        game.last_frame = ticks
 ```
 
-Note that because we need to write to `last_frame`, we've brought it in as a global. We've chosen a time of 83ms for each frame, because that's approximately one twelfth of a second, so the animation will run around 12fps - a good speed for this animation.
+We've chosen a time of 83ms for each frame, because that's approximately one twelfth of a second, so the animation will run around 12fps - a good speed for this animation.
 
 If everything's gone right so far, your code should look like this, and Tufty should be animating like a champ!
 
 ```python
-import qwstpad
 import random
+import qwstpad
+import time
 
 
 class game_state:
     TITLE = 0
     GAMEPLAY = 1
     DEATH_ANIM = 2
-    GAMEOVER = 3
+    GAME_OVER = 3
+
+
+class game:
+    background = image.load("assets/background.png")
+    branch = image.load("assets/branch.png")
+    sqirl_run = image.load("assets/running.png").spritesheet(7, 1)
+    sqirl_die = image.load("assets/death.png").spritesheet(4, 1)
+    platforms = []
+    acorns = []
+    controls = {}
+    gamepad = None
+
+    foreground_scroll_speed = 4
+    background_scroll_speed = 1
+    background_scroll_amount = 0
+
+    last_frame = 0
+    anim_last_frame = 0
+    current_game_state = game_state.TITLE
+    anim_frame_counter = 0
+
+    score = 0
 
 
 class player_base:
@@ -1045,7 +1065,7 @@ class player_base:
 
     def is_airborne(self):
         airborne = True
-        for platform in platforms:
+        for platform in game.platforms:
             if self.is_standing(platform):
                 airborne = False
         self.airborne = airborne
@@ -1053,29 +1073,31 @@ class player_base:
     def update(self):
         self.is_airborne()
 
-        if self.airborne or self.dead or controls["DROP"]:
+        if self.airborne or self.dead or game.controls["DROP"]:
             self.vy += 1
         else:
-            if controls["JUMP"]:
+            if game.controls["JUMP"]:
                 self.vy = -10
 
-            if controls["JUMP_RIGHT"]:
+            if game.controls["JUMP_RIGHT"]:
                 self.vx = max(self.vx, 3)
 
-            elif controls["JUMP_LEFT"]:
+            elif game.controls["JUMP_LEFT"]:
                 self.vx = min(self.vx, -3)
 
-            elif controls["MOVE_RIGHT"]:
+            elif game.controls["MOVE_RIGHT"]:
                 self.vx += 1.5
 
-            elif controls["MOVE_LEFT"]:
+            elif game.controls["MOVE_LEFT"]:
                 self.vx -= 1.5
 
-            if self.vx > 0: self.vx -= 0.5
-            elif self.vx < 0: self.vx += 0.5
+            if self.vx > 0:
+                self.vx -= 0.5
+            elif self.vx < 0:
+                self.vx += 0.5
 
         if not self.dead:
-            for platform in platforms:
+            for platform in game.platforms:
                 if self.is_landing(platform):
                     self.b = platform.y
                     self.vy = 0
@@ -1101,7 +1123,8 @@ class player_base:
         self.dead = True
 
     def draw(self):
-        screen.blit(sqirl_run.frame(frame_counter), rect(self.x, self.y + 2, self.w, self.h))
+        frame_no = game.anim_frame_counter % 7
+        screen.blit(game.sqirl_run.sprite(frame_no, 0), rect(self.x, self.y + 2, self.w, self.h))
 
 
 class platform_base:
@@ -1126,15 +1149,13 @@ class platform_base:
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
 
     def update(self):
-        global score
-
-        self.x -= foreground_scroll_speed
+        self.x -= game.foreground_scroll_speed
 
         if self.r <= 0:
             self.reset()
             while self.check_collisions():
                 self.reset()
-            score += 1
+            game.score += 1
 
         self.draw()
 
@@ -1144,8 +1165,7 @@ class platform_base:
         self.w = random.randint(int(screen.width / 2), screen.width)
 
     def check_collisions(self):
-        global platforms
-        for platform in platforms:
+        for platform in game.platforms:
             if platform.id == self.id:
                 continue
             if self.bounding_box.intersects(platform.bounding_box):
@@ -1153,7 +1173,7 @@ class platform_base:
         return False
 
     def draw(self):
-        screen.pen = brush.image(branch, mat3().translate(self.x, self.y))
+        screen.pen = brush.image(game.branch, mat3().translate(self.x, self.y))
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
 
@@ -1184,188 +1204,165 @@ class acorn_base:
 
 
 def draw_background(scroll=True):
-    global background_scroll_amount
-
-    background_a_pos = background_scroll_amount
-    background_b_pos = background_scroll_amount + background.width
+    background_a_pos = game.background_scroll_amount
+    background_b_pos = game.background_scroll_amount + game.background.width
 
     if scroll:
-        background_scroll_amount -= background_scroll_speed
-        background_scroll_amount %= -background.width
+        game.background_scroll_amount -= game.background_scroll_speed
+        game.background_scroll_amount %= -game.background.width
 
-    screen.blit(background, vec2(background_a_pos, 0))
-    screen.blit(background, vec2(background_b_pos, 0))
+    screen.blit(game.background, vec2(background_a_pos, 0))
+    screen.blit(game.background, vec2(background_b_pos, 0))
 
 
 def draw_score():
-    global score
-    screen.text(str(score), 0, 0)
+    screen.text(str(game.score), 0, 0)
 
 
 def init_gamepad():
-    global gamepad
     gamepads = qwstpad.Gamepadhelper()
     for i in gamepads.pads:
         if i is not None:
-            gamepad = i
-            return i
-    return None
+            game.gamepad = i
+            return
+    game.gamepad = None
+    return
 
 
 def parse_controls():
-    global controls, gamepad
-
-    if gamepad:
+    if game.gamepad:
         try:
-            gamepad.update_buttons()
+            game.gamepad.update_buttons()
         except OSError:
-            gamepad = init_gamepad()
+            init_gamepad()
     else:
-        gamepad = init_gamepad()
+        init_gamepad()
 
-    if gamepad:
-        controls["MOVE_LEFT"] = gamepad.held("L")
-        controls["MOVE_RIGHT"] = gamepad.held("R")
-        controls["DROP"] = gamepad.held("D") and gamepad.pressed("A")
-        controls["JUMP"] = gamepad.pressed("A")
-        controls["JUMP_LEFT"] = gamepad.held("L") and gamepad.pressed("A")
-        controls["JUMP_RIGHT"] = gamepad.held("R") and gamepad.pressed("A")
-        controls["ANY_KEY"] = gamepad.pressed()
+    if game.gamepad:
+        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
+        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
+        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
+        game.controls["JUMP"] = game.gamepad.pressed("A")
+        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
+        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
+        game.controls["ANY_KEY"] = game.gamepad.pressed()
     else:
-        controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        controls["MOVE_RIGHT"] = badge.held(BUTTON_B)
-        controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_C)
-        controls["JUMP"] = badge.pressed(BUTTON_C)
-        controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_C)
-        controls["JUMP_RIGHT"] = badge.held(BUTTON_B) and badge.pressed(BUTTON_C)
-        controls["ANY_KEY"] = badge.pressed()
+        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
+        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
+        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
+        game.controls["JUMP"] = badge.pressed(BUTTON_B)
+        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
+        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
+        game.controls["ANY_KEY"] = badge.pressed()
 
 
 def init_platforms():
-    global platforms
-    platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
+    game.platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
 
-background = image.load("assets/background.png")
-branch = image.load("assets/branch.png")
-sqirl_run_sheet = SpriteSheet("assets/running.png", 7, 1)
-sqirl_die_sheet = SpriteSheet("assets/death.png", 4, 1)
-sqirl_run = AnimatedSprite(sqirl_run_sheet, 0, 0, 7)
-sqirl_die = AnimatedSprite(sqirl_die_sheet, 1, 0, 2)
-
-gamepad = None
-controls = {}
-
-foreground_scroll_speed = 4
-background_scroll_speed = 1
-background_scroll_amount = 0
-
-frame_counter = 0
-player = player_base(20, 0)
-platforms = []
-acorns = []
-current_game_state = game_state.TITLE
-score = 0
-last_frame = badge.ticks
-
-init_gamepad()
-init_platforms()
 
 def title_loop():
-    global current_game_state
-
     screen.text("Title screen", 0, 0)
 
-    if controls["ANY_KEY"]:
-        current_game_state = game_state.GAMEPLAY
+    if game.controls["ANY_KEY"]:
+        game.current_game_state = game_state.GAMEPLAY
+
 
 def gameplay_loop():
-    global current_game_state
-
     draw_background()
-
     player.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.update()
 
     draw_score()
 
     if player.b >= screen.height:
         player.death()
-        current_game_state = game_state.DEATH_ANIM
+        game.current_game_state = game_state.DEATH_ANIM
+
 
 def death_anim_loop():
-    global current_game_state
-
     draw_background(False)
-
     player.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.draw()
 
     draw_score()
 
     if player.b >= screen.height:
-        current_game_state = game_state.GAMEOVER
+        game.current_game_state = game_state.GAME_OVER
+
 
 def game_over_loop():
-    global current_game_state, score
-
     screen.text("Game Over screen", 0, 0)
 
-    if controls["ANY_KEY"]:
+    if game.controls["ANY_KEY"]:
         player.reset()
         init_platforms()
-        score = 0
-        current_game_state = game_state.TITLE
-
-def update():
-    global frame_counter, last_frame
-
-    parse_controls()
-
-    if current_game_state == game_state.TITLE:
-        title_loop()
-    elif current_game_state == game_state.GAMEPLAY:
-        gameplay_loop()
-    elif current_game_state == game_state.DEATH_ANIM:
-        death_anim_loop()
-    elif current_game_state == game_state.GAMEOVER:
-        game_over_loop()
-
-    if badge.ticks - last_frame > 83:
-        frame_counter += 1
-        last_frame = badge.ticks
+        game.score = 0
+        game.current_game_state = game_state.TITLE
 
 
-run(update)
+player = player_base(20, 0)
+init_gamepad()
+init_platforms()
+
+while True:
+    ticks = time.ticks_ms()
+    frametime = ticks - game.last_frame
+    anim_frametime = ticks - game.anim_last_frame
+
+    if anim_frametime >= 83:
+        game.anim_frame_counter += 1
+        game.anim_last_frame = ticks
+
+    if frametime >= 33:
+        badge.clear()
+        badge.poll()
+        parse_controls()
+
+        if game.current_game_state == game_state.TITLE:
+            title_loop()
+        elif game.current_game_state == game_state.GAMEPLAY:
+            gameplay_loop()
+        elif game.current_game_state == game_state.DEATH_ANIM:
+            death_anim_loop()
+        elif game.current_game_state == game_state.GAME_OVER:
+            game_over_loop()
+
+        display.update()
+
+        game.last_frame = ticks
+
 ```
 
 # Other animation states
 
-Tufty is running great, but let's improve on those animations. Right now, when you jump you're running through the air, frantically pedalling your little squirrel limbs. We can take a page from the book of classic platformers of the past and just freeze on a single frame when you jump. It looks like the third frame along on the spritesheet (numbered 2) would be good, so let's just put in a little check in the player's `draw()` method that checks if you're in gameplay and airborne, and if so just displays frame 2, otherwise displaying whichever frame the frame counter tells us to.
+Tufty is running great, but let's improve on those animations. Right now, when you jump you're running through the air, frantically pedalling your little squirrel limbs. We can take a page from the book of classic platformers of the past and just freeze on a single frame when you jump. The third frame along on the sprite sheet (numbered 2) looks like it would be good, so let's just put in a little check in the player's `draw()` method that checks if you're in gameplay and airborne, and if so just displays frame 2, otherwise displaying whichever frame the frame counter tells us to.
 
 ```python-raw
     def draw(self):
-        if self.airborne and current_game_state == game_state.GAMEPLAY:
-            frame = 2
+        if self.airborne and game.current_game_state == game_state.GAMEPLAY:
+            frame_no = 2
         else:
-            frame = frame_counter
-        screen.blit(sqirl_run.frame(frame), rect(self.x, self.y + 2, self.w, self.h))
+            frame_no = game.anim_frame_counter % 7
+        screen.blit(game.sqirl_run.sprite(frame_no, 0), rect(self.x, self.y + 2, self.w, self.h))
 ```
 
 And now Tufty strikes a Dynamic Action Pose whenever you jump! But it's still not quite right when we die, and as you may have suspected when we imported sprites for it, we've got another animation for that.
 
-The setup we need to do for this involves making the player's current animation a variable in the class - that way, by changing that variable between different sprites we can change Tufty's animation. So we'll just add `self.animation = sqirl_run` in at the end of the player's `__init__()` method, after we set `self.dead`. Then we can alter `draw()` to use that variable:
+The setup we need to do for this involves making the player's current animation a variable in the class - that way, by changing that variable between different sprites we can change Tufty's animation. So we'll just add `self.animation = game.sqirl_run` in at the end of the player's `__init__()` method, after we set `self.dead`. Then we can alter `draw()` to use that variable. We're also checking `self.dead` to set the number of frames in the animation, as `sqirl_die` has fewer frames than `sqirl_run`.
 
 ```python-raw
     def draw(self):
-        if self.airborne and current_game_state == game_state.GAMEPLAY:
-            frame = 2
+        if self.airborne and game.current_game_state == game_state.GAMEPLAY:
+            frame_no = 2
+        elif self.dead:
+            frame_no = game.anim_frame_counter % 3
         else:
-            frame = frame_counter
-        screen.blit(self.animation.frame(frame), rect(self.x, self.y + 2, self.w, self.h))
+            frame_no = game.anim_frame_counter % 7
+        screen.blit(self.animation.sprite(frame_no, 0), rect(self.x, self.y + 2, self.w, self.h))
 ```
 
 Now we just need add a line to the end of the player's `reset()` and `death()` methods to switch Tufty's current animation to the right one at the right time.
@@ -1377,28 +1374,51 @@ Now we just need add a line to the end of the player's `reset()` and `death()` m
         self.vx = 0
         self.vy = 0
         self.dead = False
-        self.animation = sqirl_run
+        self.animation = game.sqirl_run
 
     def death(self):
         self.b = screen.height - 1
         self.vx = 0
         self.vy = -12
         self.dead = True
-        self.animation = sqirl_die
+        self.animation = game.sqirl_die
 ```
 
 And we're done with the animations! If you've been following along, your code should look like this:
 
 ```python
-import qwstpad
 import random
+import qwstpad
+import time
 
 
 class game_state:
     TITLE = 0
     GAMEPLAY = 1
     DEATH_ANIM = 2
-    GAMEOVER = 3
+    GAME_OVER = 3
+
+
+class game:
+    background = image.load("assets/background.png")
+    branch = image.load("assets/branch.png")
+    sqirl_run = image.load("assets/running.png").spritesheet(7, 1)
+    sqirl_die = image.load("assets/death.png").spritesheet(4, 1)
+    platforms = []
+    acorns = []
+    controls = {}
+    gamepad = None
+
+    foreground_scroll_speed = 4
+    background_scroll_speed = 1
+    background_scroll_amount = 0
+
+    last_frame = 0
+    anim_last_frame = 0
+    current_game_state = game_state.TITLE
+    anim_frame_counter = 0
+
+    score = 0
 
 
 class player_base:
@@ -1412,8 +1432,7 @@ class player_base:
         self.vx = 0
         self.airborne = False
         self.dead = False
-
-        self.animation = sqirl_run
+        self.animation = game.sqirl_run
 
     @property
     def r(self):
@@ -1451,7 +1470,7 @@ class player_base:
 
     def is_airborne(self):
         airborne = True
-        for platform in platforms:
+        for platform in game.platforms:
             if self.is_standing(platform):
                 airborne = False
         self.airborne = airborne
@@ -1459,29 +1478,31 @@ class player_base:
     def update(self):
         self.is_airborne()
 
-        if self.airborne or self.dead or controls["DROP"]:
+        if self.airborne or self.dead or game.controls["DROP"]:
             self.vy += 1
         else:
-            if controls["JUMP"]:
+            if game.controls["JUMP"]:
                 self.vy = -10
 
-            if controls["JUMP_RIGHT"]:
+            if game.controls["JUMP_RIGHT"]:
                 self.vx = max(self.vx, 3)
 
-            elif controls["JUMP_LEFT"]:
+            elif game.controls["JUMP_LEFT"]:
                 self.vx = min(self.vx, -3)
 
-            elif controls["MOVE_RIGHT"]:
+            elif game.controls["MOVE_RIGHT"]:
                 self.vx += 1.5
 
-            elif controls["MOVE_LEFT"]:
+            elif game.controls["MOVE_LEFT"]:
                 self.vx -= 1.5
 
-            if self.vx > 0: self.vx -= 0.5
-            elif self.vx < 0: self.vx += 0.5
+            if self.vx > 0:
+                self.vx -= 0.5
+            elif self.vx < 0:
+                self.vx += 0.5
 
         if not self.dead:
-            for platform in platforms:
+            for platform in game.platforms:
                 if self.is_landing(platform):
                     self.b = platform.y
                     self.vy = 0
@@ -1499,21 +1520,23 @@ class player_base:
         self.vx = 0
         self.vy = 0
         self.dead = False
-        self.animation = sqirl_run
+        self.animation = game.sqirl_run
 
     def death(self):
         self.b = screen.height - 1
         self.vx = 0
         self.vy = -12
         self.dead = True
-        self.animation = sqirl_die
+        self.animation = game.sqirl_die
 
     def draw(self):
-        if self.airborne and current_game_state == game_state.GAMEPLAY:
-            frame = 2
+        if self.airborne and game.current_game_state == game_state.GAMEPLAY:
+            frame_no = 2
+        elif self.dead:
+            frame_no = game.anim_frame_counter % 3
         else:
-            frame = frame_counter
-        screen.blit(self.animation.frame(frame), rect(self.x, self.y + 2, self.w, self.h))
+            frame_no = game.anim_frame_counter % 7
+        screen.blit(self.animation.sprite(frame_no, 0), rect(self.x, self.y + 2, self.w, self.h))
 
 
 class platform_base:
@@ -1538,15 +1561,13 @@ class platform_base:
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
 
     def update(self):
-        global score
-
-        self.x -= foreground_scroll_speed
+        self.x -= game.foreground_scroll_speed
 
         if self.r <= 0:
             self.reset()
             while self.check_collisions():
                 self.reset()
-            score += 1
+            game.score += 1
 
         self.draw()
 
@@ -1556,8 +1577,7 @@ class platform_base:
         self.w = random.randint(int(screen.width / 2), screen.width)
 
     def check_collisions(self):
-        global platforms
-        for platform in platforms:
+        for platform in game.platforms:
             if platform.id == self.id:
                 continue
             if self.bounding_box.intersects(platform.bounding_box):
@@ -1565,7 +1585,7 @@ class platform_base:
         return False
 
     def draw(self):
-        screen.pen = brush.image(branch, mat3().translate(self.x, self.y))
+        screen.pen = brush.image(game.branch, mat3().translate(self.x, self.y))
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
 
@@ -1596,162 +1616,137 @@ class acorn_base:
 
 
 def draw_background(scroll=True):
-    global background_scroll_amount
-
-    background_a_pos = background_scroll_amount
-    background_b_pos = background_scroll_amount + background.width
+    background_a_pos = game.background_scroll_amount
+    background_b_pos = game.background_scroll_amount + game.background.width
 
     if scroll:
-        background_scroll_amount -= background_scroll_speed
-        background_scroll_amount %= -background.width
+        game.background_scroll_amount -= game.background_scroll_speed
+        game.background_scroll_amount %= -game.background.width
 
-    screen.blit(background, vec2(background_a_pos, 0))
-    screen.blit(background, vec2(background_b_pos, 0))
+    screen.blit(game.background, vec2(background_a_pos, 0))
+    screen.blit(game.background, vec2(background_b_pos, 0))
 
 
 def draw_score():
-    global score
-    screen.text(str(score), 0, 0)
+    screen.text(str(game.score), 0, 0)
 
 
 def init_gamepad():
-    global gamepad
     gamepads = qwstpad.Gamepadhelper()
     for i in gamepads.pads:
         if i is not None:
-            gamepad = i
-            return i
-    return None
+            game.gamepad = i
+            return
+    game.gamepad = None
+    return
 
 
 def parse_controls():
-    global controls, gamepad
-
-    if gamepad:
+    if game.gamepad:
         try:
-            gamepad.update_buttons()
+            game.gamepad.update_buttons()
         except OSError:
-            gamepad = init_gamepad()
+            init_gamepad()
     else:
-        gamepad = init_gamepad()
+        init_gamepad()
 
-    if gamepad:
-        controls["MOVE_LEFT"] = gamepad.held("L")
-        controls["MOVE_RIGHT"] = gamepad.held("R")
-        controls["DROP"] = gamepad.held("D") and gamepad.pressed("A")
-        controls["JUMP"] = gamepad.pressed("A")
-        controls["JUMP_LEFT"] = gamepad.held("L") and gamepad.pressed("A")
-        controls["JUMP_RIGHT"] = gamepad.held("R") and gamepad.pressed("A")
-        controls["ANY_KEY"] = gamepad.pressed()
+    if game.gamepad:
+        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
+        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
+        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
+        game.controls["JUMP"] = game.gamepad.pressed("A")
+        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
+        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
+        game.controls["ANY_KEY"] = game.gamepad.pressed()
     else:
-        controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        controls["MOVE_RIGHT"] = badge.held(BUTTON_B)
-        controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_C)
-        controls["JUMP"] = badge.pressed(BUTTON_C)
-        controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_C)
-        controls["JUMP_RIGHT"] = badge.held(BUTTON_B) and badge.pressed(BUTTON_C)
-        controls["ANY_KEY"] = badge.pressed()
+        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
+        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
+        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
+        game.controls["JUMP"] = badge.pressed(BUTTON_B)
+        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
+        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
+        game.controls["ANY_KEY"] = badge.pressed()
 
 
 def init_platforms():
-    global platforms
-    platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
+    game.platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
 
-background = image.load("assets/background.png")
-branch = image.load("assets/branch.png")
-sqirl_run_sheet = SpriteSheet("assets/running.png", 7, 1)
-sqirl_die_sheet = SpriteSheet("assets/death.png", 4, 1)
-sqirl_run = AnimatedSprite(sqirl_run_sheet, 0, 0, 7)
-sqirl_die = AnimatedSprite(sqirl_die_sheet, 1, 0, 2)
-
-gamepad = None
-controls = {}
-
-foreground_scroll_speed = 4
-background_scroll_speed = 1
-background_scroll_amount = 0
-
-frame_counter = 0
-player = player_base(20, 0)
-platforms = []
-acorns = []
-current_game_state = game_state.TITLE
-score = 0
-last_frame = badge.ticks
-
-init_gamepad()
-init_platforms()
 
 def title_loop():
-    global current_game_state
-
     screen.text("Title screen", 0, 0)
 
-    if controls["ANY_KEY"]:
-        current_game_state = game_state.GAMEPLAY
+    if game.controls["ANY_KEY"]:
+        game.current_game_state = game_state.GAMEPLAY
+
 
 def gameplay_loop():
-    global current_game_state
-
     draw_background()
-
     player.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.update()
 
     draw_score()
 
     if player.b >= screen.height:
         player.death()
-        current_game_state = game_state.DEATH_ANIM
+        game.current_game_state = game_state.DEATH_ANIM
+
 
 def death_anim_loop():
-    global current_game_state
-
     draw_background(False)
-
     player.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.draw()
 
     draw_score()
 
     if player.b >= screen.height:
-        current_game_state = game_state.GAMEOVER
+        game.current_game_state = game_state.GAME_OVER
+
 
 def game_over_loop():
-    global current_game_state, score
-
     screen.text("Game Over screen", 0, 0)
 
-    if controls["ANY_KEY"]:
+    if game.controls["ANY_KEY"]:
         player.reset()
         init_platforms()
-        score = 0
-        current_game_state = game_state.TITLE
-
-def update():
-    global frame_counter, last_frame
-
-    parse_controls()
-
-    if current_game_state == game_state.TITLE:
-        title_loop()
-    elif current_game_state == game_state.GAMEPLAY:
-        gameplay_loop()
-    elif current_game_state == game_state.DEATH_ANIM:
-        death_anim_loop()
-    elif current_game_state == game_state.GAMEOVER:
-        game_over_loop()
-
-    if badge.ticks - last_frame > 83:
-        frame_counter += 1
-        last_frame = badge.ticks
+        game.score = 0
+        game.current_game_state = game_state.TITLE
 
 
-run(update)
+player = player_base(20, 0)
+init_gamepad()
+init_platforms()
+
+while True:
+    ticks = time.ticks_ms()
+    frametime = ticks - game.last_frame
+    anim_frametime = ticks - game.anim_last_frame
+
+    if anim_frametime >= 83:
+        game.anim_frame_counter += 1
+        game.anim_last_frame = ticks
+
+    if frametime >= 33:
+        badge.clear()
+        badge.poll()
+        parse_controls()
+
+        if game.current_game_state == game_state.TITLE:
+            title_loop()
+        elif game.current_game_state == game_state.GAMEPLAY:
+            gameplay_loop()
+        elif game.current_game_state == game_state.DEATH_ANIM:
+            death_anim_loop()
+        elif game.current_game_state == game_state.GAME_OVER:
+            game_over_loop()
+
+        display.update()
+
+        game.last_frame = ticks
+
 ```
 
 # Something to collect
@@ -1762,13 +1757,13 @@ Back then we already made an `acorn_base` class, as well as a global list to hol
 
 ![Acorn Highway acorn small](/tut4_res/acorn_sml.png)
 
-First of all let's draw them as that's nice and easy. After we import the other images, let's import the acorn with `acorn_sml = image.load("assets/acorn_sml.png")`.
+First of all let's draw them as that's nice and easy. After we import the other images in `game`, let's import the acorn with `acorn_sml = image.load("assets/acorn_sml.png")`.
 
 Then we can just alter the `acorn_base`'s `draw()` method to draw that image.
 
 ```python-raw
     def draw(self):
-        screen.blit(acorn_sml, vec2(self.x, self.y))
+        screen.blit(game.acorn_sml, vec2(self.x, self.y))
 ```
 
 That's done. Now, we want to spawn the acorns on top of the platforms. Which means we need to know where each platform is, and what part of the program knows that? The platforms themselves! So the basic idea is that each time a platform resets, it has a two in three chance of spawning an acorn on top of it.
@@ -1777,12 +1772,11 @@ To do that, we'll need to create a method in `platform_base`, right before its `
 
 ```python-raw
     def spawn_acorn(self):
-        global acorns
         acorn = acorn_base(random.randint(self.x, self.r - 10), self.y - 10)
-        acorns.append(acorn)
+        game.acorns.append(acorn)
 ```
 
-This is very simple. First we bring in the `acorns` list as a global, the second line creates a new acorn and the third line adds it to the list.
+This is very simple. The first line creates a new acorn and the second line adds it to the list.
 
 If you recall when we created the `acorn_base` class, it takes in x and y coordinates for the position of the acorn. We're providing that - the x coordinate is a random number between the left side of the platform, and the right side minus the width of the acorn. So in other words, somewhere along the length of the platform. The y coordinate is just ten pixels above the top of the platform - again, the height of the acorn.
 
@@ -1790,16 +1784,16 @@ Now, we can just call that method right after we reset the platform to a new pos
 
 ```python-raw
     def update(self):
-        global score
+        self.x -= game.foreground_scroll_speed
 
-        self.x -= foreground_scroll_speed
         if self.r <= 0:
             self.reset()
             while self.check_collisions():
                 self.reset()
-            score += 1
+            game.score += 1
             if random.randint(0, 2):
                 self.spawn_acorn()
+
         self.draw()
 ```
 
@@ -1809,14 +1803,12 @@ In `acorn_base`, let's create a `move()` method and an `update()` method right b
 
 ```python-raw
     def move(self):
-        self.x -= foreground_scroll_speed
+        self.x -= game.foreground_scroll_speed
         self.draw()
 
     def update(self):
-        global acorns
-
         if self.r < 0:
-            acorns.remove(self)
+            game.acorns.remove(self)
 ```
 
 Hopefully both of these are pretty self explanatory. `move()` shifts the acorn's position to the left by `foreground_scroll_speed` number of pixels and then draws it, and `update()` deletes the acorn if it's completely off the left side of the screen - in other words, if it's not been picked up.
@@ -1827,47 +1819,42 @@ Instead, what we'll do is loop through all of the acorns, moving them (which als
 
 ```python-raw
 def gameplay_loop():
-    global current_game_state
-
     draw_background()
-
     player.update()
 
-    for acorn in acorns:
+    for acorn in game.acorns:
         acorn.move()
 
-    for acorn in acorns:
+    for acorn in game.acorns:
         acorn.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.update()
 
     draw_score()
 
     if player.b >= screen.height:
         player.death()
-        current_game_state = game_state.DEATH_ANIM
+        game.current_game_state = game_state.DEATH_ANIM
 ```
 
-Before we get on to the next bit, picking up the acorns, we just want to quickly add in `acorns.clear()` into `game_over_loop()`, right after we reset the score - that way the list of acorns get cleared when everything else resets for a new game.
+Before we get on to the next bit, picking up the acorns, we just want to quickly add in `game.acorns.clear()` into `game_over_loop()`, right after we reset the score - that way the list of acorns get cleared when everything else resets for a new game.
 
 Once that's done, let's get Tufty grabbing those acorns. Like we mentioned above, that's going to be taken care of in the `acorn_base` class. And as a bonus, we've already done all the legwork for it! In `acorn_base`'s `update()` method, we just need to check if the acorn's bounding box overlaps the player's, and if it does, add three to the score and delete the acorn from the list! Easy!
 
 ```python-raw
     def update(self):
-        global acorns, score
-
         if self.bounding_box.intersects(player.bounding_box):
-            acorns.remove(self)
-            score += 3
+            game.acorns.remove(self)
+            game.score += 3
 
         elif self.r < 0:
-            acorns.remove(self)
+            game.acorns.remove(self)
 ```
 
 The more we get through this, the more we find that the mechanisms we need are already there. If you try playing now you can pick up the acorns and add to the score! There's just one last thing to do. You might notice that it's a bit easy to pick up the acorns - you don't really have to touch them to pick them up, and it's pretty easy to see why. Remember the red square we had for our player before adding the Tufty sprite? It's a lot bigger than the sprite itself, 32×32px, and as soon as any part of it hits an acorn that acorn's picked up.
 
-Fixing this isn't too complicated. The player's `bounding_box` property is used in just one place in the program - checking for collision with the acorns. That means that we can fine tune the size and location of that bounding box to better fit Tufty's actual dimensions. The property as it stands is calculated with
+Fixing this isn't too complicated. The player's `bounding_box` property is used in just one place in the program - checking for collision with the acorns. That means that we can fine tune the size and location of that bounding box to better fit Tufty's actual dimensions. The property is currently calculated with:
 
 ```python-raw
     @property
@@ -1892,15 +1879,40 @@ This takes the top of the sprite down by 20px and the sides in by 8px, like so:
 And now gameplay is almost entirely complete. Let's move on to prettying up the rest of the game - here's the code you should have so far:
 
 ```python
-import qwstpad
 import random
+import qwstpad
+import time
 
 
 class game_state:
     TITLE = 0
     GAMEPLAY = 1
     DEATH_ANIM = 2
-    GAMEOVER = 3
+    GAME_OVER = 3
+
+
+class game:
+    background = image.load("assets/background.png")
+    branch = image.load("assets/branch.png")
+    sqirl_run = image.load("assets/running.png").spritesheet(7, 1)
+    sqirl_die = image.load("assets/death.png").spritesheet(4, 1)
+    acorn_sml = image.load("assets/acorn_sml.png")
+
+    platforms = []
+    acorns = []
+    controls = {}
+    gamepad = None
+
+    foreground_scroll_speed = 4
+    background_scroll_speed = 1
+    background_scroll_amount = 0
+
+    last_frame = 0
+    anim_last_frame = 0
+    current_game_state = game_state.TITLE
+    anim_frame_counter = 0
+
+    score = 0
 
 
 class player_base:
@@ -1914,8 +1926,7 @@ class player_base:
         self.vx = 0
         self.airborne = False
         self.dead = False
-
-        self.animation = sqirl_run
+        self.animation = game.sqirl_run
 
     @property
     def r(self):
@@ -1953,7 +1964,7 @@ class player_base:
 
     def is_airborne(self):
         airborne = True
-        for platform in platforms:
+        for platform in game.platforms:
             if self.is_standing(platform):
                 airborne = False
         self.airborne = airborne
@@ -1961,29 +1972,31 @@ class player_base:
     def update(self):
         self.is_airborne()
 
-        if self.airborne or self.dead or controls["DROP"]:
+        if self.airborne or self.dead or game.controls["DROP"]:
             self.vy += 1
         else:
-            if controls["JUMP"]:
+            if game.controls["JUMP"]:
                 self.vy = -10
 
-            if controls["JUMP_RIGHT"]:
+            if game.controls["JUMP_RIGHT"]:
                 self.vx = max(self.vx, 3)
 
-            elif controls["JUMP_LEFT"]:
+            elif game.controls["JUMP_LEFT"]:
                 self.vx = min(self.vx, -3)
 
-            elif controls["MOVE_RIGHT"]:
+            elif game.controls["MOVE_RIGHT"]:
                 self.vx += 1.5
 
-            elif controls["MOVE_LEFT"]:
+            elif game.controls["MOVE_LEFT"]:
                 self.vx -= 1.5
 
-            if self.vx > 0: self.vx -= 0.5
-            elif self.vx < 0: self.vx += 0.5
+            if self.vx > 0:
+                self.vx -= 0.5
+            elif self.vx < 0:
+                self.vx += 0.5
 
         if not self.dead:
-            for platform in platforms:
+            for platform in game.platforms:
                 if self.is_landing(platform):
                     self.b = platform.y
                     self.vy = 0
@@ -2001,21 +2014,23 @@ class player_base:
         self.vx = 0
         self.vy = 0
         self.dead = False
-        self.animation = sqirl_run
+        self.animation = game.sqirl_run
 
     def death(self):
         self.b = screen.height - 1
         self.vx = 0
         self.vy = -12
         self.dead = True
-        self.animation = sqirl_die
+        self.animation = game.sqirl_die
 
     def draw(self):
-        if self.airborne and current_game_state == game_state.GAMEPLAY:
-            frame = 2
+        if self.airborne and game.current_game_state == game_state.GAMEPLAY:
+            frame_no = 2
+        elif self.dead:
+            frame_no = game.anim_frame_counter % 3
         else:
-            frame = frame_counter
-        screen.blit(self.animation.frame(frame), rect(self.x, self.y + 2, self.w, self.h))
+            frame_no = game.anim_frame_counter % 7
+        screen.blit(self.animation.sprite(frame_no, 0), rect(self.x, self.y + 2, self.w, self.h))
 
 
 class platform_base:
@@ -2040,17 +2055,16 @@ class platform_base:
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
 
     def update(self):
-        global score
-
-        self.x -= foreground_scroll_speed
+        self.x -= game.foreground_scroll_speed
 
         if self.r <= 0:
             self.reset()
             while self.check_collisions():
                 self.reset()
-            score += 1
+            game.score += 1
             if random.randint(0, 2):
                 self.spawn_acorn()
+
         self.draw()
 
     def reset(self):
@@ -2059,8 +2073,7 @@ class platform_base:
         self.w = random.randint(int(screen.width / 2), screen.width)
 
     def check_collisions(self):
-        global platforms
-        for platform in platforms:
+        for platform in game.platforms:
             if platform.id == self.id:
                 continue
             if self.bounding_box.intersects(platform.bounding_box):
@@ -2068,12 +2081,11 @@ class platform_base:
         return False
 
     def spawn_acorn(self):
-        global acorns
         acorn = acorn_base(random.randint(self.x, self.r - 10), self.y - 10)
-        acorns.append(acorn)
+        game.acorns.append(acorn)
 
     def draw(self):
-        screen.pen = brush.image(branch, mat3().translate(self.x, self.y))
+        screen.pen = brush.image(game.branch, mat3().translate(self.x, self.y))
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
 
@@ -2098,188 +2110,160 @@ class acorn_base:
         return rect(self.x, self.y, self.w, self.h)
 
     def move(self):
-        self.x -= foreground_scroll_speed
+        self.x -= game.foreground_scroll_speed
         self.draw()
 
     def update(self):
-        global acorns, score
-
         if self.bounding_box.intersects(player.bounding_box):
-            acorns.remove(self)
-            score += 3
+            game.acorns.remove(self)
+            game.score += 3
 
         elif self.r < 0:
-            acorns.remove(self)
+            game.acorns.remove(self)
 
     def draw(self):
-        screen.blit(acorn_sml, vec2(self.x, self.y))
+        screen.blit(game.acorn_sml, vec2(self.x, self.y))
 
 
 def draw_background(scroll=True):
-    global background_scroll_amount
-
-    background_a_pos = background_scroll_amount
-    background_b_pos = background_scroll_amount + background.width
+    background_a_pos = game.background_scroll_amount
+    background_b_pos = game.background_scroll_amount + game.background.width
 
     if scroll:
-        background_scroll_amount -= background_scroll_speed
-        background_scroll_amount %= -background.width
+        game.background_scroll_amount -= game.background_scroll_speed
+        game.background_scroll_amount %= -game.background.width
 
-    screen.blit(background, vec2(background_a_pos, 0))
-    screen.blit(background, vec2(background_b_pos, 0))
+    screen.blit(game.background, vec2(background_a_pos, 0))
+    screen.blit(game.background, vec2(background_b_pos, 0))
 
 
 def draw_score():
-    global score
-    screen.text(str(score), 0, 0)
+    screen.text(str(game.score), 0, 0)
 
 
 def init_gamepad():
-    global gamepad
     gamepads = qwstpad.Gamepadhelper()
     for i in gamepads.pads:
         if i is not None:
-            gamepad = i
-            return i
-    return None
+            game.gamepad = i
+            return
+    game.gamepad = None
+    return
 
 
 def parse_controls():
-    global controls, gamepad
-
-    if gamepad:
+    if game.gamepad:
         try:
-            gamepad.update_buttons()
+            game.gamepad.update_buttons()
         except OSError:
-            gamepad = init_gamepad()
+            init_gamepad()
     else:
-        gamepad = init_gamepad()
+        init_gamepad()
 
-    if gamepad:
-        controls["MOVE_LEFT"] = gamepad.held("L")
-        controls["MOVE_RIGHT"] = gamepad.held("R")
-        controls["DROP"] = gamepad.held("D") and gamepad.pressed("A")
-        controls["JUMP"] = gamepad.pressed("A")
-        controls["JUMP_LEFT"] = gamepad.held("L") and gamepad.pressed("A")
-        controls["JUMP_RIGHT"] = gamepad.held("R") and gamepad.pressed("A")
-        controls["ANY_KEY"] = gamepad.pressed()
+    if game.gamepad:
+        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
+        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
+        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
+        game.controls["JUMP"] = game.gamepad.pressed("A")
+        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
+        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
+        game.controls["ANY_KEY"] = game.gamepad.pressed()
     else:
-        controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        controls["MOVE_RIGHT"] = badge.held(BUTTON_B)
-        controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_C)
-        controls["JUMP"] = badge.pressed(BUTTON_C)
-        controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_C)
-        controls["JUMP_RIGHT"] = badge.held(BUTTON_B) and badge.pressed(BUTTON_C)
-        controls["ANY_KEY"] = badge.pressed()
+        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
+        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
+        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
+        game.controls["JUMP"] = badge.pressed(BUTTON_B)
+        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
+        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
+        game.controls["ANY_KEY"] = badge.pressed()
 
 
 def init_platforms():
-    global platforms
-    platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
+    game.platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
 
-background = image.load("assets/background.png")
-branch = image.load("assets/branch.png")
-sqirl_run_sheet = SpriteSheet("assets/running.png", 7, 1)
-sqirl_die_sheet = SpriteSheet("assets/death.png", 4, 1)
-sqirl_run = AnimatedSprite(sqirl_run_sheet, 0, 0, 7)
-sqirl_die = AnimatedSprite(sqirl_die_sheet, 1, 0, 2)
-acorn_sml = image.load("assets/acorn_sml.png")
-
-gamepad = None
-controls = {}
-
-foreground_scroll_speed = 4
-background_scroll_speed = 1
-background_scroll_amount = 0
-
-frame_counter = 0
-player = player_base(20, 0)
-platforms = []
-acorns = []
-current_game_state = game_state.TITLE
-score = 0
-last_frame = badge.ticks
-
-init_gamepad()
-init_platforms()
 
 def title_loop():
-    global current_game_state
-
     screen.text("Title screen", 0, 0)
 
-    if controls["ANY_KEY"]:
-        current_game_state = game_state.GAMEPLAY
+    if game.controls["ANY_KEY"]:
+        game.current_game_state = game_state.GAMEPLAY
+
 
 def gameplay_loop():
-    global current_game_state
-
     draw_background()
-
     player.update()
 
-    for acorn in acorns:
+    for acorn in game.acorns:
         acorn.move()
 
-    for acorn in acorns:
+    for acorn in game.acorns:
         acorn.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.update()
 
     draw_score()
 
     if player.b >= screen.height:
         player.death()
-        current_game_state = game_state.DEATH_ANIM
+        game.current_game_state = game_state.DEATH_ANIM
+
 
 def death_anim_loop():
-    global current_game_state
-
     draw_background(False)
-
     player.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.draw()
 
     draw_score()
 
     if player.b >= screen.height:
-        current_game_state = game_state.GAMEOVER
+        game.current_game_state = game_state.GAME_OVER
+
 
 def game_over_loop():
-    global current_game_state, score, acorns
-
     screen.text("Game Over screen", 0, 0)
 
-    if controls["ANY_KEY"]:
+    if game.controls["ANY_KEY"]:
         player.reset()
         init_platforms()
-        score = 0
-        acorns.clear()
-        current_game_state = game_state.TITLE
-
-def update():
-    global frame_counter, last_frame
-
-    parse_controls()
-
-    if current_game_state == game_state.TITLE:
-        title_loop()
-    elif current_game_state == game_state.GAMEPLAY:
-        gameplay_loop()
-    elif current_game_state == game_state.DEATH_ANIM:
-        death_anim_loop()
-    elif current_game_state == game_state.GAMEOVER:
-        game_over_loop()
-
-    if badge.ticks - last_frame > 83:
-        frame_counter += 1
-        last_frame = badge.ticks
+        game.score = 0
+        game.acorns.clear()
+        game.current_game_state = game_state.TITLE
 
 
-run(update)
+player = player_base(20, 0)
+init_gamepad()
+init_platforms()
+
+while True:
+    ticks = time.ticks_ms()
+    frametime = ticks - game.last_frame
+    anim_frametime = ticks - game.anim_last_frame
+
+    if anim_frametime >= 83:
+        game.anim_frame_counter += 1
+        game.anim_last_frame = ticks
+
+    if frametime >= 33:
+        badge.clear()
+        badge.poll()
+        parse_controls()
+
+        if game.current_game_state == game_state.TITLE:
+            title_loop()
+        elif game.current_game_state == game_state.GAMEPLAY:
+            gameplay_loop()
+        elif game.current_game_state == game_state.DEATH_ANIM:
+            death_anim_loop()
+        elif game.current_game_state == game_state.GAME_OVER:
+            game_over_loop()
+
+        display.update()
+
+        game.last_frame = ticks
+
 ```
 
 # The title and game over screens
@@ -2295,59 +2279,51 @@ We'll need a couple more images:
 Let's import these in right after the others.
 
 ```python-raw
-title = image.load("assets/title.png")
-gameover = image.load("assets/gameover.png")
+    title = image.load("assets/title.png")
+    gameover = image.load("assets/gameover.png")
 ```
 
 The game over loop then becomes very easy to do, as we're just replacing the line that draws the text with one that blits the image:
 
 ```python-raw
 def game_over_loop():
-    global current_game_state, score, acorns
+    screen.blit(game.gameover, vec2(0, 0))
 
-    screen.blit(gameover, vec2(0, 0))
-
-    if controls["ANY_KEY"]:
+    if game.controls["ANY_KEY"]:
         player.reset()
         init_platforms()
-        score = 0
-        acorns.clear()
-        current_game_state = game_state.TITLE
+        game.score = 0
+        game.acorns.clear()
+        game.current_game_state = game_state.TITLE
 ```
 
 For the title screen, the first thing we can do is lay down the background using `draw_background()` just like in the gameplay loop, and then we can blit the title on top of it. The title image is the width of the screen, so we can just position it at (0, 0) and it'll be in the right place.
 
 ```python-raw
 def title_loop():
-    global current_game_state
-
     draw_background()
+    screen.blit(game.title, vec2(0, 0))
 
-    screen.blit(title, vec2(0, 0))
-
-    if controls["ANY_KEY"]:
-        current_game_state = game_state.GAMEPLAY
+    if game.controls["ANY_KEY"]:
+        game.current_game_state = game_state.GAMEPLAY
 ```
 
 Alright, that's a good backdrop. Now, remember how we used an image brush to draw the platforms? We're going to do the same here for our infinite branch, but instead of moving the platform we're going to keep it in one place and let the texture scroll across it. Here's what we're going to do.
 
 ```python-raw
 def title_loop():
-    global current_game_state
-
     draw_background()
-
-    screen.blit(title, vec2(0, 0))
+    screen.blit(game.title, vec2(0, 0))
 
     branch_y = 73
     branch_tex_matrix = mat3().translate(0, branch_y)
 
     branch_bar = shape.rectangle(0, branch_y, screen.width, 10)
-    screen.pen = brush.image(branch, branch_tex_matrix)
+    screen.pen = brush.image(game.branch, branch_tex_matrix)
     screen.shape(branch_bar)
 
-    if controls["ANY_KEY"]:
-        current_game_state = game_state.GAMEPLAY
+    if game.controls["ANY_KEY"]:
+        game.current_game_state = game_state.GAMEPLAY
 ```
 
 Let's go through those new lines one by one. First we're going to set a variable for the branch's y position on the screen. Then we'll create a transformation matrix, just like we did for the platforms which moves the tiling branch texture down to that same height. We'll be using the x coordinate of this matrix to scroll the branch, but for now we'll leave it at zero.
@@ -2358,35 +2334,33 @@ If you run the program now you should see a static branch along the horizon line
 
 > Note: In theory you could use this technique to do the background scrolling as well, but in practice we found that because of some internal workings of the back end code, the way it's been accomplished in this tutorial gave a much smoother and more consistent framerate.
 
-Let's have the infinite branch move at the same speed as the ingame platforms. That gives us visual consistency, and also lets us reuse our `foreground_scroll_speed` variable. We just need another global to keep track of the scroll position of the texture, and we'll create that right below the other scrolling-related globals as `title_scroll_amount = 0`. Then in our title screen loop, we'll bring in the global, set the x coordinate of the texture transformation to `title_scroll_amount` and remember to decrease `title_scroll_amount` by `foreground_scroll_speed`.
+Let's have the infinite branch move at the same speed as the ingame platforms. That gives us visual consistency, and also lets us reuse our `foreground_scroll_speed` variable. We just need another variable in `game` to keep track of the scroll position of the texture, and we'll create that right below the other scrolling-related variables as `title_scroll_amount = 0`. Then in our title screen loop, we'll bring in the global, set the x coordinate of the texture transformation to `title_scroll_amount` and remember to decrease `title_scroll_amount` by `foreground_scroll_speed`.
 
 ```python-raw
 def title_loop():
-    global current_game_state, title_scroll_amount
-
     draw_background()
-
-    screen.blit(title, vec2(0, 0))
+    screen.blit(game.title, vec2(0, 0))
 
     branch_y = 73
-    branch_tex_matrix = mat3().translate(title_scroll_amount, branch_y)
-    title_scroll_amount -= foreground_scroll_speed
-    title_scroll_amount %= branch.width
+    branch_tex_matrix = mat3().translate(game.title_scroll_amount, branch_y)
+    game.title_scroll_amount -= game.foreground_scroll_speed
+    game.title_scroll_amount %= game.branch.width
 
     branch_bar = shape.rectangle(0, branch_y, screen.width, 10)
-    screen.pen = brush.image(branch, branch_tex_matrix)
+    screen.pen = brush.image(game.branch, branch_tex_matrix)
     screen.shape(branch_bar)
 
-    if controls["ANY_KEY"]:
-        current_game_state = game_state.GAMEPLAY
+    if game.controls["ANY_KEY"]:
+        game.current_game_state = game_state.GAMEPLAY
 ```
 
-Now we just need to add Tufty running along there. This is a lot easier than the interactive Tufty, as this one doesn't need to move or take in input from buttons, it's just an animated image.
+Now we just need to add Tufty running along there. This is a lot easier than the interactive Tufty, as this one doesn't need to move or take in input from buttons, it's just an animated image. This goes in `title_loop()` again, after the code you just added to draw the branch.
 
 ```python-raw
     sqirl_x = (screen.width - 32) / 2
     sqirl_y = 43
-    screen.blit(sqirl_run.frame(frame_counter), rect(sqirl_x, sqirl_y, 32, 32))
+    frame_no = game.anim_frame_counter % 7
+    screen.blit(game.sqirl_run.sprite(frame_no, 0), rect(sqirl_x, sqirl_y, 32, 32))
 ```
 
 So we're just using the existing frame counter we've always got running in the background for this. First we're setting x and y coordinates so that Tufty will be at the right height and centred on screen, then blitting the appropriate frame from the animation.
@@ -2404,9 +2378,7 @@ We're actually going to be centering text on the screen a fair bit for the rest 
 ```python-raw
 def centre_text(message, y):
     text_w, text_h = screen.measure_text(message)
-
     x = (screen.width - text_w) / 2
-
     screen.text(message, vec2(x, y))
 ```
 
@@ -2415,10 +2387,10 @@ This is probably pretty familiar if you've done the previous tutorials. You can 
 Now we've got that, we can easily use it ingame. You just need the following lines in `title_loop()` and `game_over_loop()`, each right after drawing everything else and before checking for button presses.
 
 ```python-raw
-    screen.font = title_font
+    screen.font = game.title_font
     screen.pen = color.white
 
-    if int(badge.ticks / 500) % 2:
+    if int(time.ticks_ms() / 500) % 2:
         restarttext = "Press any button!"
         centre_text(restarttext, 100)
 ```
@@ -2428,15 +2400,44 @@ Setting the font and the pen is self-explanatory, as is drawing the text. That `
 At this point, your program should look like this:
 
 ```python
-import qwstpad
 import random
+import qwstpad
+import time
 
 
 class game_state:
     TITLE = 0
     GAMEPLAY = 1
     DEATH_ANIM = 2
-    GAMEOVER = 3
+    GAME_OVER = 3
+
+
+class game:
+    background = image.load("assets/background.png")
+    branch = image.load("assets/branch.png")
+    sqirl_run = image.load("assets/running.png").spritesheet(7, 1)
+    sqirl_die = image.load("assets/death.png").spritesheet(4, 1)
+    acorn_sml = image.load("assets/acorn_sml.png")
+    title = image.load("assets/title.png")
+    gameover = image.load("assets/gameover.png")
+    title_font = font.yesterday
+
+    platforms = []
+    acorns = []
+    controls = {}
+    gamepad = None
+
+    foreground_scroll_speed = 4
+    background_scroll_speed = 1
+    background_scroll_amount = 0
+    title_scroll_amount = 0
+
+    last_frame = 0
+    anim_last_frame = 0
+    current_game_state = game_state.TITLE
+    anim_frame_counter = 0
+
+    score = 0
 
 
 class player_base:
@@ -2450,8 +2451,7 @@ class player_base:
         self.vx = 0
         self.airborne = False
         self.dead = False
-
-        self.animation = sqirl_run
+        self.animation = game.sqirl_run
 
     @property
     def r(self):
@@ -2489,7 +2489,7 @@ class player_base:
 
     def is_airborne(self):
         airborne = True
-        for platform in platforms:
+        for platform in game.platforms:
             if self.is_standing(platform):
                 airborne = False
         self.airborne = airborne
@@ -2497,29 +2497,31 @@ class player_base:
     def update(self):
         self.is_airborne()
 
-        if self.airborne or self.dead or controls["DROP"]:
+        if self.airborne or self.dead or game.controls["DROP"]:
             self.vy += 1
         else:
-            if controls["JUMP"]:
+            if game.controls["JUMP"]:
                 self.vy = -10
 
-            if controls["JUMP_RIGHT"]:
+            if game.controls["JUMP_RIGHT"]:
                 self.vx = max(self.vx, 3)
 
-            elif controls["JUMP_LEFT"]:
+            elif game.controls["JUMP_LEFT"]:
                 self.vx = min(self.vx, -3)
 
-            elif controls["MOVE_RIGHT"]:
+            elif game.controls["MOVE_RIGHT"]:
                 self.vx += 1.5
 
-            elif controls["MOVE_LEFT"]:
+            elif game.controls["MOVE_LEFT"]:
                 self.vx -= 1.5
 
-            if self.vx > 0: self.vx -= 0.5
-            elif self.vx < 0: self.vx += 0.5
+            if self.vx > 0:
+                self.vx -= 0.5
+            elif self.vx < 0:
+                self.vx += 0.5
 
         if not self.dead:
-            for platform in platforms:
+            for platform in game.platforms:
                 if self.is_landing(platform):
                     self.b = platform.y
                     self.vy = 0
@@ -2537,21 +2539,23 @@ class player_base:
         self.vx = 0
         self.vy = 0
         self.dead = False
-        self.animation = sqirl_run
+        self.animation = game.sqirl_run
 
     def death(self):
         self.b = screen.height - 1
         self.vx = 0
         self.vy = -12
         self.dead = True
-        self.animation = sqirl_die
+        self.animation = game.sqirl_die
 
     def draw(self):
-        if self.airborne and current_game_state == game_state.GAMEPLAY:
-            frame = 2
+        if self.airborne and game.current_game_state == game_state.GAMEPLAY:
+            frame_no = 2
+        elif self.dead:
+            frame_no = game.anim_frame_counter % 3
         else:
-            frame = frame_counter
-        screen.blit(self.animation.frame(frame), rect(self.x, self.y + 2, self.w, self.h))
+            frame_no = game.anim_frame_counter % 7
+        screen.blit(self.animation.sprite(frame_no, 0), rect(self.x, self.y + 2, self.w, self.h))
 
 
 class platform_base:
@@ -2576,17 +2580,16 @@ class platform_base:
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
 
     def update(self):
-        global score
-
-        self.x -= foreground_scroll_speed
+        self.x -= game.foreground_scroll_speed
 
         if self.r <= 0:
             self.reset()
             while self.check_collisions():
                 self.reset()
-            score += 1
+            game.score += 1
             if random.randint(0, 2):
                 self.spawn_acorn()
+
         self.draw()
 
     def reset(self):
@@ -2595,8 +2598,7 @@ class platform_base:
         self.w = random.randint(int(screen.width / 2), screen.width)
 
     def check_collisions(self):
-        global platforms
-        for platform in platforms:
+        for platform in game.platforms:
             if platform.id == self.id:
                 continue
             if self.bounding_box.intersects(platform.bounding_box):
@@ -2604,12 +2606,11 @@ class platform_base:
         return False
 
     def spawn_acorn(self):
-        global acorns
         acorn = acorn_base(random.randint(self.x, self.r - 10), self.y - 10)
-        acorns.append(acorn)
+        game.acorns.append(acorn)
 
     def draw(self):
-        screen.pen = brush.image(branch, mat3().translate(self.x, self.y))
+        screen.pen = brush.image(game.branch, mat3().translate(self.x, self.y))
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
 
@@ -2634,228 +2635,195 @@ class acorn_base:
         return rect(self.x, self.y, self.w, self.h)
 
     def move(self):
-        self.x -= foreground_scroll_speed
+        self.x -= game.foreground_scroll_speed
         self.draw()
 
     def update(self):
-        global acorns, score
-
         if self.bounding_box.intersects(player.bounding_box):
-            acorns.remove(self)
-            score += 3
+            game.acorns.remove(self)
+            game.score += 3
 
         elif self.r < 0:
-            acorns.remove(self)
+            game.acorns.remove(self)
 
     def draw(self):
-        screen.blit(acorn_sml, vec2(self.x, self.y))
+        screen.blit(game.acorn_sml, vec2(self.x, self.y))
 
 
 def centre_text(message, y):
     text_w, text_h = screen.measure_text(message)
-
     x = (screen.width - text_w) / 2
-
     screen.text(message, vec2(x, y))
 
 
 def draw_background(scroll=True):
-    global background_scroll_amount
-
-    background_a_pos = background_scroll_amount
-    background_b_pos = background_scroll_amount + background.width
+    background_a_pos = game.background_scroll_amount
+    background_b_pos = game.background_scroll_amount + game.background.width
 
     if scroll:
-        background_scroll_amount -= background_scroll_speed
-        background_scroll_amount %= -background.width
+        game.background_scroll_amount -= game.background_scroll_speed
+        game.background_scroll_amount %= -game.background.width
 
-    screen.blit(background, vec2(background_a_pos, 0))
-    screen.blit(background, vec2(background_b_pos, 0))
+    screen.blit(game.background, vec2(background_a_pos, 0))
+    screen.blit(game.background, vec2(background_b_pos, 0))
 
 
 def draw_score():
-    global score
-    screen.text(str(score), 0, 0)
+    screen.text(str(game.score), 0, 0)
 
 
 def init_gamepad():
-    global gamepad
     gamepads = qwstpad.Gamepadhelper()
     for i in gamepads.pads:
         if i is not None:
-            gamepad = i
-            return i
-    return None
+            game.gamepad = i
+            return
+    game.gamepad = None
+    return
 
 
 def parse_controls():
-    global controls, gamepad
-
-    if gamepad:
+    if game.gamepad:
         try:
-            gamepad.update_buttons()
+            game.gamepad.update_buttons()
         except OSError:
-            gamepad = init_gamepad()
+            init_gamepad()
     else:
-        gamepad = init_gamepad()
+        init_gamepad()
 
-    if gamepad:
-        controls["MOVE_LEFT"] = gamepad.held("L")
-        controls["MOVE_RIGHT"] = gamepad.held("R")
-        controls["DROP"] = gamepad.held("D") and gamepad.pressed("A")
-        controls["JUMP"] = gamepad.pressed("A")
-        controls["JUMP_LEFT"] = gamepad.held("L") and gamepad.pressed("A")
-        controls["JUMP_RIGHT"] = gamepad.held("R") and gamepad.pressed("A")
-        controls["ANY_KEY"] = gamepad.pressed()
+    if game.gamepad:
+        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
+        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
+        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
+        game.controls["JUMP"] = game.gamepad.pressed("A")
+        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
+        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
+        game.controls["ANY_KEY"] = game.gamepad.pressed()
     else:
-        controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        controls["MOVE_RIGHT"] = badge.held(BUTTON_B)
-        controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_C)
-        controls["JUMP"] = badge.pressed(BUTTON_C)
-        controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_C)
-        controls["JUMP_RIGHT"] = badge.held(BUTTON_B) and badge.pressed(BUTTON_C)
-        controls["ANY_KEY"] = badge.pressed()
+        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
+        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
+        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
+        game.controls["JUMP"] = badge.pressed(BUTTON_B)
+        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
+        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
+        game.controls["ANY_KEY"] = badge.pressed()
 
 
 def init_platforms():
-    global platforms
-    platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
+    game.platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
 
-background = image.load("assets/background.png")
-branch = image.load("assets/branch.png")
-sqirl_run_sheet = SpriteSheet("assets/running.png", 7, 1)
-sqirl_die_sheet = SpriteSheet("assets/death.png", 4, 1)
-sqirl_run = AnimatedSprite(sqirl_run_sheet, 0, 0, 7)
-sqirl_die = AnimatedSprite(sqirl_die_sheet, 1, 0, 2)
-acorn_sml = image.load("assets/acorn_sml.png")
-title = image.load("assets/title.png")
-gameover = image.load("assets/gameover.png")
-title_font = font.yesterday
-
-gamepad = None
-controls = {}
-
-foreground_scroll_speed = 4
-background_scroll_speed = 1
-background_scroll_amount = 0
-title_scroll_amount = 0
-
-frame_counter = 0
-player = player_base(20, 0)
-platforms = []
-acorns = []
-current_game_state = game_state.TITLE
-score = 0
-last_frame = badge.ticks
-
-init_gamepad()
-init_platforms()
 
 def title_loop():
-    global current_game_state, title_scroll_amount
-
     draw_background()
-
-    screen.blit(title, vec2(0, 0))
+    screen.blit(game.title, vec2(0, 0))
 
     branch_y = 73
-    branch_tex_matrix = mat3().translate(title_scroll_amount, branch_y)
-    title_scroll_amount -= foreground_scroll_speed
+    branch_tex_matrix = mat3().translate(game.title_scroll_amount, branch_y)
+    game.title_scroll_amount -= game.foreground_scroll_speed
+    game.title_scroll_amount %= game.branch.width
 
     branch_bar = shape.rectangle(0, branch_y, screen.width, 10)
-    screen.pen = brush.image(branch, branch_tex_matrix)
+    screen.pen = brush.image(game.branch, branch_tex_matrix)
     screen.shape(branch_bar)
 
     sqirl_x = (screen.width - 32) / 2
     sqirl_y = 43
-    screen.blit(sqirl_run.frame(frame_counter), rect(sqirl_x, sqirl_y, 32, 32))
+    frame_no = game.anim_frame_counter % 7
+    screen.blit(game.sqirl_run.sprite(frame_no, 0), rect(sqirl_x, sqirl_y, 32, 32))
 
-    screen.font = title_font
+    screen.font = game.title_font
     screen.pen = color.white
 
-    if int(badge.ticks / 500) % 2:
+    if int(time.ticks_ms() / 500) % 2:
         restarttext = "Press any button!"
         centre_text(restarttext, 100)
 
-    if controls["ANY_KEY"]:
-        current_game_state = game_state.GAMEPLAY
+    if game.controls["ANY_KEY"]:
+        game.current_game_state = game_state.GAMEPLAY
+
 
 def gameplay_loop():
-    global current_game_state
-
     draw_background()
-
     player.update()
 
-    for acorn in acorns:
+    for acorn in game.acorns:
         acorn.move()
 
-    for acorn in acorns:
+    for acorn in game.acorns:
         acorn.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.update()
 
     draw_score()
 
     if player.b >= screen.height:
         player.death()
-        current_game_state = game_state.DEATH_ANIM
+        game.current_game_state = game_state.DEATH_ANIM
+
 
 def death_anim_loop():
-    global current_game_state
-
     draw_background(False)
-
     player.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.draw()
 
     draw_score()
 
     if player.b >= screen.height:
-        current_game_state = game_state.GAMEOVER
+        game.current_game_state = game_state.GAME_OVER
+
 
 def game_over_loop():
-    global current_game_state, score, acorns
+    screen.blit(game.gameover, vec2(0, 0))
 
-    screen.blit(gameover, vec2(0, 0))
-
-    screen.font = title_font
+    screen.font = game.title_font
     screen.pen = color.white
 
-    if int(badge.ticks / 500) % 2:
+    if int(time.ticks_ms() / 500) % 2:
         restarttext = "Press any button!"
         centre_text(restarttext, 100)
 
-    if controls["ANY_KEY"]:
+    if game.controls["ANY_KEY"]:
         player.reset()
         init_platforms()
-        score = 0
-        acorns.clear()
-        current_game_state = game_state.TITLE
-
-def update():
-    global frame_counter, last_frame
-
-    parse_controls()
-
-    if current_game_state == game_state.TITLE:
-        title_loop()
-    elif current_game_state == game_state.GAMEPLAY:
-        gameplay_loop()
-    elif current_game_state == game_state.DEATH_ANIM:
-        death_anim_loop()
-    elif current_game_state == game_state.GAMEOVER:
-        game_over_loop()
-
-    if badge.ticks - last_frame > 83:
-        frame_counter += 1
-        last_frame = badge.ticks
+        game.score = 0
+        game.acorns.clear()
+        game.current_game_state = game_state.TITLE
 
 
-run(update)
+player = player_base(20, 0)
+init_gamepad()
+init_platforms()
+
+while True:
+    ticks = time.ticks_ms()
+    frametime = ticks - game.last_frame
+    anim_frametime = ticks - game.anim_last_frame
+
+    if anim_frametime >= 83:
+        game.anim_frame_counter += 1
+        game.anim_last_frame = ticks
+
+    if frametime >= 33:
+        badge.clear()
+        badge.poll()
+        parse_controls()
+
+        if game.current_game_state == game_state.TITLE:
+            title_loop()
+        elif game.current_game_state == game_state.GAMEPLAY:
+            gameplay_loop()
+        elif game.current_game_state == game_state.DEATH_ANIM:
+            death_anim_loop()
+        elif game.current_game_state == game_state.GAME_OVER:
+            game_over_loop()
+
+        display.update()
+
+        game.last_frame = ticks
+
 ```
 
 # Visual finishing touches
@@ -2864,14 +2832,14 @@ One thing we've neglected so far is that poor little score indicator in the game
 
 ![Acorn Highway acorn large](/tut4_res/acorn_lg.png)
 
-And we'll import it in just the same way as we have the others, adding in right after them
+And we'll import it in just the same way as we have the others, adding it into `game` right after them.
 
 ```python-raw
 acorn_lg = image.load("assets/acorn_lg.png")
 score_font = font.futile
 ```
 
-You can see we also loaded another pixel font from memory. That's all the assets we need to add for the game! Now let's just implement them. Let's scroll back up to the `draw_score()` method that we created all that time ago.
+You can see we also loaded another pixel font from memory. That's all the assets we need to add for the game! Now let's just implement them. Let's scroll back down to the `draw_score()` method that we created all that time ago.
 
 We're going to put the icon in the top right of the screen, with the score next to it, aligned to the right. The score will just be plain text, but we're going to do two copies of it, offset just slightly to give a drop shadow effect. This is the only place we're going to use this, so there's no point in making a matrix transformation or anything like we did in the dashboard tutorial. Here we can just position it by hand.
 
@@ -2879,66 +2847,62 @@ First, let's do the image:
 
 ```python-raw
 def draw_score():
-    global score
-
     x = screen.width - 16
     y = 3
 
     acorn_coords = vec2(x, y)
-    screen.blit(acorn_lg, acorn_coords)
+    screen.blit(game.acorn_lg, acorn_coords)
 ```
 
 After that we'll measure the text - remember, it's an integer, so will need converting to a string before we draw or measure it:
 
 ```python-raw
-    score_w, score_h = screen.measure_text(str(score))
+    score_w, score_h = screen.measure_text(str(game.score))
 ```
 
 To draw the text and the drop shadow we need to do the shadow first, so that the text displays over the top of it. We'll modify and reuse the x and y coordinates we already made for the acorn icon to get first the position of the drop shadow and then of the score text.
 
 ```python-raw
-    screen.font = score_font
+    screen.font = game.score_font
     screen.pen = color.black
 
     x -= score_w
     y -= 5
-    screen.text(str(score), vec2(x, y))
+    screen.text(str(game.score), vec2(x, y))
 ```
 
 As you can see, we've just shifted our x coordinate left by the width of the score text, and our y coordinate up a little. We've also set the font and the colour for our drop shadow, and then drawn it to the screen.
 
 ```python-raw
-    x -=2
-    y -=2
+    x -= 2
+    y -= 2
     screen.pen = color.brown
-    screen.text(str(score), vec2(x, y))
+    screen.text(str(game.score), vec2(x, y))
 ```
 
 Finally we'll just move the position up and to the left by two pixels, change the pen colour and draw the same text again. Your method should now look like the following, and should display a neat looking bold score up in the top right of the screen.
 
 ```python-raw
 def draw_score():
-    global score
-
     x = screen.width - 16
     y = 3
 
     acorn_coords = vec2(x, y)
-    screen.blit(acorn_lg, acorn_coords)
+    screen.blit(game.acorn_lg, acorn_coords)
 
-    score_w, score_h = screen.measure_text(str(score))
+    score_w, score_h = screen.measure_text(str(game.score))
 
-    screen.font = score_font
+    screen.font = game.score_font
     screen.pen = color.black
 
     x -= score_w
     y -= 5
-    screen.text(str(score), vec2(x, y))
+    screen.text(str(game.score), vec2(x, y))
 
-    x -=2
-    y -=2
+    x -= 2
+    y -= 2
     screen.pen = color.brown
-    screen.text(str(score), vec2(x, y))
+    screen.text(str(game.score), vec2(x, y))
 ```
 
 Not bad, right?
@@ -2950,7 +2914,7 @@ Now we just want to put on two finishing touches - displaying your final score w
 Displaying the score is trivial - you just need the following lines in `game_over_loop()`, right after you display the flashing 'Press any button!' message:
 
 ```python-raw
-    scoretext = f"Your score: {str(score)}"
+    scoretext = f"Your score: {str(game.score)}"
     centre_text(scoretext, 87)
 ```
 
@@ -2960,10 +2924,10 @@ That's all you need. High scores are trickier though, and they require the use o
 
 In essence, a state is just a little JSON file that contains simple data - in this case, one single number - that of the current high score. There's methods in the Badgeware API that let you easily and quickly load and save states, and this is ideal for what we want to do.
 
-States are saved in the form of a dictionary, and we need to set up that dictionary with default values, so that if there is no save state file (like when the program is first run), there's still data to work with. We're working just after we've set our player, acorns, game state and so on, right before we run `init_gamepad()` and/or `init_platforms()`.
+States are saved in the form of a dictionary, and we need to set up that dictionary with default values, so that if there is no save state file (like when the program is first run), there's still data to work with. We'll put this right at the very end of `game` after the score..
 
 ```python-raw
-save_state = {"highscore": 0}
+    save_state = {"highscore": 0}
 ```
 
 This single line sets up a little dictionary with a single entry - the key is the string "highscore", and the value starts at 0. It's this dictionary we read the high score from and write it to, so before we've even done any saving or loading we can add in the code for displaying it.
@@ -2971,22 +2935,22 @@ This single line sets up a little dictionary with a single entry - the key is th
 Let's go to our `title_loop()` method and add in the following, right after the flashing text:
 
 ```python-raw
-    highscoretext = f"High score: {str(save_state["highscore"])}"
+    highscoretext = f"High score: {str(game.save_state["highscore"])}"
     centre_text(highscoretext, 85)
 ```
 
-I'm sure you're getting the hang of this by now - we're drawing another centred line of text, a bit higher, and we're including in the string `save_state[highscore]` - that is, the value from the dictionary we just created. Note that again, the value is an integer, so we need to convert it into a string.
+I'm sure you're getting the hang of this by now - we're drawing another centred line of text, a bit higher, and in the string we're inserting `game.save_state[highscore]` - that is, the value from the dictionary we just created. Note that again, the value is an integer, so we need to convert it into a string.
 
 We can put the same high score into our `game_over_loop()` method, although this time, we've got a little more to do.
 
-We could just say `highscoretext = f"High score: {str(save_state["highscore"])}"` just like in the title screen. But if you get a new high score, we need to update the dictionary to reflect that - and while we could just show "Your score - 99, High score - 99" it might be cool to use that space to actually congratulate the player. Let's go with the following:
+We could just say `highscoretext = f"High score: {str(game.save_state["highscore"])}"` just like in the title screen. But if you get a new high score, we need to update the dictionary to reflect that - and while we could just show "Your score - 99, High score - 99" it might be cool to use that space to actually congratulate the player. Let's go with the following, adding it in after we draw the score text:
 
 ```python-raw
-    if score >= save_state["highscore"]:
+    if game.score >= game.save_state["highscore"]:
         highscoretext = "High score!"
-        save_state["highscore"] = score
+        game.save_state["highscore"] = game.score
     else:
-        highscoretext = f"High score: {str(save_state["highscore"])}"
+        highscoretext = f"High score: {str(game.save_state["highscore"])}"
 
     centre_text(highscoretext, 74)
 ```
@@ -3009,10 +2973,10 @@ Let's unpack that `State.load()`. The first parameter is the name of the save st
 Similarly, where we just were on the game over screen, right after putting the new high score in the dictionary we're going to add a line:
 
 ```python-raw
-    if score >= save_state["highscore"]:
+    if game.score >= game.save_state["highscore"]:
         highscoretext = "High score!"
-        save_state["highscore"] = score
-        State.save("acorn_highway", save_state)
+        game.save_state["highscore"] = game.score
+        State.save("acorn_highway", game.save_state)
 ```
 
 # The end
@@ -3020,15 +2984,48 @@ Similarly, where we just were on the game over screen, right after putting the n
 And that's it! By'eck, it's been a little while, but we got there. You should have a fully fledged platform game for Tufty. Here's the final code for the game. Well done for getting this far and happy coding in the future!
 
 ```python
-import qwstpad
 import random
+import qwstpad
+import time
 
 
 class game_state:
     TITLE = 0
     GAMEPLAY = 1
     DEATH_ANIM = 2
-    GAMEOVER = 3
+    GAME_OVER = 3
+
+
+class game:
+    background = image.load("assets/background.png")
+    branch = image.load("assets/branch.png")
+    sqirl_run = image.load("assets/running.png").spritesheet(7, 1)
+    sqirl_die = image.load("assets/death.png").spritesheet(4, 1)
+    acorn_sml = image.load("assets/acorn_sml.png")
+    title = image.load("assets/title.png")
+    gameover = image.load("assets/gameover.png")
+    title_font = font.yesterday
+    acorn_lg = image.load("assets/acorn_lg.png")
+    score_font = font.futile
+
+    platforms = []
+    acorns = []
+    controls = {}
+    gamepad = None
+
+    foreground_scroll_speed = 4
+    background_scroll_speed = 1
+    background_scroll_amount = 0
+    title_scroll_amount = 0
+
+    last_frame = 0
+    anim_last_frame = 0
+    current_game_state = game_state.TITLE
+    anim_frame_counter = 0
+
+    score = 0
+    save_state = {"highscore": 0}
+    State.load("acorn_highway", save_state)
 
 
 class player_base:
@@ -3042,8 +3039,7 @@ class player_base:
         self.vx = 0
         self.airborne = False
         self.dead = False
-
-        self.animation = sqirl_run
+        self.animation = game.sqirl_run
 
     @property
     def r(self):
@@ -3081,7 +3077,7 @@ class player_base:
 
     def is_airborne(self):
         airborne = True
-        for platform in platforms:
+        for platform in game.platforms:
             if self.is_standing(platform):
                 airborne = False
         self.airborne = airborne
@@ -3089,29 +3085,31 @@ class player_base:
     def update(self):
         self.is_airborne()
 
-        if self.airborne or self.dead or controls["DROP"]:
+        if self.airborne or self.dead or game.controls["DROP"]:
             self.vy += 1
         else:
-            if controls["JUMP"]:
+            if game.controls["JUMP"]:
                 self.vy = -10
 
-            if controls["JUMP_RIGHT"]:
+            if game.controls["JUMP_RIGHT"]:
                 self.vx = max(self.vx, 3)
 
-            elif controls["JUMP_LEFT"]:
+            elif game.controls["JUMP_LEFT"]:
                 self.vx = min(self.vx, -3)
 
-            elif controls["MOVE_RIGHT"]:
+            elif game.controls["MOVE_RIGHT"]:
                 self.vx += 1.5
 
-            elif controls["MOVE_LEFT"]:
+            elif game.controls["MOVE_LEFT"]:
                 self.vx -= 1.5
 
-            if self.vx > 0: self.vx -= 0.5
-            elif self.vx < 0: self.vx += 0.5
+            if self.vx > 0:
+                self.vx -= 0.5
+            elif self.vx < 0:
+                self.vx += 0.5
 
         if not self.dead:
-            for platform in platforms:
+            for platform in game.platforms:
                 if self.is_landing(platform):
                     self.b = platform.y
                     self.vy = 0
@@ -3129,21 +3127,23 @@ class player_base:
         self.vx = 0
         self.vy = 0
         self.dead = False
-        self.animation = sqirl_run
+        self.animation = game.sqirl_run
 
     def death(self):
         self.b = screen.height - 1
         self.vx = 0
         self.vy = -12
         self.dead = True
-        self.animation = sqirl_die
+        self.animation = game.sqirl_die
 
     def draw(self):
-        if self.airborne and current_game_state == game_state.GAMEPLAY:
-            frame = 2
+        if self.airborne and game.current_game_state == game_state.GAMEPLAY:
+            frame_no = 2
+        elif self.dead:
+            frame_no = game.anim_frame_counter % 3
         else:
-            frame = frame_counter
-        screen.blit(self.animation.frame(frame), rect(self.x, self.y + 2, self.w, self.h))
+            frame_no = game.anim_frame_counter % 7
+        screen.blit(self.animation.sprite(frame_no, 0), rect(self.x, self.y + 2, self.w, self.h))
 
 
 class platform_base:
@@ -3168,17 +3168,16 @@ class platform_base:
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
 
     def update(self):
-        global score
-
-        self.x -= foreground_scroll_speed
+        self.x -= game.foreground_scroll_speed
 
         if self.r <= 0:
             self.reset()
             while self.check_collisions():
                 self.reset()
-            score += 1
+            game.score += 1
             if random.randint(0, 2):
                 self.spawn_acorn()
+
         self.draw()
 
     def reset(self):
@@ -3187,8 +3186,7 @@ class platform_base:
         self.w = random.randint(int(screen.width / 2), screen.width)
 
     def check_collisions(self):
-        global platforms
-        for platform in platforms:
+        for platform in game.platforms:
             if platform.id == self.id:
                 continue
             if self.bounding_box.intersects(platform.bounding_box):
@@ -3196,12 +3194,11 @@ class platform_base:
         return False
 
     def spawn_acorn(self):
-        global acorns
         acorn = acorn_base(random.randint(self.x, self.r - 10), self.y - 10)
-        acorns.append(acorn)
+        game.acorns.append(acorn)
 
     def draw(self):
-        screen.pen = brush.image(branch, mat3().translate(self.x, self.y))
+        screen.pen = brush.image(game.branch, mat3().translate(self.x, self.y))
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
 
@@ -3226,266 +3223,226 @@ class acorn_base:
         return rect(self.x, self.y, self.w, self.h)
 
     def move(self):
-        self.x -= foreground_scroll_speed
+        self.x -= game.foreground_scroll_speed
         self.draw()
 
     def update(self):
-        global acorns, score
-
         if self.bounding_box.intersects(player.bounding_box):
-            acorns.remove(self)
-            score += 3
+            game.acorns.remove(self)
+            game.score += 3
 
         elif self.r < 0:
-            acorns.remove(self)
+            game.acorns.remove(self)
 
     def draw(self):
-        screen.blit(acorn_sml, vec2(self.x, self.y))
+        screen.blit(game.acorn_sml, vec2(self.x, self.y))
 
 
 def centre_text(message, y):
     text_w, text_h = screen.measure_text(message)
-
     x = (screen.width - text_w) / 2
-
     screen.text(message, vec2(x, y))
 
 
 def draw_background(scroll=True):
-    global background_scroll_amount
-
-    background_a_pos = background_scroll_amount
-    background_b_pos = background_scroll_amount + background.width
+    background_a_pos = game.background_scroll_amount
+    background_b_pos = game.background_scroll_amount + game.background.width
 
     if scroll:
-        background_scroll_amount -= background_scroll_speed
-        background_scroll_amount %= -background.width
+        game.background_scroll_amount -= game.background_scroll_speed
+        game.background_scroll_amount %= -game.background.width
 
-    screen.blit(background, vec2(background_a_pos, 0))
-    screen.blit(background, vec2(background_b_pos, 0))
+    screen.blit(game.background, vec2(background_a_pos, 0))
+    screen.blit(game.background, vec2(background_b_pos, 0))
 
 
 def draw_score():
-    global score
-
     x = screen.width - 16
     y = 3
 
     acorn_coords = vec2(x, y)
-    screen.blit(acorn_lg, acorn_coords)
+    screen.blit(game.acorn_lg, acorn_coords)
 
-    score_w, score_h = screen.measure_text(str(score))
+    score_w, score_h = screen.measure_text(str(game.score))
 
-    screen.font = score_font
+    screen.font = game.score_font
     screen.pen = color.black
 
     x -= score_w
     y -= 5
-    screen.text(str(score), vec2(x, y))
+    screen.text(str(game.score), vec2(x, y))
 
-    x -=2
-    y -=2
+    x -= 2
+    y -= 2
     screen.pen = color.brown
-    screen.text(str(score), vec2(x, y))
+    screen.text(str(game.score), vec2(x, y))
 
 
 def init_gamepad():
-    global gamepad
     gamepads = qwstpad.Gamepadhelper()
     for i in gamepads.pads:
         if i is not None:
-            gamepad = i
-            return i
-    return None
+            game.gamepad = i
+            return
+    game.gamepad = None
+    return
 
 
 def parse_controls():
-    global controls, gamepad
-
-    if gamepad:
+    if game.gamepad:
         try:
-            gamepad.update_buttons()
+            game.gamepad.update_buttons()
         except OSError:
-            gamepad = init_gamepad()
+            init_gamepad()
     else:
-        gamepad = init_gamepad()
+        init_gamepad()
 
-    if gamepad:
-        controls["MOVE_LEFT"] = gamepad.held("L")
-        controls["MOVE_RIGHT"] = gamepad.held("R")
-        controls["DROP"] = gamepad.held("D") and gamepad.pressed("A")
-        controls["JUMP"] = gamepad.pressed("A")
-        controls["JUMP_LEFT"] = gamepad.held("L") and gamepad.pressed("A")
-        controls["JUMP_RIGHT"] = gamepad.held("R") and gamepad.pressed("A")
-        controls["ANY_KEY"] = gamepad.pressed()
+    if game.gamepad:
+        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
+        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
+        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
+        game.controls["JUMP"] = game.gamepad.pressed("A")
+        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
+        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
+        game.controls["ANY_KEY"] = game.gamepad.pressed()
     else:
-        controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        controls["MOVE_RIGHT"] = badge.held(BUTTON_B)
-        controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_C)
-        controls["JUMP"] = badge.pressed(BUTTON_C)
-        controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_C)
-        controls["JUMP_RIGHT"] = badge.held(BUTTON_B) and badge.pressed(BUTTON_C)
-        controls["ANY_KEY"] = badge.pressed()
+        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
+        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
+        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
+        game.controls["JUMP"] = badge.pressed(BUTTON_B)
+        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
+        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
+        game.controls["ANY_KEY"] = badge.pressed()
 
 
 def init_platforms():
-    global platforms
-    platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
+    game.platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
 
-background = image.load("assets/background.png")
-branch = image.load("assets/branch.png")
-sqirl_run_sheet = SpriteSheet("assets/running.png", 7, 1)
-sqirl_die_sheet = SpriteSheet("assets/death.png", 4, 1)
-sqirl_run = AnimatedSprite(sqirl_run_sheet, 0, 0, 7)
-sqirl_die = AnimatedSprite(sqirl_die_sheet, 1, 0, 2)
-acorn_sml = image.load("assets/acorn_sml.png")
-title = image.load("assets/title.png")
-gameover = image.load("assets/gameover.png")
-title_font = font.yesterday
-acorn_lg = image.load("assets/acorn_lg.png")
-score_font = font.futile
-
-gamepad = None
-controls = {}
-
-foreground_scroll_speed = 4
-background_scroll_speed = 1
-background_scroll_amount = 0
-title_scroll_amount = 0
-
-frame_counter = 0
-player = player_base(20, 0)
-platforms = []
-acorns = []
-current_game_state = game_state.TITLE
-score = 0
-last_frame = badge.ticks
-
-save_state = {"highscore": 0}
-State.load("acorn_highway", save_state)
-
-init_gamepad()
-init_platforms()
 
 def title_loop():
-    global current_game_state, title_scroll_amount
-
     draw_background()
-
-    screen.blit(title, vec2(0, 0))
+    screen.blit(game.title, vec2(0, 0))
 
     branch_y = 73
-    branch_tex_matrix = mat3().translate(title_scroll_amount, branch_y)
-    title_scroll_amount -= foreground_scroll_speed
-    title_scroll_amount %= branch.width
+    branch_tex_matrix = mat3().translate(game.title_scroll_amount, branch_y)
+    game.title_scroll_amount -= game.foreground_scroll_speed
+    game.title_scroll_amount %= game.branch.width
 
     branch_bar = shape.rectangle(0, branch_y, screen.width, 10)
-    screen.pen = brush.image(branch, branch_tex_matrix)
+    screen.pen = brush.image(game.branch, branch_tex_matrix)
     screen.shape(branch_bar)
 
     sqirl_x = (screen.width - 32) / 2
     sqirl_y = 43
-    screen.blit(sqirl_run.frame(frame_counter), rect(sqirl_x, sqirl_y, 32, 32))
+    frame_no = game.anim_frame_counter % 7
+    screen.blit(game.sqirl_run.sprite(frame_no, 0), rect(sqirl_x, sqirl_y, 32, 32))
 
-    screen.font = title_font
+    screen.font = game.title_font
     screen.pen = color.white
 
-    if int(badge.ticks / 500) % 2:
+    if int(time.ticks_ms() / 500) % 2:
         restarttext = "Press any button!"
         centre_text(restarttext, 100)
 
-    highscoretext = f"High score: {str(save_state["highscore"])}"
+    highscoretext = f"High score: {str(game.save_state["highscore"])}"
     centre_text(highscoretext, 85)
 
-    if controls["ANY_KEY"]:
-        current_game_state = game_state.GAMEPLAY
+    if game.controls["ANY_KEY"]:
+        game.current_game_state = game_state.GAMEPLAY
+
 
 def gameplay_loop():
-    global current_game_state
-
     draw_background()
-
     player.update()
 
-    for acorn in acorns:
+    for acorn in game.acorns:
         acorn.move()
 
-    for acorn in acorns:
+    for acorn in game.acorns:
         acorn.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.update()
 
     draw_score()
 
     if player.b >= screen.height:
         player.death()
-        current_game_state = game_state.DEATH_ANIM
+        game.current_game_state = game_state.DEATH_ANIM
+
 
 def death_anim_loop():
-    global current_game_state
-
     draw_background(False)
-
     player.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.draw()
 
     draw_score()
 
     if player.b >= screen.height:
-        current_game_state = game_state.GAMEOVER
+        game.current_game_state = game_state.GAME_OVER
+
 
 def game_over_loop():
-    global current_game_state, score, acorns
+    screen.blit(game.gameover, vec2(0, 0))
 
-    screen.blit(gameover, vec2(0, 0))
-
-    screen.font = title_font
+    screen.font = game.title_font
     screen.pen = color.white
 
-    if int(badge.ticks / 500) % 2:
+    if int(time.ticks_ms() / 500) % 2:
         restarttext = "Press any button!"
         centre_text(restarttext, 100)
 
-    scoretext = f"Your score: {str(score)}"
+    scoretext = f"Your score: {str(game.score)}"
     centre_text(scoretext, 87)
 
-    if score >= save_state["highscore"]:
+    if game.score >= game.save_state["highscore"]:
         highscoretext = "High score!"
-        save_state["highscore"] = score
-        State.save("acorn_highway", save_state)
+        game.save_state["highscore"] = game.score
+        State.save("acorn_highway", game.save_state)
     else:
-        highscoretext = f"High score: {str(save_state["highscore"])}"
+        highscoretext = f"High score: {str(game.save_state["highscore"])}"
 
     centre_text(highscoretext, 74)
 
-    if controls["ANY_KEY"]:
+    if game.controls["ANY_KEY"]:
         player.reset()
         init_platforms()
-        score = 0
-        acorns.clear()
-        current_game_state = game_state.TITLE
-
-def update():
-    global frame_counter, last_frame
-
-    parse_controls()
-
-    if current_game_state == game_state.TITLE:
-        title_loop()
-    elif current_game_state == game_state.GAMEPLAY:
-        gameplay_loop()
-    elif current_game_state == game_state.DEATH_ANIM:
-        death_anim_loop()
-    elif current_game_state == game_state.GAMEOVER:
-        game_over_loop()
-
-    if badge.ticks - last_frame > 83:
-        frame_counter += 1
-        last_frame = badge.ticks
+        game.score = 0
+        game.acorns.clear()
+        game.current_game_state = game_state.TITLE
 
 
-run(update)
+player = player_base(20, 0)
+init_gamepad()
+init_platforms()
+
+while True:
+    ticks = time.ticks_ms()
+    frametime = ticks - game.last_frame
+    anim_frametime = ticks - game.anim_last_frame
+
+    if anim_frametime >= 83:
+        game.anim_frame_counter += 1
+        game.anim_last_frame = ticks
+
+    if frametime >= 33:
+        badge.clear()
+        badge.poll()
+        parse_controls()
+
+        if game.current_game_state == game_state.TITLE:
+            title_loop()
+        elif game.current_game_state == game_state.GAMEPLAY:
+            gameplay_loop()
+        elif game.current_game_state == game_state.DEATH_ANIM:
+            death_anim_loop()
+        elif game.current_game_state == game_state.GAME_OVER:
+            game_over_loop()
+
+        display.update()
+
+        game.last_frame = ticks
+
 ```

@@ -12,13 +12,22 @@ The game you'll be making it called Acorn Highway, and it's a simple infinite ru
 
 # Setting up
 
-First of all, let's set up basic classes for two very important things we'll be using. The basics of creating a MicroPython class are outside the scope of this tutorial, but we will talk a little about properties and how they work.
+First of all, let's set up basic classes for three very important things we'll be using. The basics of creating a MicroPython class are outside the scope of this tutorial, but we will talk a little about properties and how they work.
 
 Create a new app with an icon, assets folder and `__init__.py`. Here's a good image to use as `icon.png` - just right click and save the image as a PNG.
 
 ![Icon image for Acorn Highway](/tut4_res/icon.png)
 
-Inside `__init__.py` we'll make the classes. We will still need to do the usual `update()` loop, we'll just be putting it in later. We'll start by creating a class for the player:
+Inside `__init__.py` we'll make the classes. We will still need to create a loop, we'll just be creating our own custom one instead of using the built in `update()`. We'll start by creating a class right at the top of the file for all of the things that we need to keep track of and access from other parts of the program. For now, we'll just 
+
+```python-raw
+class game:
+    pass
+```
+
+We've not put anything inside it yet, but as we go we'll add things to this. You'll notice as we do that these will not use `self.` - We're not going to be making any instances of this class, just using it as a convenient store for things to access, so they'll go directly inside the class.
+
+Then, directly after that, we'll make a class for the player:
 
 ```python-raw
 class player_base:
@@ -41,15 +50,29 @@ class player_base:
 
 Then we've put in a `draw()` method too, that we can call whenever we want to draw the player. We'll be using a fancy animated sprite later, but for now we're just drawing a simple red box.
 
-We'll keep all the class definitions together at the top of the file, right after any bits we need to import. After `player_base`, let's create an instance of it, and then add our `update()` loop just to check it's working:
+We'll keep all the class definitions together at the top of the file, right after any bits we need to import. After `player_base`, let's create an instance of it, and we'll also need to add our main program loop to check it's working.
+
+Instead of `update()`, we're going to make our own loop at the very bottom of the program using `while`. It uses `while True`, so it'll loop forever just like `update()`, but this way we have more control over what happens when we update. Inside, we'll put individual commands to clear the screen with `badge.clear()`, read the badge's buttons using `badge.poll()`, and to update the screen once we've drawn what we want with `display.update()`.
+
+```python-raw
+while True:
+    badge.clear()
+    badge.poll()
+    display.update()
+```
+
+With what we're putting in the loop right now, it can go anywhere as long as it's before we update the display, but when we implement things later we'll want to check our controls before we do anything else - so let's call the `draw()` function in between the two commands. Altogether, that's:
 
 ```python-raw
 player = player_base(20, 0)
 
-def update():
+while True:
+    badge.clear()
+    badge.poll()
+
     player.draw()
 
-run(update)
+    display.update()
 ```
 
 This should give you a red square at the top of the screen, 20 pixels from the left. Of course, positioning things is nice and easy if you only ever want to check on the top left corner, but what about other positions on the player? We could store the position of the right and bottom as variables, and update them every time the x and y change, but there's a way that makes life simpler throughout the rest of the program. In the `player_base` class, add the following, after `__init__` and before `draw()`:
@@ -112,7 +135,10 @@ class player_base:
 
 player = player_base(20, 0)
 
-def update():
+while True:
+    badge.clear()
+    badge.poll()
+
     player.x = 80
     player.y = 60
     player.draw()
@@ -121,12 +147,12 @@ def update():
     player.b = 60
     player.draw()
 
-run(update)
+    display.update()
 ```
 
 As you can see, you're getting two squares. First, you're setting the top left corner of the box to be at `80, 60` - the centre of the screen, and you're drawing it. Then you're setting the bottom right corner to be at the same coordinates, and drawing it again. When you're setting `r` and `b` there, it's calculating what `x` and `y` need to be to put it in the right place.
 
-We'll be making lots of other methods in `player_base`, but for now let's move on. This program is structured so that the things that effect each type of entity in the game are handled and processed by that entity, so the player class will be doing all of the calculations for moving the player, the platform class will do all the calculations for placing platforms, and so on. We'll make two new classes called `platform_base` and `acorn_base` and set them up with very similar properties to `player_base`. You could give them setters for `r` and `b` as you did for `player_base`, but it's not necessary, it doesn't get used.
+We'll be making lots of other methods in `player_base`, but for now let's move on. This program is structured so that the things that effect each type of entity in the game are handled and processed by that entity, so the player class will be doing all of the calculations for moving the player, the platform class will do all the calculations for placing platforms, and so on. We'll make two new classes called `platform_base` and `acorn_base` and set them up with very simiilar properties to `player_base`. For the sake of completeness you could give them setters for `r` and `b` as you did for `player_base`, but it's not necessary, they won't be used.
 
 ```python-raw
 class platform_base:
@@ -151,7 +177,7 @@ class platform_base:
         screen.shape(player_box)
 ```
 
-You'll notice `platform_base` has an extra parameter when you create it, which is just a unique name for that particular platform. It's not important now, but useful later. The length of the platform is also randomly generated for each one, somewhere between half the screen width and the full screen width. Remember to insert `import random` at the very beginning of the file to import the random number functions.
+You'll notice `platform_base` has an extra parameter when you create it, which is just a unique name for that particular platform. It's not important now, but will be useful later. The length of the platform is also randomly generated for each one, somewhere between half the screen width and the full screen width. Remember to insert `import random` at the very beginning of the file to import the random number functions.
 
 ```python-raw
 class acorn_base:
@@ -175,7 +201,7 @@ class acorn_base:
         screen.shape(player_box)
 ```
 
-The `acorn_base` class is basically the same as `player_base` at the moment. Given that all these properties are common between them you could potentially make a parent class which all of these are subclasses of, but that's beyond the scope of this tutorial. Here's an example of each one being created with fairly arbitrary positions, then drawn to the screen:
+The `acorn_base` class is basically the same as `player_base` at the moment. Given that all these properties are common between them you could potentially make a parent class which all of these are subclasses of, but that's beyond the scope of this tutorial. We'll make an example of each one being created with fairly arbitrary positions, then drawn to the screen:
 
 ```python
 import random
@@ -259,17 +285,20 @@ player = player_base(20, 0)
 platform = platform_base("a", 0, 80)
 acorn = acorn_base(10, 45)
 
-def update():
+while True:
+    badge.clear()
+    badge.poll()
+
     player.draw()
     platform.draw()
     acorn.draw()
 
-run(update)
+    display.update()
 ```
 
 # Basic physics
 
-Now, let's apply some physics. We'll make an `update()` method in our `player_base` class, which we'll call to update the player's physics, and eventually process the controls. For now we just need two new lines in it, but we'll also move the call to `draw()` the player in here rather than in the main `update()` loop. That way we'll only need to call `player.update()`.
+Now, let's apply some physics. We'll make an `update()` method in our `player_base` class, which we'll call to update the player's physics, and eventually process the controls. For now we just need two new lines in it, but we'll also move the call to `draw()` the player in here rather than in the main loop. That way we'll only need to call `player.update()` - make sure you change the call in the loop to reflect that.
 
 ```python-raw
 class player_base:
@@ -361,6 +390,11 @@ The whole program should look like this:
 ```python
 import random
 
+
+class game:
+    pass
+
+
 class player_base:
     def __init__(self, x, y):
         self.x = x
@@ -402,7 +436,6 @@ class player_base:
         return False
 
     def update(self):
-
         if not self.is_standing(platform):
             self.vy += 1
 
@@ -468,40 +501,43 @@ player = player_base(20, 0)
 platform = platform_base("a", 0, 80)
 acorn = acorn_base(10, 45)
 
+while True:
+    badge.clear()
+    badge.poll()
 
-def update():
     player.update()
     platform.draw()
     acorn.draw()
 
+    display.update()
 
-run(update)
 ```
 
 You'll see that when you run it, no matter where you put the platform, as long as it's below the player they'll fall down and land on the platform.
 
 # Multiple platforms
 
-It would be a pretty boring platformer with only one platform, though. Let's switch it up a bit to make a list of platforms which we initialise to start with. We'll define this list where we created the platform before, and in fact while we're at it, let's do the same for the acorns as we know we'll want multiple of those, remembering to delete the line to draw the acorn:
+It would be a pretty boring platformer with only one platform, though. Let's switch it up a bit to make a list of platforms which we initialise to start with. We'll define this list as the first thing in our `game` class and in fact while we're at it, let's do the same for the acorns as we know we'll want multiple of those. Remember to delete our old lines where we set up `platform` and `acorn`, as well as the line to draw the acorn in the main loop. Your `game` class should look like this:
 
 ```python-raw
-player = player_base(20, 0)
-platforms = []
-acorns = []
+class game:
+    platforms = []
+    acorns = []
 ```
 
-That list is empty right now, but we're about to make a little method that fills it with three platforms in default starting positions. Although this is so short, we're making it a separate method so we can call on it later from elsewhere in the program. Don't forget to call `init_platforms()` in your main program, right before the `update()` loop.
+Those lists are empty right now, but we're about to make a little method that fills the platform list with three platforms in default starting positions. Although this is short, we're making it a separate method after the classes so that we can call on it later from elsewhere in the program. Dont forget to call `init_platforms()` in your main program, right before the loop.
 
 ```python-raw
 def init_platforms():
-    global platforms
-    platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
+    game.platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
 ```
 
-So we're now setting up three different platforms. Let's make sure we draw them all by looping through the list in the `update()` method:
+You can see that because it's in that class we made, we're able to just access the list wherever we are in the program with `game.platforms`, which means we don't need to mess around with Micropython globals.
+
+So we're now setting up three different platforms. Let's make sure we draw them all by looping through the list in the `while` loop:
 
 ```python-raw
-    for platform in platforms:
+    for platform in game.platforms:
         platform.draw()
 ```
 
@@ -551,19 +587,18 @@ class player_base:
 
     def is_airborne(self):
         airborne = True
-        for platform in platforms:
+        for platform in game.platforms:
             if self.is_standing(platform):
                 airborne = False
         self.airborne = airborne
 
     def update(self):
-
         self.is_airborne()
 
         if self.airborne:
             self.vy += 1
 
-        for platform in platforms:
+        for platform in game.platforms:
             if self.is_landing(platform):
                 self.b = platform.y
                 self.vy = 0
@@ -584,6 +619,12 @@ Okay, by the end of this part your code should look like this:
 ```python
 import random
 
+
+class game:
+    platforms = []
+    acorns = []
+
+
 class player_base:
     def __init__(self, x, y):
         self.x = x
@@ -627,7 +668,7 @@ class player_base:
 
     def is_airborne(self):
         airborne = True
-        for platform in platforms:
+        for platform in game.platforms:
             if self.is_standing(platform):
                 airborne = False
         self.airborne = airborne
@@ -638,7 +679,7 @@ class player_base:
         if self.airborne:
             self.vy += 1
 
-        for platform in platforms:
+        for platform in game.platforms:
             if self.is_landing(platform):
                 self.b = platform.y
                 self.vy = 0
@@ -697,18 +738,23 @@ class acorn_base:
         screen.shape(player_box)
 
 
+def init_platforms():
+    game.platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
+
+
 player = player_base(20, 0)
-platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
-acorns = []
+init_platforms()
 
-def update():
+while True:
+    badge.clear()
+    badge.poll()
+
     player.update()
-
-    for platform in platforms:
+    for platform in game.platforms:
         platform.draw()
 
+    display.update()
 
-run(update)
 ```
 
 The player drops down onto the top platform, and that's it. Of course, it'd be nice to actually move around, and we'll deal with that in the next part. We'll come back to the physics of it all once we've got a way of making things happen.
@@ -721,69 +767,250 @@ There's two ways of implementing controls, and it depends on whether or not you 
 
 Of course, the buttons on Badgeware are built in to the software API, but we're going to be creating a structure on top of that which lets you define in-game actions and refer to them by name. The benefit of this is that those in-game actions could be a combination of two or more buttons, so once they're defined it's easy to just check on them quickly elsewhere in the program - and that it'll read both the onboard buttons and any other input you care to mention.
 
-We're going to need several things in place. First let's set up a dictionary for our controls. It doesn't need to have anything in it, as we'll populate it using a method we'll create, but it wants to go after our classes and before creating our player, platforms, and acorns:
+We're going to need several things in place. First let's set up a dictionary in the `game` class for our controls. It doesn't need to have anything in it, as we'll populate it using a method we'll create. `game` should look like this:
 
 ```python-raw
-controls = {}
-
-player = player_base(20, 0)
-platforms = []
-acorns = []
+class game:
+    platforms = []
+    acorns = []
+    controls = {}
 ```
 
 And right before `init_platforms()` is defined, we'll create a method called `parse_controls()` which will fill that dictionary each turn with the appropriate values:
 
 ```python-raw
 def parse_controls():
-    global controls
-
-    controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-    controls["MOVE_RIGHT"] = badge.held(BUTTON_B)
-    controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_C)
-    controls["JUMP"] = badge.pressed(BUTTON_C)
-    controls["ANY_KEY"] = badge.pressed()
+    game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
+    game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
+    game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
+    game.controls["JUMP"] = badge.pressed(BUTTON_B)
+    game.controls["ANY_KEY"] = badge.pressed()
 ```
 
-As you can see, we've now got a dictionary of controls which we can access by name. If you're using this structure in your own projects, the definitions for those can use any of `pressed()`, `released()`, `changed()` and `held()`, and as you can see we've used both `pressed()` and `held()` here as appropriate. You can also string these together with standard logic. Now, in your code you can just check, for example, `if controls["MOVE_LEFT"]` and it'll give you the appropriate `True` or `False`.
+As you can see, we've now got a dictionary of controls which we can access by name. If you're using this structure in your own projects, the definitions for those can use any of `pressed()`, `released()`, `changed()` and `held()`, and as you can see we've used both `pressed()` and `held()` here as appropriate. You can also string these together with standard logic. Now, in your code you can just check, for example, `if game.controls["MOVE_LEFT"]` and it'll give you the appropriate `True` or `False`.
 
-You can see that we've created five controls - moving left and right depend on a button being held, jumping just happens once on a press, and dropping uses a combination of holding down and pressing C. In this case C is also used as the jump button, but it doesn't have to be, it could be anything you like.
+You can see that we've created five controls - moving left and right depend on a button being held, jumping just happens once on a press, and dropping uses a combination of holding down and pressing B. In this case B is also used as the jump button, but it doesn't have to be, it could be anything you like.
 
-Now we've got our method for reading in the controls, we'll just call it at the very start of the main `update()` loop, so these values update every frame.
+Now we've got our method for reading in the controls, we'll just call it at the start of the main `while` loop, right after `badge.poll()`, so these values update every frame.
 
 ## Bringing in the gamepad
 
-To bring in the Qw/ST Pad, we're just going to be adding to this structure. First of all we need to import that library, so at the very top of the file add `import qwstpad`.
+To bring in the Qw/ST Pad, we're just going to be adding to this structure. First of all we need to import that library. We're going to be using a modified version of the Qw/ST Pad driver, which we'll include in the game folder. Put the following into a new text file, and save it as `qwstpad.py` in the same folder as `__init__.py`. Don't worry about how it works, it's simply the existing Qw/ST Pad driver with a couple of extra bits added so that we can treat the gamepad buttons the same way we treat the badge buttons.
 
-Now, we need to connect to the pad and create an object we can read its buttons from. We'll make a method to initialise the gamepad, which we'll call `init_gamepad()` - this can go right before `parse_controls()` and after the classes. We'll also add in `gamepad = None` right before `controls = {}`.
+```python-raw
+import struct
+from collections import OrderedDict
+
+from micropython import const
+from machine import I2C
+
+__version__ = "0.0.1"
+
+# Constants
+NUM_LEDS = const(4)
+NUM_BUTTONS = const(10)
+
+DEFAULT_ADDRESS = const(0x21)
+ALT_ADDRESS_1 = const(0x23)
+ALT_ADDRESS_2 = const(0x25)
+ALT_ADDRESS_3 = const(0x27)
+ADDRESSES = (DEFAULT_ADDRESS, ALT_ADDRESS_1, ALT_ADDRESS_2, ALT_ADDRESS_3)
+I2C_PINS = {"id": 0, "sda": 4, "scl": 5}    # The I2C pins the QwSTPad is connected to
+i2c = I2C(**I2C_PINS)                           # The I2C instance to pass to all QwSTPads
+
+
+class QwSTPad:
+    # Registers
+    INPUT_PORT0 = const(0x00)
+    INPUT_PORT1 = const(0x01)
+    OUTPUT_PORT0 = const(0x02)
+    OUTPUT_PORT1 = const(0x03)
+    POLARITY_PORT0 = const(0x04)
+    POLARITY_PORT1 = const(0x05)
+    CONFIGURATION_PORT0 = const(0x06)
+    CONFIGURATION_PORT1 = const(0x07)
+
+    # Mappings
+    BUTTON_MAPPING = OrderedDict({"A": 0xE, "B": 0xC, "X": 0xF, "Y": 0xD,
+                                  "U": 0x1, "D": 0x4, "L": 0x2, "R": 0x3,
+                                  "+": 0xB, "-": 0x5
+                                  })
+    LED_MAPPING = (0x6, 0x7, 0x9, 0xA)
+
+    def __init__(self, i2c, address=DEFAULT_ADDRESS, show_address=True):
+        if address not in ADDRESSES:
+            raise ValueError("address is not valid. Expected: 0x21, 0x23, 0x25, or 0x27")
+
+        self.__i2c = i2c
+        self.__address = address
+
+        # Set up the TCA9555 with the correct input and output pins
+        self.__reg_write_uint16(self.__i2c, self.__address, self.CONFIGURATION_PORT0, 0b11111001_00111111)
+        self.__reg_write_uint16(self.__i2c, self.__address, self.POLARITY_PORT0, 0b11111000_00111111)
+        self.__reg_write_uint16(self.__i2c, self.__address, self.OUTPUT_PORT0, 0b00000110_11000000)
+
+        self.__button_states = OrderedDict({})
+        for key, _ in self.BUTTON_MAPPING.items():
+            self.__button_states[key] = False
+
+        self.__led_states = 0b0000
+        if show_address:
+            self.set_leds(self.address_code())
+
+        self.buttons = self.read_buttons()
+        self.__pressed = {}
+        self.__released = {}
+        self.__changed = {}
+        self.__held = {}
+        self.update_buttons()
+
+    def address_code(self):
+        return self.__change_bit(0x0000, ADDRESSES.index(self.__address), True)
+
+    def read_buttons(self):
+        state = self.__reg_read_uint16(self.__i2c, self.__address, self.INPUT_PORT0)
+        for key, value in self.BUTTON_MAPPING.items():
+            self.__button_states[key] = self.__get_bit(state, value)
+        return self.__button_states
+
+    def set_leds(self, states):
+        self.__led_states = states & 0b1111
+        self.__update_leds()
+
+    def set_led(self, led, state):
+        if led < 1 or led > NUM_LEDS:
+            raise ValueError("'led' out of range. Expected 1 to 4")
+
+        self.__led_states = self.__change_bit(self.__led_states, led - 1, state)
+        self.__update_leds()
+
+    def clear_leds(self):
+        self.__led_states = 0b0000
+        self.__update_leds()
+
+    def __update_leds(self):
+        output = 0
+        for i in range(NUM_LEDS):
+            output = self.__change_bit(output, self.LED_MAPPING[i], not self.__get_bit(self.__led_states, i))
+        self.__reg_write_uint16(self.__i2c, self.__address, self.OUTPUT_PORT0, output)
+
+    def __get_bit(self, num, bit_pos):
+        return (num & (1 << bit_pos)) != 0
+
+    def __change_bit(self, num, bit_pos, state):
+        return num | (1 << bit_pos) if state else num & ~(1 << bit_pos)
+
+    def __reg_write_uint16(self, i2c, address, reg, value):
+        buffer = struct.pack("<H", value)
+        i2c.writeto_mem(address, reg, buffer)
+
+    def __reg_read_uint16(self, i2c, address, reg):
+        buffer = i2c.readfrom_mem(address, reg, 2)
+        return struct.unpack("<H", buffer)[0]
+
+    def update_buttons(self):
+        old_values = {}
+        for key, value in self.buttons.items():
+            old_values[key] = value
+
+        self.buttons = self.read_buttons()
+
+        for key, value in self.buttons.items():
+            if not old_values[key] and not value:
+                self.__pressed[key] = False
+                self.__released[key] = False
+                self.__changed[key] = False
+                self.__held[key] = False
+            if not old_values[key] and value:
+                self.__pressed[key] = True
+                self.__released[key] = False
+                self.__changed[key] = True
+                self.__held[key] = True
+            if old_values[key] and not value:
+                self.__pressed[key] = False
+                self.__released[key] = True
+                self.__changed[key] = True
+                self.__held[key] = False
+            if old_values[key] and value:
+                self.__pressed[key] = False
+                self.__released[key] = False
+                self.__changed[key] = False
+                self.__held[key] = True
+
+    def pressed(self, button=None):
+        if button is None:
+            return True in self.__pressed.values()
+        return self.__pressed[button]
+
+    def released(self, button=None):
+        if button is None:
+            return True in self.__released.values()
+        return self.__released[button]
+
+    def changed(self, button=None):
+        if button is None:
+            return True in self.__changed.values()
+        return self.__changed[button]
+
+    def held(self, button=None):
+        if button is None:
+            return True in self.__held.values()
+        return self.__held[button]
+
+
+class Gamepadhelper:
+    def __init__(self):
+        self.pads = []
+        self.pads_count = 0
+        self.get_gamepads()
+
+    def get_gamepads(self):
+        pads_count = 0
+
+        # Create a player for each connected QwSTPad
+        for i in range(len(ADDRESSES)):
+            try:
+                self.pads.append(QwSTPad(i2c, ADDRESSES[i]))
+                print(f"P{i + 1}: Connected")
+                pads_count += 1
+            except OSError:
+                self.pads.append(None)
+                print(f"P{i + 1}: Not Connected")
+
+        self.pads_count = pads_count
+
+```
+
+Finally, at the very top of the file add `import qwstpad`.
+
+Now, we need to connect to the pad and create an object we can read its buttons from. We'll make a method to initialise the gamepad, which we'll call `init_gamepad()` - this can go right before `parse_controls()` and after the classes. We also need to add `gamepad = None` in our `game` class.
 
 ```python-raw
 def init_gamepad():
-    global gamepad
     gamepads = qwstpad.Gamepadhelper()
     for i in gamepads.pads:
         if i is not None:
-            gamepad = i
-            return i
-    return None
+            game.gamepad = i
+            return
+    game.gamepad = None
+    return
 ```
 
 This code uses the `qwstpad` library to check for the presence of Qw/ST Pads, and adds any it finds to a temporary list called `gamepads`. Then it just runs through the list and returns the first one that's connected. If there aren't any, it just returns None. Let's make sure we call this at the start of everything, inserting `init_gamepad()` right before `init_platforms()`
 
-Now it's easy to use this to check for connected pads and assign the first one to the `gamepad` variable we made. Then when we're parsing controls we can just check if `gamepad` has a value that's not None to see if we need to check its controls. If we check regularly, each update, the system can even handle plugging and unplugging pads mid-game. Let's do that - first of all, we'll change the beginning of `parse_controls()` to read:
+Now it's easy to use this to check for connected pads and assign the first one to the `game.gamepad` variable we made. Then when we're parsing controls we can just check if `game.gamepad` has a value that's not None to see if we need to check its controls. If we check regularly, each update, the system can even handle plugging and unplugging pads mid-game. Let's do that - first of all, we'll change the beginning of `parse_controls()` to read:
 
 ```python-raw
-    global controls, gamepad
-
-    if gamepad:
+    if game.gamepad:
         try:
-            gamepad.update_buttons()
+            game.gamepad.update_buttons()
         except OSError:
-            gamepad = init_gamepad()
+            init_gamepad()
     else:
-        gamepad = init_gamepad()
+        init_gamepad()
 ```
 
-We're defining `gamepad` as a global, so that it's looking at the right variable, and then if it's connected we're telling it to read the status of all of its buttons. We're also enclosing that in a `try` statement so that if it throws an error (as it would if the pad was disconnected unexpectedly) it ignores reading the gamepad for this update and instead just tries to initialise it again for the next update. If there isn't a pad connected it'll try and connect to one, because you never know, someone might have just plugged one in.
+So if `gamepad` is showing something other than `None` (and therefore a pad is connected), we're telling it to read the status of all of its buttons. We're also enclosing that in a `try` statement so that if it throws an error (as it would if the pad was disconnected unexpectedly) it ignores reading the gamepad for this update and instead just tries to initialise it again for the next update. If there isn't a pad connected it'll try and connect to one, because you never know, someone might have just plugged one in.
 
 Now that we've got access to the gamepad's buttons, we can integrate them into the controls. This is very simple, just an `if` statement checking on the gamepad's status, and then a set of new definitions for if it's connected. The `qwstpad` library for Badgeware provides the same methods you can call on the Badgeware buttons, just using strings to identify the buttons - your options are `U, D, L, R, A, B, X, Y, +, -`.
 
@@ -791,31 +1018,29 @@ Let's see the `parse_controls()` method with that added in.
 
 ```python-raw
 def parse_controls():
-    global controls, gamepad
-
-    if gamepad:
+    if game.gamepad:
         try:
-            gamepad.update_buttons()
+            game.gamepad.update_buttons()
         except OSError:
-            gamepad = init_gamepad()
+            init_gamepad()
     else:
-        gamepad = init_gamepad()
+        init_gamepad()
 
-    if gamepad:
-        controls["MOVE_LEFT"] = gamepad.held("L")
-        controls["MOVE_RIGHT"] = gamepad.held("R")
-        controls["DROP"] = gamepad.held("D") and gamepad.pressed("A")
-        controls["JUMP"] = gamepad.pressed("A")
-        controls["ANY_KEY"] = gamepad.pressed()
+    if game.gamepad:
+        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
+        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
+        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
+        game.controls["JUMP"] = game.gamepad.pressed("A")
+        game.controls["ANY_KEY"] = game.gamepad.pressed()
     else:
-        controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        controls["MOVE_RIGHT"] = badge.held(BUTTON_B)
-        controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_C)
-        controls["JUMP"] = badge.pressed(BUTTON_C)
-        controls["ANY_KEY"] = badge.pressed()
+        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
+        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
+        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
+        game.controls["JUMP"] = badge.pressed(BUTTON_B)
+        game.controls["ANY_KEY"] = badge.pressed()
 ```
 
-You can see that currently, the badge buttons would essentially be disabled when the gamepad was plugged in, but it doesn't have to be like that - you could use `or` statements to allow either button to activate the control.
+You can see that currently, the badge buttons would essentially be disabled when the gamepad was plugged in, but it doesn't have to be like that - you could get rid of the `if game.gamepad` check and instead use an `or` operator on each control, such as `game.controls["MOVE_LEFT"] = gamepad.held("L") or badge.held(BUTTON_A)`
 
 So, we've got a set of controls we can query for our game mechanics. But currently you can't even tell if they're working or not, since they're not hooked up to anything. Next up, let's learn to move.
 
@@ -831,7 +1056,7 @@ You don't want to be able to jump while you're in the air, but fortunately we al
         if self.airborne:
             self.vy += 1
         else:
-            if controls["JUMP"]:
+            if game.controls["JUMP"]:
                 self.vy = -10
 ```
 
@@ -840,8 +1065,16 @@ So if we're standing on a platform, we'll check to see if the button we've assig
 Here's the full code so far:
 
 ```python
-import qwstpad
 import random
+import qwstpad
+
+
+class game:
+    platforms = []
+    acorns = []
+    controls = {}
+    gamepad = None
+
 
 class player_base:
     def __init__(self, x, y):
@@ -886,7 +1119,7 @@ class player_base:
 
     def is_airborne(self):
         airborne = True
-        for platform in platforms:
+        for platform in game.platforms:
             if self.is_standing(platform):
                 airborne = False
         self.airborne = airborne
@@ -897,10 +1130,10 @@ class player_base:
         if self.airborne:
             self.vy += 1
         else:
-            if controls["JUMP"]:
+            if game.controls["JUMP"]:
                 self.vy = -10
 
-        for platform in platforms:
+        for platform in game.platforms:
             if self.is_landing(platform):
                 self.b = platform.y
                 self.vy = 0
@@ -960,65 +1193,57 @@ class acorn_base:
 
 
 def init_gamepad():
-    global gamepad
     gamepads = qwstpad.Gamepadhelper()
     for i in gamepads.pads:
         if i is not None:
-            gamepad = i
-            return i
-    return None
+            game.gamepad = i
+            return
+    game.gamepad = None
+    return
 
 
 def parse_controls():
-    global controls, gamepad
-
-    if gamepad:
+    if game.gamepad:
         try:
-            gamepad.update_buttons()
+            game.gamepad.update_buttons()
         except OSError:
-            gamepad = init_gamepad()
+            init_gamepad()
     else:
-        gamepad = init_gamepad()
+        init_gamepad()
 
-    if gamepad:
-        controls["MOVE_LEFT"] = gamepad.held("L")
-        controls["MOVE_RIGHT"] = gamepad.held("R")
-        controls["DROP"] = gamepad.held("D") and gamepad.pressed("A")
-        controls["JUMP"] = gamepad.pressed("A")
-        controls["ANY_KEY"] = gamepad.pressed()
+    if game.gamepad:
+        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
+        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
+        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
+        game.controls["JUMP"] = game.gamepad.pressed("A")
+        game.controls["ANY_KEY"] = game.gamepad.pressed()
     else:
-        controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        controls["MOVE_RIGHT"] = badge.held(BUTTON_B)
-        controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_C)
-        controls["JUMP"] = badge.pressed(BUTTON_C)
-        controls["ANY_KEY"] = badge.pressed()
+        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
+        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
+        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
+        game.controls["JUMP"] = badge.pressed(BUTTON_B)
+        game.controls["ANY_KEY"] = badge.pressed()
 
 
 def init_platforms():
-    global platforms
-    platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
+    game.platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
 
-
-gamepad = None
-controls = {}
 
 player = player_base(20, 0)
-platforms = []
-acorns = []
-
 init_gamepad()
 init_platforms()
 
-def update():
+while True:
+    badge.clear()
+    badge.poll()
     parse_controls()
 
     player.update()
-
-    for platform in platforms:
+    for platform in game.platforms:
         platform.draw()
 
+    display.update()
 
-run(update)
 ```
 
 ## Running
@@ -1026,24 +1251,26 @@ run(update)
 Running is easy, we just add a bit of acceleration to the player in the appropriate direction. Again, just like jumping, we only want to be able to run if we're standing on a platform, so we can add this in right after our jump, within that same `else` statement:
 
 ```python-raw
-    if controls["MOVE_RIGHT"]:
-        self.vx += 1.5
+            if game.controls["MOVE_RIGHT"]:
+                self.vx += 1.5
 
-    if controls["MOVE_LEFT"]:
-        self.vx -= 1.5
+            if game.controls["MOVE_LEFT"]:
+                self.vx -= 1.5
 ```
 
 Test that now and you'll find two things - first, you just accelerate and don't stop, and second, you disappear off the edge of the screen. We can remedy the second one easy enough. Right after changing the player's position and before drawing them, we can clamp your position using the following line:
 
 ```python-raw
-    self.x = clamp(self.x, 0, screen.width - self.w)
+        self.x = clamp(self.x, 0, screen.width - self.w)
 ```
 
 Now you'll see you'll at least not fly off the screen, but that speed is still wild. You're a squirrel, not a rocket. We want it to be pretty nippy, part of the gameplay is that you're controlling something very fast moving, but we clearly need some kind of damping. That's easy enough to implement - right after our movement controls, within that same `else` statement, let's say:
 
 ```python-raw
-    if self.vx > 0: self.vx -= 0.5
-    elif self.vx < 0: self.vx += 0.5
+            if self.vx > 0:
+                self.vx -= 0.5
+            elif self.vx < 0:
+                self.vx += 0.5
 ```
 
 So now your speed is reduced by 0.5 every frame you're touching the ground. Tufty still clearly has the zoomies, but you can see that there is now a deceleration after a light tap on the buttons.
@@ -1053,7 +1280,7 @@ So now your speed is reduced by 0.5 every frame you're touching the ground. Tuft
 Let's also look at dropping through the platforms. This is easy, as we've already established a control for drop, and all we want to happen when it's activated is for the player to start falling under gravity. We have that condition anyway - it applies whenever the player is airborne - so we just need to add to that check to tell it to also fall if we've hit 'Drop':
 
 ```python-raw
-        if self.airborne or controls["DROP"]:
+        if self.airborne or game.controls["DROP"]:
 ```
 
 ## Jumping sideways
@@ -1061,41 +1288,41 @@ Let's also look at dropping through the platforms. This is easy, as we've alread
 And finally, we can already jump sideways if we've got a running start, but given how much we're bouncing between platforms it might be good to actually have a sideways jump. For this, let's create new controls in `parse_controls()`:
 
 ```python-raw
-    if gamepad:
-        controls["MOVE_LEFT"] = gamepad.held("L")
-        controls["MOVE_RIGHT"] = gamepad.held("R")
-        controls["DROP"] = gamepad.held("D") and gamepad.pressed("A")
-        controls["JUMP"] = gamepad.pressed("A")
-        controls["JUMP_LEFT"] = gamepad.held("L") and gamepad.pressed("A")
-        controls["JUMP_RIGHT"] = gamepad.held("R") and gamepad.pressed("A")
-        controls["ANY_KEY"] = gamepad.pressed()
+    if game.gamepad:
+        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
+        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
+        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
+        game.controls["JUMP"] = game.gamepad.pressed("A")
+        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
+        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
+        game.controls["ANY_KEY"] = game.gamepad.pressed()
     else:
-        controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        controls["MOVE_RIGHT"] = badge.held(BUTTON_B)
-        controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_C)
-        controls["JUMP"] = badge.pressed(BUTTON_C)
-        controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_C)
-        controls["JUMP_RIGHT"] = badge.held(BUTTON_B) and badge.pressed(BUTTON_C)
-        controls["ANY_KEY"] = badge.pressed()
+        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
+        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
+        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
+        game.controls["JUMP"] = badge.pressed(BUTTON_B)
+        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
+        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
+        game.controls["ANY_KEY"] = badge.pressed()
 ```
 
 We're treating this just like the Drop command and checking for jump being pressed while a direction is held. We can just add these lines in too, after the jump command and before the movement:
 
 ```python-raw
-    if controls["JUMP"]:
-        self.vy = -10
+            if game.controls["JUMP"]:
+                self.vy = -10
 
-    if controls["JUMP_RIGHT"]:
-        self.vx = max(self.vx, 3)
+            if game.controls["JUMP_RIGHT"]:
+                self.vx = max(self.vx, 3)
 
-    elif controls["JUMP_LEFT"]:
-        self.vx = min(self.vx, -3)
+            elif game.controls["JUMP_LEFT"]:
+                self.vx = min(self.vx, -3)
 
-    elif controls["MOVE_RIGHT"]:
-        self.vx += 1.5
+            elif game.controls["MOVE_RIGHT"]:
+                self.vx += 1.5
 
-    elif controls["MOVE_LEFT"]:
-        self.vx -= 1.5
+            elif game.controls["MOVE_LEFT"]:
+                self.vx -= 1.5
 ```
 
 You'll see we've altered the existing commands to include a couple of `elif`s there. If Jump has been pressed, we always want to get that upward acceleration whether we're pressing left, right or nothing, so it just uses `if`. But the rest of the controls we want to each do a specific thing, so they're in their order of priority and made exclusive using `elif` statements.
@@ -1120,14 +1347,22 @@ And that's it! That's pretty much everything for player movement. There's one mo
 ```
 
 ```python-raw
-        if self.airborne or self.dead or controls["DROP"]:
+        if self.airborne or self.dead or game.controls["DROP"]:
 ```
 
 For the moment, `dead` will just stay permanently on `False`, but watch out for it, it'll show up again. You'll notice that because all of the controls are in the `else` after the `if`, that being dead will also automatically disable all of your control inputs. Here's the code you should have if you've been following along:
 
 ```python
-import qwstpad
 import random
+import qwstpad
+
+
+class game:
+    platforms = []
+    acorns = []
+    controls = {}
+    gamepad = None
+
 
 class player_base:
     def __init__(self, x, y):
@@ -1173,7 +1408,7 @@ class player_base:
 
     def is_airborne(self):
         airborne = True
-        for platform in platforms:
+        for platform in game.platforms:
             if self.is_standing(platform):
                 airborne = False
         self.airborne = airborne
@@ -1181,28 +1416,30 @@ class player_base:
     def update(self):
         self.is_airborne()
 
-        if self.airborne or self.dead or controls["DROP"]:
+        if self.airborne or self.dead or game.controls["DROP"]:
             self.vy += 1
         else:
-            if controls["JUMP"]:
+            if game.controls["JUMP"]:
                 self.vy = -10
 
-            if controls["JUMP_RIGHT"]:
+            if game.controls["JUMP_RIGHT"]:
                 self.vx = max(self.vx, 3)
 
-            elif controls["JUMP_LEFT"]:
+            elif game.controls["JUMP_LEFT"]:
                 self.vx = min(self.vx, -3)
 
-            elif controls["MOVE_RIGHT"]:
+            elif game.controls["MOVE_RIGHT"]:
                 self.vx += 1.5
 
-            elif controls["MOVE_LEFT"]:
+            elif game.controls["MOVE_LEFT"]:
                 self.vx -= 1.5
 
-            if self.vx > 0: self.vx -= 0.5
-            elif self.vx < 0: self.vx += 0.5
+            if self.vx > 0:
+                self.vx -= 0.5
+            elif self.vx < 0:
+                self.vx += 0.5
 
-        for platform in platforms:
+        for platform in game.platforms:
             if self.is_landing(platform):
                 self.b = platform.y
                 self.vy = 0
@@ -1264,69 +1501,61 @@ class acorn_base:
 
 
 def init_gamepad():
-    global gamepad
     gamepads = qwstpad.Gamepadhelper()
     for i in gamepads.pads:
         if i is not None:
-            gamepad = i
-            return i
-    return None
+            game.gamepad = i
+            return
+    game.gamepad = None
+    return
 
 
 def parse_controls():
-    global controls, gamepad
-
-    if gamepad:
+    if game.gamepad:
         try:
-            gamepad.update_buttons()
+            game.gamepad.update_buttons()
         except OSError:
-            gamepad = init_gamepad()
+            init_gamepad()
     else:
-        gamepad = init_gamepad()
+        init_gamepad()
 
-    if gamepad:
-        controls["MOVE_LEFT"] = gamepad.held("L")
-        controls["MOVE_RIGHT"] = gamepad.held("R")
-        controls["DROP"] = gamepad.held("D") and gamepad.pressed("A")
-        controls["JUMP"] = gamepad.pressed("A")
-        controls["JUMP_LEFT"] = gamepad.held("L") and gamepad.pressed("A")
-        controls["JUMP_RIGHT"] = gamepad.held("R") and gamepad.pressed("A")
-        controls["ANY_KEY"] = gamepad.pressed()
+    if game.gamepad:
+        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
+        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
+        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
+        game.controls["JUMP"] = game.gamepad.pressed("A")
+        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
+        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
+        game.controls["ANY_KEY"] = game.gamepad.pressed()
     else:
-        controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        controls["MOVE_RIGHT"] = badge.held(BUTTON_B)
-        controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_C)
-        controls["JUMP"] = badge.pressed(BUTTON_C)
-        controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_C)
-        controls["JUMP_RIGHT"] = badge.held(BUTTON_B) and badge.pressed(BUTTON_C)
-        controls["ANY_KEY"] = badge.pressed()
+        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
+        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
+        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
+        game.controls["JUMP"] = badge.pressed(BUTTON_B)
+        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
+        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
+        game.controls["ANY_KEY"] = badge.pressed()
 
 
 def init_platforms():
-    global platforms
-    platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
+    game.platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
 
-
-gamepad = None
-controls = {}
 
 player = player_base(20, 0)
-platforms = []
-acorns = []
-
 init_gamepad()
 init_platforms()
 
-def update():
+while True:
+    badge.clear()
+    badge.poll()
     parse_controls()
 
     player.update()
-
-    for platform in platforms:
+    for platform in game.platforms:
         platform.draw()
 
+    display.update()
 
-run(update)
 ```
 
 We're not quite done with the `player_base` class overall, but we're at least done for now. Now, we'll work on getting some scrolling platforms.
@@ -1346,13 +1575,13 @@ First though, we need to make them scroll in the first place. Just like `player_
         self.draw()
 ```
 
-Don't forget to change the call in the main `update()` loop to `platform.update()` instead of `platform.draw()`.
+Don't forget to change the call in the main `while` loop to `platform.update()` instead of `platform.draw()`.
 
-Scrolling is pretty easy. Let's set a global `foreground_scroll_speed` variable with a value of 4, so that if we need to change it we only have to change it in one place. Let's put it right after `controls = {}`. Then, we just need to subtract this value from the platform's x coordinate every frame, and voila! Scrolling platforms. It should look like this:
+Scrolling is pretty easy. Let's create a `foreground_scroll_speed` variable within `game` with a value of 4, so that if we need to change it we only have to change it in one place. Then, we just need to subtract this value from the platform's x co-ordinate every frame, and voila! Scrolling platforms. It should look like this:
 
 ```python-raw
     def update(self):
-        self.x -= foreground_scroll_speed
+        self.x -= game.foreground_scroll_speed
         self.draw()
 ```
 
@@ -1362,7 +1591,7 @@ To do this, we can easily just check to see if the right hand side of the platfo
 
 ```python-raw
     def update(self):
-        self.x -= foreground_scroll_speed
+        self.x -= game.foreground_scroll_speed
 
         if self.r <= 0:
             self.x = screen.width
@@ -1370,7 +1599,54 @@ To do this, we can easily just check to see if the right hand side of the platfo
         self.draw()
 ```
 
-And all of a sudden, there's gameplay! It's very fast-paced and pretty difficult, but playable. It'll slow down a little once we've got it crunching numbers on all the graphics, but it's intended to still be pretty speedy even then.
+And all of a sudden, there's gameplay! It's very fast-paced and pretty difficult, but it is technically playable.
+
+## Getting a consistent framerate
+
+Not playable enough, though. At the moment the Tufty is putting out frames as fast as it can draw them, and since everything moves the same amount every frame that means it's going too fast. Not only that, but loops where the processor needs to do more work will take longer than ones where it has to do less, so that frame rate isn't necessarily consistent. We need a framerate limiter.
+
+> Note: Acorn Highway is pretty light on the processor, which is why it goes so fast. That means the variation in frame time likely won't be visible to the naked eye in this case, but it's there. It becomes a lot more apparent when you're taxing the hardware a bit more or when there's a bigger variation on how much work needs doing in different frames.
+
+The first step in limiting the frame rate is finding out how long the frame took to process. We can do this using MicroPython's built in `time` module. Badgeware has a very similar thing in its own API, but it's tied into `update()`, which we're not using.
+
+First, let's add `import time` to our imports at the top of the file. We'll also add another variable into `game`, which we'll call `last_frame`. We'll set it at zero right now. Your `game` class should look like this by now:
+
+```python-raw
+class game:
+    platforms = []
+    acorns = []
+    controls = {}
+    gamepad = None
+    foreground_scroll_speed = 4
+    last_frame = 0
+```
+
+Every time we go round the loop, we're going to check `time.ticks_ms()`, which will tell us how many milliseconds it's been since the badge was powered on. We can easily calculate how many milliseconds we want each frame to take, dividing 1000 by our desired framerate. We want Acorn Highway running at 30fps, so that's about 33ms per frame.
+
+Basically each time round the loop we'll check if it's been 33ms or more since the last frame we calculated. If it has, great, we can calculate the next one. If not, we just keep running round the loop until enough time has passed.
+
+It's just a few lines of code to do the above, and it's all in the main `while` loop:
+
+```python-raw
+while True:
+    ticks = time.ticks_ms()
+    frametime = ticks - game.last_frame
+
+    if frametime >= 33:
+        badge.clear()
+        badge.poll()
+        parse_controls()
+
+        player.update()
+        for platform in game.platforms:
+            platform.update()
+
+        display.update()
+
+        game.last_frame = ticks
+```
+
+The first two lines work out how many milliseconds it's been since `game.last_frame`. Then everything that was in the loop before is now behind the new `if` statement, checking if it's been more than 33ms. Finally, we've added a very important line at the end, to set `game.last_frame` to the new ticks value for the next frame. Note that it's inside the `if` statement, as we only want that to happen on those times through the loop where we calculate a new frame.
 
 ## Renewing platforms
 
@@ -1378,7 +1654,7 @@ Right now, the platforms are staying at their original size and their original h
 
 ```python-raw
     def update(self):
-        self.x -= foreground_scroll_speed
+        self.x -= game.foreground_scroll_speed
 
         if self.r <= 0:
             self.reset()
@@ -1407,8 +1683,7 @@ Now we've got everything we need to, when we reset a platform, check against the
 
 ```python-raw
     def check_collisions(self):
-        global platforms
-        for platform in platforms:
+        for platform in game.platforms:
             if platform.id == self.id:
                 continue
             if self.bounding_box.intersects(platform.bounding_box):
@@ -1424,7 +1699,7 @@ We call this method right after resetting the platform, and loop it using `while
 
 ```python-raw
     def update(self):
-        self.x -= foreground_scroll_speed
+        self.x -= game.foreground_scroll_speed
 
         if self.r <= 0:
             self.reset()
@@ -1461,8 +1736,19 @@ And now we've got nicely spawning, nicely spaced platforms.
 Here's your code so far:
 
 ```python
-import qwstpad
 import random
+import qwstpad
+import time
+
+
+class game:
+    platforms = []
+    acorns = []
+    controls = {}
+    gamepad = None
+    foreground_scroll_speed = 4
+    last_frame = 0
+
 
 class player_base:
     def __init__(self, x, y):
@@ -1512,7 +1798,7 @@ class player_base:
 
     def is_airborne(self):
         airborne = True
-        for platform in platforms:
+        for platform in game.platforms:
             if self.is_standing(platform):
                 airborne = False
         self.airborne = airborne
@@ -1520,28 +1806,30 @@ class player_base:
     def update(self):
         self.is_airborne()
 
-        if self.airborne or self.dead or controls["DROP"]:
+        if self.airborne or self.dead or game.controls["DROP"]:
             self.vy += 1
         else:
-            if controls["JUMP"]:
+            if game.controls["JUMP"]:
                 self.vy = -10
 
-            if controls["JUMP_RIGHT"]:
+            if game.controls["JUMP_RIGHT"]:
                 self.vx = max(self.vx, 3)
 
-            elif controls["JUMP_LEFT"]:
+            elif game.controls["JUMP_LEFT"]:
                 self.vx = min(self.vx, -3)
 
-            elif controls["MOVE_RIGHT"]:
+            elif game.controls["MOVE_RIGHT"]:
                 self.vx += 1.5
 
-            elif controls["MOVE_LEFT"]:
+            elif game.controls["MOVE_LEFT"]:
                 self.vx -= 1.5
 
-            if self.vx > 0: self.vx -= 0.5
-            elif self.vx < 0: self.vx += 0.5
+            if self.vx > 0:
+                self.vx -= 0.5
+            elif self.vx < 0:
+                self.vx += 0.5
 
-        for platform in platforms:
+        for platform in game.platforms:
             if self.is_landing(platform):
                 self.b = platform.y
                 self.vy = 0
@@ -1581,7 +1869,7 @@ class platform_base:
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
 
     def update(self):
-        self.x -= foreground_scroll_speed
+        self.x -= game.foreground_scroll_speed
 
         if self.r <= 0:
             self.reset()
@@ -1596,8 +1884,7 @@ class platform_base:
         self.w = random.randint(int(screen.width / 2), screen.width)
 
     def check_collisions(self):
-        global platforms
-        for platform in platforms:
+        for platform in game.platforms:
             if platform.id == self.id:
                 continue
             if self.bounding_box.intersects(platform.bounding_box):
@@ -1636,71 +1923,67 @@ class acorn_base:
 
 
 def init_gamepad():
-    global gamepad
     gamepads = qwstpad.Gamepadhelper()
     for i in gamepads.pads:
         if i is not None:
-            gamepad = i
-            return i
-    return None
+            game.gamepad = i
+            return
+    game.gamepad = None
+    return
 
 
 def parse_controls():
-    global controls, gamepad
-
-    if gamepad:
+    if game.gamepad:
         try:
-            gamepad.update_buttons()
+            game.gamepad.update_buttons()
         except OSError:
-            gamepad = init_gamepad()
+            init_gamepad()
     else:
-        gamepad = init_gamepad()
+        init_gamepad()
 
-    if gamepad:
-        controls["MOVE_LEFT"] = gamepad.held("L")
-        controls["MOVE_RIGHT"] = gamepad.held("R")
-        controls["DROP"] = gamepad.held("D") and gamepad.pressed("A")
-        controls["JUMP"] = gamepad.pressed("A")
-        controls["JUMP_LEFT"] = gamepad.held("L") and gamepad.pressed("A")
-        controls["JUMP_RIGHT"] = gamepad.held("R") and gamepad.pressed("A")
-        controls["ANY_KEY"] = gamepad.pressed()
+    if game.gamepad:
+        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
+        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
+        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
+        game.controls["JUMP"] = game.gamepad.pressed("A")
+        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
+        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
+        game.controls["ANY_KEY"] = game.gamepad.pressed()
     else:
-        controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        controls["MOVE_RIGHT"] = badge.held(BUTTON_B)
-        controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_C)
-        controls["JUMP"] = badge.pressed(BUTTON_C)
-        controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_C)
-        controls["JUMP_RIGHT"] = badge.held(BUTTON_B) and badge.pressed(BUTTON_C)
-        controls["ANY_KEY"] = badge.pressed()
+        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
+        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
+        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
+        game.controls["JUMP"] = badge.pressed(BUTTON_B)
+        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
+        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
+        game.controls["ANY_KEY"] = badge.pressed()
 
 
 def init_platforms():
-    global platforms
-    platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
+    game.platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
 
-
-gamepad = None
-controls = {}
-
-foreground_scroll_speed = 4
 
 player = player_base(20, 0)
-platforms = []
-acorns = []
-
 init_gamepad()
 init_platforms()
 
-def update():
-    parse_controls()
+while True:
+    ticks = time.ticks_ms()
+    frametime = ticks - game.last_frame
 
-    player.update()
+    if frametime >= 33:
+        badge.clear()
+        badge.poll()
+        parse_controls()
 
-    for platform in platforms:
-        platform.update()
+        player.update()
+        for platform in game.platforms:
+            platform.update()
 
+        display.update()
 
-run(update)
+        game.last_frame = ticks
+
 ```
 
 Looking good. But what we've got right now is a gameplay snippet, nothing more. Let's turn it into something with a start and a finish.
@@ -1709,85 +1992,97 @@ Looking good. But what we've got right now is a gameplay snippet, nothing more. 
 
 To start off with, we're going to introduce three basic states - the title screen, gameplay, and the game over screen. The loop will be that the game starts at the title screen, switches to the gameplay screen when any button is pressed, switches to the game over screen when you die, then switches back to the title screen when you press any button on the game over screen.
 
-First, let's do some setup. We'll make a little mini class to define our game states. At the very top of the file, right below the imports and before `player_base`, we're going to add the following class:
+First, let's do some setup. We'll make a little mini class to define our game states. At the very top of the file, right below the imports and and before `game`, we're going to add the following class:
 
 ```python-raw
 class game_state:
     TITLE = 0
     GAMEPLAY = 1
-    GAMEOVER = 3
+    GAME_OVER = 3
 ```
 
-That's it, that's the whole class. Don't worry about the numbers going "0, 1, 3" - that certainly isn't foreshadowing about a secret fourth state we're going to add later or anything, nooo, not at all.
+That's it, that's the whole class. Don't worry about the numbers going "0, 1, 3" - that certainly isn't foreshadowing about a secret extra state we're going to add later or anything, nooo, not at all.
 
-You can see that these are static variables - we're not making an instance of this class anywhere, it's just going to sit there as a shorthand to make the code readable. We could just have an global variable called `game_state` and set it to different numbers to indicate different states, but this way stops us having to remember "Was it 1 that was gameplay, or was that 2?". Plus, having a name in the code means that anyone else looking at it will immediately understand what's going on in a way that they wouldn't with just a number.
+You can see that these are static variables, just lioke the ones in `game` - we're not making an instance of this class anywhere and in fact we'll never change these, it's just going to sit there as a shorthand to make the code readable. We could just have a variable in `game` called `game_state` and set it to different numbers to indicate different states, but this way stops us having to remember "Was it 1 that was gameplay, or was that 2?". Plus, having a name in the code means that anyone else looking at it will immediately understand what's going on in a way that they wouldn't with just a number.
 
-Now let's make a global variable that keeps track of which state we're in. We'll put it just after setting up our player, platforms, and acorns:
+Now, we are going to mak that variable in `game` that keeps track of which state we're in, but we can now use a name instead of a number. We'll put it just after setting up our player, platforms, and acorns:
 
 ```python-raw
-player = player_base(20, 0)
-platforms = []
-acorns = []
-current_game_state = game_state.TITLE
+class game:
+    platforms = []
+    acorns = []
+    controls = {}
+    gamepad = None
+    foreground_scroll_speed = 4
+    last_frame = 0
+    current_game_state = game_state.TITLE
 ```
 
-Now, we're going to put a series of checks into the main `update()` which lets it choose what it wants to do based on what `current_game_state` is set to. We'll leave `parse_controls()` where it is, since you're going to need to read button inputs whatever state you're in. Let's rewrite `update()` so it looks like this:
+Now, we're going to put a series of checks into the main `while` loop which lets it choose what it wants to do based on what `current_game_state` is set to. We'll leave `parse_controls()` where it is, since you're going to need to read button inputs whatever state you're in. Let's rewrite the loop so it looks like this:
 
 ```python-raw
-def update():
-    parse_controls()
+while True:
+    ticks = time.ticks_ms()
+    frametime = ticks - game.last_frame
 
-    if current_game_state == game_state.TITLE:
-        title_loop()
-    elif current_game_state == game_state.GAMEPLAY:
-        gameplay_loop()
-    elif current_game_state == game_state.GAMEOVER:
-        game_over_loop()
+    if frametime >= 33:
+        badge.clear()
+        badge.poll()
+        parse_controls()
+
+        if game.current_game_state == game_state.TITLE:
+            title_loop()
+        elif game.current_game_state == game_state.GAMEPLAY:
+            gameplay_loop()
+        elif game.current_game_state == game_state.GAME_OVER:
+            game_over_loop()
+
+        display.update()
+
+        game.last_frame = ticks
 ```
 
-It's a very simple `update()`, since all the fancy stuff is happening in those methods with `_loop` in the names. Of course, right now this would just throw up an error as we haven't written any of those methods yet, so let's write them. We'll put them directly before `update()` and keep them simple to start with - you can see that `gameplay_loop()` just contains the lines we removed from `update()`, and the other two just draw a line of text:
+It's a very simple loop, since all the fancy stuff is happening in those methods with `_loop` in the names. Of course, right now this would just throw up an error as we haven't written any of those methods yet, so let's write them. We'll put them directly after `init_platforms()` and keep them simple to start with - you can see that `gameplay_loop()` just contains the lines we removed from the main loop, and the other two just draw a line of text:
 
 ```python-raw
 def title_loop():
     screen.text("Title screen", 0, 0)
 
+
 def gameplay_loop():
     player.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.update()
+
 
 def game_over_loop():
     screen.text("Game Over screen", 0, 0)
 ```
 
-Well, this seems like a step backwards. Try running it now, and you'll just get a black screen with "Title screen" written on it that you can't get out of. And of course that's because we started with the state set to `TITLE` and we've got nothing in place to change it. You can see the stuff that used to be in `update()` right there in `gameplay_loop()`, we just can't get to it yet. That's easily fixed, we just check for a button press each frame and when it's pressed, we move it onto the next one:
+Well, this seems like a step backwards. Try running it now, and you'll just get a black screen with "Title screen" written on it that you can't get out of. And of course that's because we started with the state set to `TITLE` and we've got nothing in place to change it. You can see the stuff that used to be in the `while` loop right there in `gameplay_loop()`, we just can't get to it yet. That's easily fixed, we just check for a button press each frame and when it's pressed, we move it onto the next one:
 
 ```python-raw
 def title_loop():
-    global current_game_state
-
     screen.text("Title screen", 0, 0)
 
-    if controls["ANY_KEY"]:
-        current_game_state = game_state.GAMEPLAY
+    if game.controls["ANY_KEY"]:
+        game.current_game_state = game_state.GAMEPLAY
+
 
 def gameplay_loop():
     player.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.update()
 
-def game_over_loop():
-    global current_game_state
 
+def game_over_loop():
     screen.text("Game Over screen", 0, 0)
 
-    if controls["ANY_KEY"]:
-        current_game_state = game_state.TITLE
+    if game.controls["ANY_KEY"]:
+        game.current_game_state = game_state.TITLE
 ```
-
-> Note: When you're using globals in a method like we are here, you need to declare them at the top of the method. We've mentioned this before, but it's worth a reminder here as it's one of the easier things to forget to do, especially if the code that uses them isn't anywhere near the top of the method. If your code isn't working and you're not sure why, this is a good first thing to double check.
 
 ## Losing the game
 
@@ -1795,31 +2090,27 @@ That gets us into gameplay, but now we can't get out of it - there's no lose con
 
 ```python-raw
 def title_loop():
-    global current_game_state
-
     screen.text("Title screen", 0, 0)
 
-    if controls["ANY_KEY"]:
-        current_game_state = game_state.GAMEPLAY
+    if game.controls["ANY_KEY"]:
+        game.current_game_state = game_state.GAMEPLAY
+
 
 def gameplay_loop():
-    global current_game_state
-
     player.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.update()
 
     if player.b >= screen.height:
-        current_game_state = game_state.GAME_OVER
+        game.current_game_state = game_state.GAME_OVER
+
 
 def game_over_loop():
-    global current_game_state
-
     screen.text("Game Over screen", 0, 0)
 
-    if controls["ANY_KEY"]:
-        current_game_state = game_state.TITLE
+    if game.controls["ANY_KEY"]:
+        game.current_game_state = game_state.TITLE
 ```
 
 Hmmm, well now there's another problem. That loop seems to work okay once - title screen, gameplay till you die, game over screen, title screen - but then the second time round it flashes up gameplay for a single frame and goes straight to game over. What's happening?
@@ -1840,17 +2131,15 @@ Not too big of a problem though - let's just put a `reset()` method into `player
 
 Then we call that so that the player is reset when we start a new game. You might think this happens in the title screen method, but if it did then it would be carried out every frame - not a problem for resetting the player's position, but for other things later on it would cause issues. So, anything we want to happen just once when you first enter a game state goes in the same block of code that switches to that game state.
 
-In this case that means we reset the score at the end of the game over screen, when we're switching the game state back to the title screen:
+In this case that means we reset the player at the end of the game over screen, when we're switching the game state back to the title screen:
 
 ```python-raw
 def game_over_loop():
-    global current_game_state, score
-
     screen.text("Game Over screen", 0, 0)
 
     if controls["ANY_KEY"]:
         player.reset()
-        current_game_state = game_state.TITLE
+        game.current_game_state = game_state.TITLE
 ```
 
 That'll just reset the player back to the starting position and zero out their speed. You might notice we've still not used that `dead` property of the player, but that'll come in later still. The suspense must be killing you. And now we've got a full gameplay loop.
@@ -1858,27 +2147,25 @@ That'll just reset the player back to the starting position and zero out their s
 It's still not quite right though. Do you notice that after you finish your first playthrough, after that you sometimes just fall and die instantly because there's no platform beneath you? That's as a result of the same thing - the platforms aren't resetting, they're exactly where you left them. Easily fixed though - we'll call `init_platforms()` that we made ages ago to reset their positions, and we'll do it right after we reset the player:
 
 ```python-raw
-    if controls["ANY_KEY"]:
+    if game.controls["ANY_KEY"]:
         player.reset()
         init_platforms()
-        current_game_state = game_state.TITLE
+        game.current_game_state = game_state.TITLE
 ```
 
 # Scoring
 
-What's next, then? How about a score? Say, one point for every platform you pass? Sounds good. Let's add in a global variable named `score`. It can go right after we initially set the game state, and of course it wants to start off set to zero. We can easily increase the score by adding it as a global into the `update()` method of `platform_base`, and then adding in `score += 1` just after the `while` loop to find a new position for the platform:
+What's next, then? How about a score? Say, one point for every platform you pass? Sounds good. Let's add in a variable, once again in `game`, named `score`. It can go right after we initially set the game state, and of course it wants to start off set to zero. We can easily increase the score by adding it as a global into the `update()` method of `platform_base`, and then adding in `score += 1` just after the `while` loop to find a new position for the platform:
 
 ```python-raw
     def update(self):
-        global score
-
-        self.x -= foreground_scroll_speed
+        self.x -= game.foreground_scroll_speed
 
         if self.r <= 0:
             self.reset()
             while self.check_collisions():
                 self.reset()
-            score += 1
+            game.score += 1
 
         self.draw()
 ```
@@ -1887,54 +2174,60 @@ That way, the score goes up by one every time a platform passes off the left sid
 
 ```python-raw
 def draw_score():
-    global score
-    screen.text(str(score), 0, 0)
+    screen.text(str(game.score), 0, 0)
 ```
 
 Then we can call it after we've drawn everything else:
 
 ```python-raw
 def gameplay_loop():
-    global current_game_state
-
     player.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.update()
 
     draw_score()
 
     if player.b >= screen.height:
-        player.reset()
-        current_game_state = game_state.GAMEOVER
+        game.current_game_state = game_state.GAME_OVER
 ```
 
 The final thing is to reset the score when you go back to the title screen. That'll happen at the end of the game over screen, at the same time as we're resetting the player and platforms:
 
 ```python-raw
 def game_over_loop():
-    global current_game_state, score
-
     screen.text("Game Over screen", 0, 0)
 
-    if controls["ANY_KEY"]:
+    if game.controls["ANY_KEY"]:
         player.reset()
         init_platforms()
-        score = 0
-        current_game_state = game_state.TITLE
+        game.score = 0
+        game.current_game_state = game_state.TITLE
 ```
 
 By this point you should be working with something a lot like this:
 
 ```python
-import qwstpad
 import random
+import qwstpad
+import time
 
 
 class game_state:
     TITLE = 0
     GAMEPLAY = 1
-    GAMEOVER = 3
+    GAME_OVER = 3
+
+
+class game:
+    platforms = []
+    acorns = []
+    controls = {}
+    gamepad = None
+    foreground_scroll_speed = 4
+    last_frame = 0
+    current_game_state = game_state.TITLE
+    score = 0
 
 
 class player_base:
@@ -1985,7 +2278,7 @@ class player_base:
 
     def is_airborne(self):
         airborne = True
-        for platform in platforms:
+        for platform in game.platforms:
             if self.is_standing(platform):
                 airborne = False
         self.airborne = airborne
@@ -1993,28 +2286,30 @@ class player_base:
     def update(self):
         self.is_airborne()
 
-        if self.airborne or self.dead or controls["DROP"]:
+        if self.airborne or self.dead or game.controls["DROP"]:
             self.vy += 1
         else:
-            if controls["JUMP"]:
+            if game.controls["JUMP"]:
                 self.vy = -10
 
-            if controls["JUMP_RIGHT"]:
+            if game.controls["JUMP_RIGHT"]:
                 self.vx = max(self.vx, 3)
 
-            elif controls["JUMP_LEFT"]:
+            elif game.controls["JUMP_LEFT"]:
                 self.vx = min(self.vx, -3)
 
-            elif controls["MOVE_RIGHT"]:
+            elif game.controls["MOVE_RIGHT"]:
                 self.vx += 1.5
 
-            elif controls["MOVE_LEFT"]:
+            elif game.controls["MOVE_LEFT"]:
                 self.vx -= 1.5
 
-            if self.vx > 0: self.vx -= 0.5
-            elif self.vx < 0: self.vx += 0.5
+            if self.vx > 0:
+                self.vx -= 0.5
+            elif self.vx < 0:
+                self.vx += 0.5
 
-        for platform in platforms:
+        for platform in game.platforms:
             if self.is_landing(platform):
                 self.b = platform.y
                 self.vy = 0
@@ -2060,15 +2355,13 @@ class platform_base:
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
 
     def update(self):
-        global score
-
-        self.x -= foreground_scroll_speed
+        self.x -= game.foreground_scroll_speed
 
         if self.r <= 0:
             self.reset()
             while self.check_collisions():
                 self.reset()
-            score += 1
+            game.score += 1
 
         self.draw()
 
@@ -2078,8 +2371,7 @@ class platform_base:
         self.w = random.randint(int(screen.width / 2), screen.width)
 
     def check_collisions(self):
-        global platforms
-        for platform in platforms:
+        for platform in game.platforms:
             if platform.id == self.id:
                 continue
             if self.bounding_box.intersects(platform.bounding_box):
@@ -2118,125 +2410,114 @@ class acorn_base:
 
 
 def draw_score():
-    global score
-    screen.text(str(score), 0, 0)
+    screen.text(str(game.score), 0, 0)
 
 
 def init_gamepad():
-    global gamepad
     gamepads = qwstpad.Gamepadhelper()
     for i in gamepads.pads:
         if i is not None:
-            gamepad = i
-            return i
-    return None
+            game.gamepad = i
+            return
+    game.gamepad = None
+    return
 
 
 def parse_controls():
-    global controls, gamepad
-
-    if gamepad:
+    if game.gamepad:
         try:
-            gamepad.update_buttons()
+            game.gamepad.update_buttons()
         except OSError:
-            gamepad = init_gamepad()
+            init_gamepad()
     else:
-        gamepad = init_gamepad()
+        init_gamepad()
 
-    if gamepad:
-        controls["MOVE_LEFT"] = gamepad.held("L")
-        controls["MOVE_RIGHT"] = gamepad.held("R")
-        controls["DROP"] = gamepad.held("D") and gamepad.pressed("A")
-        controls["JUMP"] = gamepad.pressed("A")
-        controls["JUMP_LEFT"] = gamepad.held("L") and gamepad.pressed("A")
-        controls["JUMP_RIGHT"] = gamepad.held("R") and gamepad.pressed("A")
-        controls["ANY_KEY"] = gamepad.pressed()
+    if game.gamepad:
+        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
+        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
+        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
+        game.controls["JUMP"] = game.gamepad.pressed("A")
+        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
+        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
+        game.controls["ANY_KEY"] = game.gamepad.pressed()
     else:
-        controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        controls["MOVE_RIGHT"] = badge.held(BUTTON_B)
-        controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_C)
-        controls["JUMP"] = badge.pressed(BUTTON_C)
-        controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_C)
-        controls["JUMP_RIGHT"] = badge.held(BUTTON_B) and badge.pressed(BUTTON_C)
-        controls["ANY_KEY"] = badge.pressed()
+        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
+        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
+        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
+        game.controls["JUMP"] = badge.pressed(BUTTON_B)
+        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
+        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
+        game.controls["ANY_KEY"] = badge.pressed()
 
 
 def init_platforms():
-    global platforms
-    platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
+    game.platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
 
-
-gamepad = None
-controls = {}
-
-foreground_scroll_speed = 4
-
-player = player_base(20, 0)
-platforms = []
-acorns = []
-current_game_state = game_state.TITLE
-score = 0
-
-init_gamepad()
-init_platforms()
 
 def title_loop():
-    global current_game_state
-
     screen.text("Title screen", 0, 0)
 
-    if controls["ANY_KEY"]:
-        current_game_state = game_state.GAMEPLAY
+    if game.controls["ANY_KEY"]:
+        game.current_game_state = game_state.GAMEPLAY
+
 
 def gameplay_loop():
-    global current_game_state
-
     player.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.update()
 
     draw_score()
 
     if player.b >= screen.height:
-        current_game_state = game_state.GAMEOVER
+        game.current_game_state = game_state.GAME_OVER
+
 
 def game_over_loop():
-    global current_game_state, score
-
     screen.text("Game Over screen", 0, 0)
 
-    if controls["ANY_KEY"]:
+    if game.controls["ANY_KEY"]:
         player.reset()
         init_platforms()
-        score = 0
-        current_game_state = game_state.TITLE
-
-def update():
-    parse_controls()
-
-    if current_game_state == game_state.TITLE:
-        title_loop()
-    elif current_game_state == game_state.GAMEPLAY:
-        gameplay_loop()
-    elif current_game_state == game_state.GAMEOVER:
-        game_over_loop()
+        game.score = 0
+        game.current_game_state = game_state.TITLE
 
 
-run(update)
+player = player_base(20, 0)
+init_gamepad()
+init_platforms()
+
+while True:
+    ticks = time.ticks_ms()
+    frametime = ticks - game.last_frame
+
+    if frametime >= 33:
+        badge.clear()
+        badge.poll()
+        parse_controls()
+
+        if game.current_game_state == game_state.TITLE:
+            title_loop()
+        elif game.current_game_state == game_state.GAMEPLAY:
+            gameplay_loop()
+        elif game.current_game_state == game_state.GAME_OVER:
+            game_over_loop()
+
+        display.update()
+
+        game.last_frame = ticks
+
 ```
 
 # Losing, but properly
 
 We'll get into the fancy graphics soon. But first, does that dying seem abrupt to you? Hit the bottom of the screen and then boom, straight to game over? In fact, if you're mashing the buttons it's easy to accidentally hit it an extra time and skip the game over and even the title screen.
 
-Well, we can remedy that with a.... secret fourth state nobody knew about! Who could have seen that coming?
+Well, we can remedy that with a.... secret fourth game state nobody knew about! Who could have seen that coming?
 
 This is going to be a little death animation similar to those you see in classic Sonic or Mario games, where the player bounces up from the bottom of the screen, then falls back down and disappears. Once we've got our full graphics, we can use a different sprite animation to show the owies.
 
-First of all, let's create that missing game state, by adding in `DEATH_ANIM = 2` in the appropriate place in our `game_state` class. Then, we'll do the same to set it up in `update()` and create a `death_anim_loop()` method, such that it sits in between `GAMEPLAY` and `GAMEOVER`. You'll also need to change `gameplay_loop()` so that it points to `DEATH_ANIM` instead of `GAMEOVER`.
-
-What's going in this method, though? Well, for now, it's just going to almost be a copy of `gameplay_loop()`:
+First of all, let's create that missing game state, by adding in `DEATH_ANIM = 2` in the appropriate place in our `game_state` class. Then, we'll  create a `death_anim_loop()` method in between `gameplay_loop()` and `game_over_loop()`. What's going in this method, though? Well, for now, it's just going to almost be a copy of `gameplay_loop()`:
 
 ```python-raw
 def death_anim_loop():
@@ -2248,12 +2529,19 @@ def death_anim_loop():
     player.update()
 
     if player.b >= screen.height:
-        current_game_state = game_state.GAMEOVER
+        current_game_state = game_state.GAME_OVER
 ```
 
-Can you spot the difference? In this state, we're calling `platform.draw()` instead of `platform.update()`. That means they'll still get drawn, but they won't move, reset or anything else. The scrolling stops when you die.
+Can you spot the difference? In this state, we're calling `platform.draw()` instead of `platform.update()`. That means the platforms will still get drawn, but they won't move, reset or anything else. The scrolling stops when you die.
 
-But surely that won't matter, because this screen will only be up for a single frame, right? Nothing has reset the player's position, so it'll display, detect that the player is at the bottom of the screen and then move on to the game over screen, surely?
+Now, let's hook this into everything else. Since it's now `death_anim_loop()` that changes the game state to `GAME_OVER`, we want to alter `gameplay_loop()` to point to the `DEATH_ANIM` state instead. And finally, we need to add an extra `elif` statement into the main loop, so that it's at the right point in the sequence:
+
+```python-raw
+        elif game.current_game_state == game_state.DEATH_ANIM:
+            death_anim_loop()
+```
+
+But surely none of that will matter, because this screen will only be up for a single frame, right? Nothing has reset the player's position, so it'll display, detect that the player is at the bottom of the screen and then move on to the game over screen, surely?
 
 Absolutely, that's what would happen with things as they are right now. But that same hitting-the-screen-bottom logic is still going to be what takes us to the game over screen in the end. We've just got to stop it firing off too early.
 
@@ -2269,11 +2557,11 @@ We're going to create one more method within `player_base`, with the delightful 
 
 You might be able to see where this is going. It's just like the `reset()` method, only it's leaving the player where they are in x, moving them to just one pixel above the screen bottom in y so that they won't trigger the game over screen, and giving them an upward speed just a little bigger than a normal jump. It's also, finally, doing something with that `dead` property, setting it to True.
 
-This will mean that when the player updates, they'll be subject to gravity and all of the controls will be locked out.  We need to do one more thing with that here, though. In the player's `update()` method, we need to put that check for landing on a platform behind a test of `dead` so that they'll just fall through platforms and not land on them:
+This will mean that when the player updates, they'll fall with gravity and all of the controls will be locked out.  We need to do one more thing with that here, though. In the player's `update()` method, we need to put that check for landing on a platform behind a test of `dead` so that they'll just fall through platforms and not land on them:
 
 ```python-raw
         if not self.dead:
-            for platform in platforms:
+            for platform in game.platforms:
                 if self.is_landing(platform):
                     self.b = platform.y
                     self.vy = 0
@@ -2290,22 +2578,48 @@ Finally we just need to add a line to the player's `reset()` method to set `dead
         self.dead = False
 ```
 
-We also need to call `player.death()` when we switch from `GAMEPLAY` to `DEATH_ANIM`, just like we reset the player when going from `GAMEOVER` to `TITLE`
+We also need to call `player.death()` when we switch from `GAMEPLAY` to `DEATH_ANIM`, just like we reset the player when going from `GAMEOVER` to `TITLE`:
+
+```python-raw
+def gameplay_loop():
+    player.update()
+
+    for platform in game.platforms:
+        platform.update()
+
+    draw_score()
+
+    if player.b >= screen.height:
+        player.death()
+        game.current_game_state = game_state.DEATH_ANIM
+```
 
 Now you might be able to see what's going to happen. When you hit the bottom of the screen the first time, it goes into the `DEATH_ANIM` mode. This stops the platforms from scrolling, moves the player up a tiny bit so they won't immediately trigger the game over screen, and gives them a boost upward while disabling controls and collisions with platforms. Since they're still being affected by gravity, they're going to bounce up, fall down and then trigger the game over screen when they hit the bottom of the screen again.
 
 And by jingo, it works. Here's the full code so far:
 
 ```python
-import qwstpad
 import random
+import qwstpad
+import time
 
 
 class game_state:
     TITLE = 0
     GAMEPLAY = 1
     DEATH_ANIM = 2
-    GAMEOVER = 3
+    GAME_OVER = 3
+
+
+class game:
+    platforms = []
+    acorns = []
+    controls = {}
+    gamepad = None
+    foreground_scroll_speed = 4
+    last_frame = 0
+    current_game_state = game_state.TITLE
+    score = 0
 
 
 class player_base:
@@ -2356,7 +2670,7 @@ class player_base:
 
     def is_airborne(self):
         airborne = True
-        for platform in platforms:
+        for platform in game.platforms:
             if self.is_standing(platform):
                 airborne = False
         self.airborne = airborne
@@ -2364,29 +2678,31 @@ class player_base:
     def update(self):
         self.is_airborne()
 
-        if self.airborne or self.dead or controls["DROP"]:
+        if self.airborne or self.dead or game.controls["DROP"]:
             self.vy += 1
         else:
-            if controls["JUMP"]:
+            if game.controls["JUMP"]:
                 self.vy = -10
 
-            if controls["JUMP_RIGHT"]:
+            if game.controls["JUMP_RIGHT"]:
                 self.vx = max(self.vx, 3)
 
-            elif controls["JUMP_LEFT"]:
+            elif game.controls["JUMP_LEFT"]:
                 self.vx = min(self.vx, -3)
 
-            elif controls["MOVE_RIGHT"]:
+            elif game.controls["MOVE_RIGHT"]:
                 self.vx += 1.5
 
-            elif controls["MOVE_LEFT"]:
+            elif game.controls["MOVE_LEFT"]:
                 self.vx -= 1.5
 
-            if self.vx > 0: self.vx -= 0.5
-            elif self.vx < 0: self.vx += 0.5
+            if self.vx > 0:
+                self.vx -= 0.5
+            elif self.vx < 0:
+                self.vx += 0.5
 
         if not self.dead:
-            for platform in platforms:
+            for platform in game.platforms:
                 if self.is_landing(platform):
                     self.b = platform.y
                     self.vy = 0
@@ -2439,15 +2755,13 @@ class platform_base:
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
 
     def update(self):
-        global score
-
-        self.x -= foreground_scroll_speed
+        self.x -= game.foreground_scroll_speed
 
         if self.r <= 0:
             self.reset()
             while self.check_collisions():
                 self.reset()
-            score += 1
+            game.score += 1
 
         self.draw()
 
@@ -2457,8 +2771,7 @@ class platform_base:
         self.w = random.randint(int(screen.width / 2), screen.width)
 
     def check_collisions(self):
-        global platforms
-        for platform in platforms:
+        for platform in game.platforms:
             if platform.id == self.id:
                 continue
             if self.bounding_box.intersects(platform.bounding_box):
@@ -2497,128 +2810,118 @@ class acorn_base:
 
 
 def draw_score():
-    global score
-    screen.text(str(score), 0, 0)
+    screen.text(str(game.score), 0, 0)
 
 
 def init_gamepad():
-    global gamepad
     gamepads = qwstpad.Gamepadhelper()
     for i in gamepads.pads:
         if i is not None:
-            gamepad = i
-            return i
-    return None
+            game.gamepad = i
+            return
+    game.gamepad = None
+    return
 
 
 def parse_controls():
-    global controls, gamepad
-
-    if gamepad:
+    if game.gamepad:
         try:
-            gamepad.update_buttons()
+            game.gamepad.update_buttons()
         except OSError:
-            gamepad = init_gamepad()
+            init_gamepad()
     else:
-        gamepad = init_gamepad()
+        init_gamepad()
 
-    if gamepad:
-        controls["MOVE_LEFT"] = gamepad.held("L")
-        controls["MOVE_RIGHT"] = gamepad.held("R")
-        controls["DROP"] = gamepad.held("D") and gamepad.pressed("A")
-        controls["JUMP"] = gamepad.pressed("A")
-        controls["JUMP_LEFT"] = gamepad.held("L") and gamepad.pressed("A")
-        controls["JUMP_RIGHT"] = gamepad.held("R") and gamepad.pressed("A")
-        controls["ANY_KEY"] = gamepad.pressed()
+    if game.gamepad:
+        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
+        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
+        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
+        game.controls["JUMP"] = game.gamepad.pressed("A")
+        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
+        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
+        game.controls["ANY_KEY"] = game.gamepad.pressed()
     else:
-        controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        controls["MOVE_RIGHT"] = badge.held(BUTTON_B)
-        controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_C)
-        controls["JUMP"] = badge.pressed(BUTTON_C)
-        controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_C)
-        controls["JUMP_RIGHT"] = badge.held(BUTTON_B) and badge.pressed(BUTTON_C)
-        controls["ANY_KEY"] = badge.pressed()
+        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
+        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
+        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
+        game.controls["JUMP"] = badge.pressed(BUTTON_B)
+        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
+        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
+        game.controls["ANY_KEY"] = badge.pressed()
 
 
 def init_platforms():
-    global platforms
-    platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
+    game.platforms = [platform_base("a", 0, 50), platform_base("b", 40, 80), platform_base("c", 80, 110)]
 
-
-gamepad = None
-controls = {}
-
-foreground_scroll_speed = 4
-
-player = player_base(20, 0)
-platforms = []
-acorns = []
-current_game_state = game_state.TITLE
-score = 0
-
-init_gamepad()
-init_platforms()
 
 def title_loop():
-    global current_game_state
-
     screen.text("Title screen", 0, 0)
 
-    if controls["ANY_KEY"]:
-        current_game_state = game_state.GAMEPLAY
+    if game.controls["ANY_KEY"]:
+        game.current_game_state = game_state.GAMEPLAY
+
 
 def gameplay_loop():
-    global current_game_state
-
     player.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.update()
 
     draw_score()
 
     if player.b >= screen.height:
         player.death()
-        current_game_state = game_state.DEATH_ANIM
+        game.current_game_state = game_state.DEATH_ANIM
+
 
 def death_anim_loop():
-    global current_game_state
-
     player.update()
 
-    for platform in platforms:
+    for platform in game.platforms:
         platform.draw()
 
     draw_score()
 
     if player.b >= screen.height:
-        current_game_state = game_state.GAMEOVER
+        game.current_game_state = game_state.GAME_OVER
+
 
 def game_over_loop():
-    global current_game_state, score
-
     screen.text("Game Over screen", 0, 0)
 
-    if controls["ANY_KEY"]:
+    if game.controls["ANY_KEY"]:
         player.reset()
         init_platforms()
-        score = 0
-        current_game_state = game_state.TITLE
-
-def update():
-    parse_controls()
-
-    if current_game_state == game_state.TITLE:
-        title_loop()
-    elif current_game_state == game_state.GAMEPLAY:
-        gameplay_loop()
-    elif current_game_state == game_state.DEATH_ANIM:
-        death_anim_loop()
-    elif current_game_state == game_state.GAMEOVER:
-        game_over_loop()
+        game.score = 0
+        game.current_game_state = game_state.TITLE
 
 
-run(update)
+player = player_base(20, 0)
+init_gamepad()
+init_platforms()
+
+while True:
+    ticks = time.ticks_ms()
+    frametime = ticks - game.last_frame
+
+    if frametime >= 33:
+        badge.clear()
+        badge.poll()
+        parse_controls()
+
+        if game.current_game_state == game_state.TITLE:
+            title_loop()
+        elif game.current_game_state == game_state.GAMEPLAY:
+            gameplay_loop()
+        elif game.current_game_state == game_state.DEATH_ANIM:
+            death_anim_loop()
+        elif game.current_game_state == game_state.GAME_OVER:
+            game_over_loop()
+
+        display.update()
+
+        game.last_frame = ticks
+
 ```
 
-Now, it runs very fast, so it's pretty difficult. And it's not especially attractive. But that's what the other part of the tutorial is for. We're going to take this functional starting point and give it that beautiful Triple-A Badgeware sheen, as well as adding acorns for Tufty to collect, and a couple of other bells and whistles too.
+Now, it's not especially attractive. But that's what the other part of the tutorial is for. We're going to take this functional starting point and give it that beautiful Triple-A Badgeware sheen, as well as adding acorns for Tufty to collect, and a couple of other bells and whistles too.
