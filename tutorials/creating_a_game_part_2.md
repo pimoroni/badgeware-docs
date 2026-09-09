@@ -2,13 +2,14 @@
 title: "A simple game - part 2"
 summary: "Animation, sprites and interactivity"
 icon: sports_esports
-publish: false
+publish: true
+sort: 4
 ---
 # A simple game: Acorn Highway (Part 2)
 
 So having followed the previous tutorial, you should have a working, if ugly and speedy, platformer made of coloured blocks. Let's get it looking really good. First of all, here's the code you should have in your app by the end of the last tutorial:
 
-```simulator
+```python
 import random
 import qwstpad
 import time

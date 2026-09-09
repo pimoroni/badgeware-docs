@@ -1,8 +1,9 @@
 ---
 title: "A simple game - part 1"
-summary: "Animation, sprites and interactivity"
+summary: "Gameplay"
 icon: sports_esports
-publish: false
+publish: true
+sort: 3
 ---
 # A simple game: Acorn Highway (Part 1)
 
@@ -101,7 +102,7 @@ The `@property` on these makes them very useful. They're defined like methods, b
 
 This essentially works the same, but in reverse. It allows people to assign values to `player.r` or `player.b`, and this will be taken in as the parameter `a` and used to calculate how to change the x and y coordinates. Let's try this out - alter `update()` so that the whole program looks like this:
 
-```simulator
+```python
 class player_base:
     def __init__(self, x, y):
         self.x = x
