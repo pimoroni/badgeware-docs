@@ -95,7 +95,6 @@ Here's an example that keeps a running log of **pressed** and **released** event
 
 ```python
 screen.font = font.nope
-screen.pen = color.black
 
 # each button constant, paired with the label to show for it
 BUTTONS = [
@@ -123,10 +122,14 @@ while True:
   if not redraw:
     continue     # nothing changed, skip the slow screen update
 
+  screen.pen = color.white
+  screen.clear()
+  screen.pen = color.black
+
   # draw the most recent lines, oldest at the top
-  log = log[-7:]
+  log = log[-5:]
   for i, line in enumerate(log):
-    screen.text(line, 10, 20 + i * 20)
+    screen.text(line, 10, 10 + i * 20)
 
   badge.update()   # only refresh when something changed
   redraw = False
