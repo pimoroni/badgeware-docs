@@ -335,6 +335,10 @@ while True:
 
 ```
 
+> Remember, when you see Tufty, it's a good spot to run your program and see how it's going.
+
+![Run your code!](/tut4_res/tufty.png)
+
 If you've got that in `__init__.py` in your app folder, along with an `icon.png`, `qwstpad.py` and an `assets` folder, you're ready to go.
 
 # The Background
@@ -348,7 +352,7 @@ You might notice that this and the other images we'll get into look a lot like t
 To do that, we'll first load in the image. We'll need to do this with quite a few assets, so let's load them all in in the same place, in the `game` class:
 
 ```python-raw
-background = image.load("assets/background.png")
+    background = image.load("assets/background.png")
 ```
 
 Now, let's create a method to draw that background. We'll put it right before `draw_score()`, and right at the moment we're just going to draw the image to the screen:
@@ -375,6 +379,8 @@ def gameplay_loop():
         player.death()
         game.current_game_state = game_state.DEATH_ANIM
 ```
+
+![Run your code!](/tut4_res/tufty.png)
 
 ## Scrolling the background
 
@@ -417,13 +423,15 @@ class game:
 
 Now we've got them separated out into basic gameplay elements, settings for gameplay, game flow variables and our score.
 
-Anyway, now we've made our scrolling variables we'll alter `draw_background()` to utilise those. We're still painting the background in, but offset horizontally by `game.background_scroll_amount` pixels. Before that we're changing that value by the background scroll speed, subtracting so that it moves left:
+Anyway, now we've made our scrolling variables we'll alter `draw_background()` to utilise those. We're still painting the background in, but now it's offset horizontally by `game.background_scroll_amount` pixels. Before that, we're changing that value by the background scroll speed, subtracting so that it moves left:
 
 ```python-raw
 def draw_background():
     game.background_scroll_amount -= game.background_scroll_speed
     screen.blit(game.background, vec2(game.background_scroll_amount, 0))
 ```
+
+![Run your code!](/tut4_res/tufty.png)
 
 Now you'll see that the background scrolls, but of course it's just scrolling off the edge of the screen. We just need a single line of code to get the scroll to repeat - if we use the modulo operator (`%`), we can get it to loop around every time `background_scroll_amount` goes below minus 180, the width of the background image.
 
@@ -433,6 +441,8 @@ def draw_background():
     game.background_scroll_amount %= -game.background.width
     screen.blit(game.background, vec2(game.background_scroll_amount, 0))
 ```
+
+![Run your code!](/tut4_res/tufty.png)
 
 Now it's repeating, but obviously still scrolling off the edge of the screen. So what to do? Simple! Draw a second copy of the background exactly where the first one ends.
 
@@ -447,6 +457,8 @@ def draw_background():
     screen.blit(game.background, vec2(background_a_pos, 0))
     screen.blit(game.background, vec2(background_b_pos, 0))
 ```
+
+![Run your code!](/tut4_res/tufty.png)
 
 Great, that's a repeating scrolling background. But you'll notice that it only appears in the gameplay loop, as soon as you die it'll disappear. So let's call the background method in the death animation loop, right at the top. Try running it now and you'll see we have a background on the death animation.
 
@@ -470,6 +482,8 @@ We've set `scroll` to default to True, so we only need to include it when called
 ```python-raw
     draw_background(False)
 ```
+
+![Run your code!](/tut4_res/tufty.png)
 
 And we're done - the background stops scrolling when the platform does. Here's the full code up to now.
 
@@ -842,6 +856,8 @@ For this we can use the `brush` object, specifically `brush.image()`. This allow
         screen.shape(player_box)
 ```
 
+![Run your code!](/tut4_res/tufty.png)
+
 As you can see we've only changed one line, and the platforms now show the branch texture. But something's very wrong. The image seems to flow along the platforms as they scroll, and sometimes it's misaligned with them. That's because `brush.image()` assumes the image starts at (0, 0) and repeats forever in x and y, and the shapes you draw using the brush are kind of like a window into that endless repeating pattern.
 
 That means we need to change the brush to be aligned to our platform each time we draw it, which will solve both visual issues together. If you've done the dashboard tutorial you might have an idea of how we're going to do this - it's all to do with that `mat3()` we casually tossed into the brush's parameters hoping nobody would notice it. This is a transformation matrix, and we're going to use it to translate the position of the brush texture to the position of the platform whenever `draw()` is called.
@@ -854,6 +870,8 @@ At the moment it's just a plain bare `mat3()`, which means it's essentially a tr
         player_box = shape.rectangle(self.x, self.y, self.w, self.h)
         screen.shape(player_box)
 ```
+
+![Run your code!](/tut4_res/tufty.png)
 
 And that's the platforms working correctly - a lot less work than the background, since we did a lot more to set up for it earlier on. Now let's tackle Tufty in all their squirrely majesty.
 
@@ -880,6 +898,8 @@ We can access sprites within a spritesheet by using `sprite()` and supplying it 
     def draw(self):
         screen.blit(game.sqirl_run.sprite(0, 0), rect(self.x, self.y + 2, self.w, self.h))
 ```
+
+![Run your code!](/tut4_res/tufty.png)
 
 And voila, one squirrel bouncing around the level. Now in fairness it's not the most animated squirrel yet, but we can change that. The `(0, 0)` is the coordinate of the frame we want to show. You can test it by replacing that first zero with other numbers and you'll see different frames appear.
 
@@ -922,6 +942,8 @@ Of course this won't do anything unless we apply it, so there's another change t
         frame_no = game.anim_frame_counter % 7
         screen.blit(game.sqirl_run.sprite(frame_no, 0), rect(self.x, self.y + 2, self.w, self.h))
 ```
+
+![Run your code!](/tut4_res/tufty.png)
 
 Run the program now, and Tufty is animated! But hoo boy, that's one squirrely squirrel - that frame rate is clearly way too fast. We can fix it though, and we've done this before. We can use the same technique we used to lock the whole game to 30fps to lock the animation to a lower framerate.
 
@@ -980,6 +1002,8 @@ while True:
 ```
 
 We've chosen a time of 83ms for each frame, because that's approximately one twelfth of a second, so the animation will run around 12fps - a good speed for this animation.
+
+![Run your code!](/tut4_res/tufty.png)
 
 If everything's gone right so far, your code should look like this, and Tufty should be animating like a champ!
 
@@ -1351,6 +1375,8 @@ Tufty is running great, but let's improve on those animations. Right now, when y
         screen.blit(game.sqirl_run.sprite(frame_no, 0), rect(self.x, self.y + 2, self.w, self.h))
 ```
 
+![Run your code!](/tut4_res/tufty.png)
+
 And now Tufty strikes a Dynamic Action Pose whenever you jump! But it's still not quite right when we die, and as you may have suspected when we imported sprites for it, we've got another animation for that.
 
 The setup we need to do for this involves making the player's current animation a variable in the class - that way, by changing that variable between different sprites we can change Tufty's animation. So we'll just add `self.animation = game.sqirl_run` in at the end of the player's `__init__()` method, after we set `self.dead`. Then we can alter `draw()` to use that variable. We're also checking `self.dead` to set the number of frames in the animation, as `sqirl_die` has fewer frames than `sqirl_run`.
@@ -1360,7 +1386,7 @@ The setup we need to do for this involves making the player's current animation 
         if self.airborne and game.current_game_state == game_state.GAMEPLAY:
             frame_no = 2
         elif self.dead:
-            frame_no = game.anim_frame_counter % 3
+            frame_no = game.anim_frame_counter % 4
         else:
             frame_no = game.anim_frame_counter % 7
         screen.blit(self.animation.sprite(frame_no, 0), rect(self.x, self.y + 2, self.w, self.h))
@@ -1384,6 +1410,8 @@ Now we just need add a line to the end of the player's `reset()` and `death()` m
         self.dead = True
         self.animation = game.sqirl_die
 ```
+
+![Run your code!](/tut4_res/tufty.png)
 
 And we're done with the animations! If you've been following along, your code should look like this:
 
@@ -1534,7 +1562,7 @@ class player_base:
         if self.airborne and game.current_game_state == game_state.GAMEPLAY:
             frame_no = 2
         elif self.dead:
-            frame_no = game.anim_frame_counter % 3
+            frame_no = game.anim_frame_counter % 4
         else:
             frame_no = game.anim_frame_counter % 7
         screen.blit(self.animation.sprite(frame_no, 0), rect(self.x, self.y + 2, self.w, self.h))
@@ -1841,6 +1869,8 @@ def gameplay_loop():
 
 Before we get on to the next bit, picking up the acorns, we just want to quickly add in `game.acorns.clear()` into `game_over_loop()`, right after we reset the score - that way the list of acorns get cleared when everything else resets for a new game.
 
+![Run your code!](/tut4_res/tufty.png)
+
 Once that's done, let's get Tufty grabbing those acorns. Like we mentioned above, that's going to be taken care of in the `acorn_base` class. And as a bonus, we've already done all the legwork for it! In `acorn_base`'s `update()` method, we just need to check if the acorn's bounding box overlaps the player's, and if it does, add three to the score and delete the acorn from the list! Easy!
 
 ```python-raw
@@ -1853,9 +1883,13 @@ Once that's done, let's get Tufty grabbing those acorns. Like we mentioned above
             game.acorns.remove(self)
 ```
 
-The more we get through this, the more we find that the mechanisms we need are already there. If you try playing now you can pick up the acorns and add to the score! There's just one last thing to do. You might notice that it's a bit easy to pick up the acorns - you don't really have to touch them to pick them up, and it's pretty easy to see why. Remember the red square we had for our player before adding the Tufty sprite? It's a lot bigger than the sprite itself, 32×32px, and as soon as any part of it hits an acorn that acorn's picked up.
+The more we get through this, the more we find that the mechanisms we need are already there. If you try playing now you can pick up the acorns and add to the score!
 
-Fixing this isn't too complicated. The player's `bounding_box` property is used in just one place in the program - checking for collision with the acorns. That means that we can fine tune the size and location of that bounding box to better fit Tufty's actual dimensions. The property is currently calculated with:
+![Run your code!](/tut4_res/tufty.png)
+
+There's just one last thing to do. You might notice that it's a bit easy to pick up the acorns - you don't really have to touch them to pick them up, and it's pretty easy to see why. Remember the red square we had for our player before adding the Tufty sprite? It's a lot bigger than the sprite itself, 32×32px, and as soon as any part of it hits an acorn, that acorn gets picked up.
+
+Fixing this isn't too complicated. The player's `bounding_box` property is used in just one place in the program - checking for collision with the acorns. That means that we can fine tune the size and location of that bounding box to better fit Tufty's actual dimensions, without affecting anything else in the game. The property is currently calculated with:
 
 ```python-raw
     @property
@@ -1876,6 +1910,8 @@ This takes the top of the sprite down by 20px and the sides in by 8px, like so:
 ![Acorn Highway sprite bounding box](/tut4_res/sprite_clip_demo.png)
 
 (You don't need to download this image, it's just to show the new bounding box.)
+
+![Run your code!](/tut4_res/tufty.png)
 
 And now gameplay is almost entirely complete. Let's move on to prettying up the rest of the game - here's the code you should have so far:
 
@@ -2028,7 +2064,7 @@ class player_base:
         if self.airborne and game.current_game_state == game_state.GAMEPLAY:
             frame_no = 2
         elif self.dead:
-            frame_no = game.anim_frame_counter % 3
+            frame_no = game.anim_frame_counter % 4
         else:
             frame_no = game.anim_frame_counter % 7
         screen.blit(self.animation.sprite(frame_no, 0), rect(self.x, self.y + 2, self.w, self.h))
@@ -2309,6 +2345,8 @@ def title_loop():
         game.current_game_state = game_state.GAMEPLAY
 ```
 
+![Run your code!](/tut4_res/tufty.png)
+
 Alright, that's a good backdrop. Now, remember how we used an image brush to draw the platforms? We're going to do the same here for our infinite branch, but instead of moving the platform we're going to keep it in one place and let the texture scroll across it. Here's what we're going to do.
 
 ```python-raw
@@ -2327,7 +2365,7 @@ def title_loop():
         game.current_game_state = game_state.GAMEPLAY
 ```
 
-Let's go through those new lines one by one. First we're going to set a variable for the branch's y position on the screen. Then we'll create a transformation matrix, just like we did for the platforms which moves the tiling branch texture down to that same height. We'll be using the x coordinate of this matrix to scroll the branch, but for now we'll leave it at zero.
+Let's go through those new lines one by one. First we're going to set a variable for the branch's y position on the screen. Then we'll create a transformation matrix, just like we did for the platforms, which moves the tiling branch texture down to that same height. We'll be using the x coordinate of this matrix to scroll the branch, but for now we'll leave it at zero.
 
 Then we create a rectangle of the right size in the right position - in this case full screen width, 10px high, and our previously decided y position. Finally we just set the pen to be a new image brush using our already-loaded branch texture as the image, the matrix we just created as the transformation, and we draw it to the screen.
 
@@ -2335,7 +2373,7 @@ If you run the program now you should see a static branch along the horizon line
 
 > Note: In theory you could use this technique to do the background scrolling as well, but in practice we found that because of some internal workings of the back end code, the way it's been accomplished in this tutorial gave a much smoother and more consistent framerate.
 
-Let's have the infinite branch move at the same speed as the ingame platforms. That gives us visual consistency, and also lets us reuse our `foreground_scroll_speed` variable. We just need another variable in `game` to keep track of the scroll position of the texture, and we'll create that right below the other scrolling-related variables as `title_scroll_amount = 0`. Then in our title screen loop, we'll bring in the global, set the x coordinate of the texture transformation to `title_scroll_amount` and remember to decrease `title_scroll_amount` by `foreground_scroll_speed`.
+Let's have the infinite branch move at the same speed as the ingame platforms. That gives us visual consistency, and also lets us reuse our `foreground_scroll_speed` variable. We just need another variable in `game` to keep track of the scroll position of the texture, and we'll create that right below the other scrolling-related variables as `title_scroll_amount = 0`. Then in our title screen loop, we'll set the x coordinate of the texture transformation to `title_scroll_amount` and remember to decrease `title_scroll_amount` by `foreground_scroll_speed`.
 
 ```python-raw
 def title_loop():
@@ -2366,6 +2404,8 @@ Now we just need to add Tufty running along there. This is a lot easier than the
 
 So we're just using the existing frame counter we've always got running in the background for this. First we're setting x and y coordinates so that Tufty will be at the right height and centred on screen, then blitting the appropriate frame from the animation.
 
+![Run your code!](/tut4_res/tufty.png)
+
 # Captions
 
 For another touch, let's add a flashing "Press any button!" message to the title and game over screens. There are some pixel fonts just the right fit for this purpose - we'll add the following line right at the end of our image imports:
@@ -2374,7 +2414,7 @@ For another touch, let's add a flashing "Press any button!" message to the title
 title_font = font.yesterday
 ```
 
-We're actually going to be centering text on the screen a fair bit for the rest of this tutorial, so let's make a quick method for doing this more easily. Here it is in full, and it can go at the very beginning of our methods, right after the definition for the `acorn_base` class:
+We're actually going to be centering text on the screen a fair bit for the rest of this tutorial, so let's make a quick method for doing this more easily. Here it is in full, and it can go at the very beginning of our other functions, right after the definition for the `acorn_base` class:
 
 ```python-raw
 def centre_text(message, y):
@@ -2396,7 +2436,9 @@ Now we've got that, we can easily use it ingame. You just need the following lin
         centre_text(restarttext, 100)
 ```
 
-Setting the font and the pen is self-explanatory, as is drawing the text. That `if` statement bears some explaining though - it's looking at the badge's `ticks` property again, dividing it by 500, rounding it to a whole number and seeing if that whole number is even. The way the maths works out, the result of that calculation would switch between odd and even every half a second, so we can use it in an if statement to make the text flash on and off. Dividing by 500 gives us that half second rate - as `ticks` is in milliseconds, 500 ticks is half a second - but you can experiment and see how different values in there will alter the rate of flashing.
+Setting the font and the pen is self-explanatory, as is drawing the text. That `if` statement bears some explaining though - it's looking at the ticks again, dividing it by 500, rounding it to a whole number and seeing if that whole number is even. The way the maths works out, the result of that calculation would switch between odd and even every half a second, so we can use it in an if statement to make the text flash on and off. Dividing by 500 gives us that half second rate - as `ticks` is in milliseconds, 500 ticks is half a second - but you can experiment and see how different values in there will alter the rate of flashing.
+
+![Run your code!](/tut4_res/tufty.png)
 
 At this point, your program should look like this:
 
@@ -2855,6 +2897,8 @@ def draw_score():
     screen.blit(game.acorn_lg, acorn_coords)
 ```
 
+![Run your code!](/tut4_res/tufty.png)
+
 After that we'll measure the text - remember, it's an integer, so will need converting to a string before we draw or measure it:
 
 ```python-raw
@@ -2906,6 +2950,8 @@ def draw_score():
     screen.text(str(game.score), vec2(x, y))
 ```
 
+![Run your code!](/tut4_res/tufty.png)
+
 Not bad, right?
 
 # Final score tricks
@@ -2921,9 +2967,11 @@ Displaying the score is trivial - you just need the following lines in `game_ove
 
 > Note: If you've not seen this type of string formatting before, it's simple - if you put an f before opening the string, you can include variables in the string by enclosing them in curly braces. It just saves on faffing about concatenating strings together.
 
+![Run your code!](/tut4_res/tufty.png)
+
 That's all you need. High scores are trickier though, and they require the use of the last part of the API to be covered in this tutorial, states.
 
-In essence, a state is just a little JSON file that contains simple data - in this case, one single number - that of the current high score. There's methods in the Badgeware API that let you easily and quickly load and save states, and this is ideal for what we want to do.
+In essence, a state is just a little JSON file that contains simple data - in this case, one single number, the current high score. There's methods in the Badgeware API that let you easily and quickly load and save states, and this is ideal for what we want to do.
 
 States are saved in the form of a dictionary, and we need to set up that dictionary with default values, so that if there is no save state file (like when the program is first run), there's still data to work with. We'll put this right at the very end of `game` after the score..
 
@@ -2960,7 +3008,9 @@ So, probably pretty easy to see what's going on here - if the current score is g
 
 > Note: It's `>=` rather than just `>` because otherwise, the game would consider it a new high score for the first frame of displaying it, and then after that it would have updated the dictionary, so it wouldn't flag up as a high score any more and would just display the normal message.
 
-Nice! Your high scores are being recorded. Only problem is, the game is forgetting the high score every time it restarts. That's there the states come in, and it's just two more lines of code before you're done with the whole thing!
+![Run your code!](/tut4_res/tufty.png)
+
+Nice! Your high scores are being recorded. Only problem is, the game is forgetting the high score every time it restarts. That's where the states come in, and it's just two more lines of code before you're done with the whole thing!
 
 First off, right after creating that dictionary, we'll just load in any saved states into it:
 
@@ -2981,6 +3031,8 @@ Similarly, where we just were on the game over screen, right after putting the n
 ```
 
 # The end
+
+![Run your code!](/tut4_res/tufty.png)
 
 And that's it! By'eck, it's been a little while, but we got there. You should have a fully fledged platform game for Tufty. Here's the final code for the game. Well done for getting this far and happy coding in the future!
 

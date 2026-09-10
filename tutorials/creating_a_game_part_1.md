@@ -11,9 +11,9 @@ It's time to put everything together to make a simple but fun game, with lots of
 
 The game you'll be making it called Acorn Highway, and it's a simple infinite runner / platformer. You control Tufty the squirrel, hopping from branch to branch to grab as many acorns as you can without falling out of the tree. Tufty can run very fast but has a lot of momentum, so part of the challenge is to know when _not_ to run or jump. Tufty earns one point for each platform passed, and another three points for each acorn collected.
 
-> Note: Whenever it's time to run your program to test something, you'll see an animated Tufty running like the one below.
+> Note: Whenever it's time to run your program to test something, you'll see an icon of Tufty running like the one below.
 
-![Run your code!](/tut4_res/tufty.gif)
+![Run your code!](/tut4_res/tufty.png)
 
 # Setting up
 
@@ -30,7 +30,7 @@ class game:
     pass
 ```
 
-We've not put anything inside it yet, but as we go we'll add things to this. You'll notice as we do that these will not use `self.` to make these into variables that can change per instance - we're not going to be making any instances of this class, just using it as a convenient store for things to access, so they'll go directly inside the class as static variables.
+We've not put anything inside it yet, but as we go we'll add things to this. You'll notice as we do that those things will not use `self.` to make them into variables that can change per instance - we're not going to be making any instances of this class, just using it as a convenient store for things to access, so they'll go directly inside the class as static variables.
 
 Then, directly after that, we'll make a class for the player:
 
@@ -80,30 +80,31 @@ while True:
     display.update()
 ```
 
-![Run your code!](/tut4_res/tufty.gif)
+![Run your code!](/tut4_res/tufty.png)
 
 This should give you a red square at the top of the screen, 20 pixels from the left. Of course, positioning things is nice and easy if you only ever want to check on the top left corner, but what about other positions on the player? We could store the position of the right and bottom as variables, and update them every time the x and y change, but there's a way that makes life simpler throughout the rest of the program. In the `player_base` class, add the following, after `__init__` and before `draw()`:
 
 ```python-raw
-@property
-def r(self):
-    return self.x + self.w
 
-@property
-def b(self):
-    return self.y + self.h
+    @property
+    def r(self):
+        return self.x + self.w
+
+    @property
+    def b(self):
+        return self.y + self.h
 ```
 
 The `@property` on these makes them very useful. They're defined like methods, but they act like variables. They're like variables that aren't stored as a fixed value in the instance of the class, but calculated fresh every time the program asks for them, and it's that calculation that is in the methods you just added. So another part of the program could use, say, `player.r` in a calculation, and it would be whatever value is equal to the player's x position plus their width - or in other words, the player's right hand side. We can go further with this. Add the following after the above:
 
 ```python-raw
-@r.setter
-def r(self, a):
-    self.x = a - self.w
+    @r.setter
+    def r(self, a):
+        self.x = a - self.w
 
-@b.setter
-def b(self, a):
-    self.y = a - self.h
+    @b.setter
+    def b(self, a):
+        self.y = a - self.h
 ```
 
 This essentially works the same, but in reverse. It allows people to assign values to `player.r` or `player.b`, and this will be taken in as the parameter `a` and used to calculate how to change the x and y coordinates. Let's try this out - alter `update()` so that the whole program looks like this:
@@ -157,7 +158,7 @@ while True:
     display.update()
 ```
 
-![Run your code!](/tut4_res/tufty.gif)
+![Run your code!](/tut4_res/tufty.png)
 
 As you can see, you're getting two squares. First, you're setting the top left corner of the box to be at `80, 60` - the centre of the screen, and you're drawing it. Then you're setting the bottom right corner to be at the same coordinates, and drawing it again. When you're setting `r` and `b` there, it's calculating what `x` and `y` need to be to put it in the right place.
 
@@ -211,6 +212,24 @@ class acorn_base:
 ```
 
 The `acorn_base` class is basically the same as `player_base` at the moment. Given that all these properties are common between them you could potentially make a parent class which all of these are subclasses of, but that's beyond the scope of this tutorial. We'll make an example of each one being created with fairly arbitrary positions, then drawn to the screen:
+
+```python-raw
+player = player_base(20, 0)
+platform = platform_base("a", 0, 80)
+acorn = acorn_base(10, 45)
+
+while True:
+    badge.clear()
+    badge.poll()
+
+    player.draw()
+    platform.draw()
+    acorn.draw()
+
+    display.update()
+```
+
+Which all together looks like this:
 
 ```python
 import random
@@ -305,11 +324,11 @@ while True:
     display.update()
 ```
 
-![Run your code!](/tut4_res/tufty.gif)
+![Run your code!](/tut4_res/tufty.png)
 
 # Basic physics
 
-Now, let's apply some physics. We'll make an `update()` method in our `player_base` class, which we'll call to update the player's physics, and eventually process the controls. For now we just need two new lines in it, but we'll also move the call to `draw()` the player in here rather than in the main loop. That way we'll only need to call `player.update()` - make sure you change the call in the loop to reflect that.
+Now, let's apply some physics. We'll make an `update()` method in our `player_base` class, which we'll call to update the player's physics, and eventually process the controls. For now we just need two new lines in it, but we'll also move the call to `draw()` the player into here rather than in the main loop. That way we'll only need to call `player.update()` - make sure you change the call in the loop to reflect that.
 
 ```python-raw
 class player_base:
@@ -357,12 +376,12 @@ So with those new lines, we're adding 1 to `vy`, the player's y speed, every upd
 However, a game where the player disappears off the edge of the screen within the first second isn't going to be winning any Game Of The Year awards, except maybe really artsy ones. Let's see if we can get it to land on the platform. For that, we need it to stop when it hits the platform, and to do that we'll add the following method into the `player_base` class:
 
 ```python-raw
-def is_standing(self, platform):
-    if self.r < platform.x or self.x > platform.r:
+    def is_standing(self, platform):
+        if self.r < platform.x or self.x > platform.r:
+            return False
+        if self.b == platform.y:
+            return True
         return False
-    if self.b == platform.y:
-        return True
-    return False
 ```
 
 This will return True if the player overlaps the platform horizontally, and the bottom of the player is at the top of the platform. But if you think about how the player's position is calculated using vx and vy, you'll notice it's sometimes moving several pixels in a frame. So we also need to check whether it will pass through the top of the platform between this frame and the next one. That's not too hard, and just needs the following method adding to `player_base`:
@@ -381,19 +400,18 @@ You can see that this is very similar to `is_standing()` - it's just that there'
 What we're going to do is first check if we're in the air to see whether we want to accelerate downward this frame. For this we'll use `is_standing()`. But then, before we move, we want to check if we're going to land next frame. If we are, we'll set our position to the top of the platform and our y speed to 0 so that next frame, `is_standing()` will catch it and not accelerate the player downward. Let's change the player's `update()` to look like this:
 
 ```python-raw
-def update(self):
+    def update(self):
+        if not self.is_standing(platform):
+            self.vy += 1
 
-    if not self.is_standing(platform):
-        self.vy += 1
+        if self.is_landing(platform):
+            self.b = platform.y
+            self.vy = 0
 
-    if self.is_landing(platform):
-        self.b = platform.y
-        self.vy = 0
+        self.x += self.vx
+        self.y += self.vy
 
-    self.x += self.vx
-    self.y += self.vy
-
-    self.draw()
+        self.draw()
 ```
 
 The whole program should look like this:
@@ -524,7 +542,7 @@ while True:
 
 ```
 
-![Run your code!](/tut4_res/tufty.gif)
+![Run your code!](/tut4_res/tufty.png)
 
 You'll see that when you run it, no matter where you put the platform, as long as it's below the player they'll fall down and land on the platform.
 
@@ -550,8 +568,8 @@ You can see that because it's in that class we made, we're able to just access t
 So we're now setting up three different platforms. Let's make sure we draw them all by looping through the list in the `while` loop:
 
 ```python-raw
-for platform in game.platforms:
-    platform.draw()
+    for platform in game.platforms:
+        platform.draw()
 ```
 
 And before we can run this again, we'll also need to change up the player's `update()` method to check through every platform. To do this we'll make one more method in `player_base`, `is_airborne()`, which we'll use to check if we're in the air and just set a variable on the player, as it's something we need to check several times in a frame and we might as well just calculate it once. Here's our new `player_base`.
@@ -770,7 +788,7 @@ while True:
 
 ```
 
-![Run your code!](/tut4_res/tufty.gif)
+![Run your code!](/tut4_res/tufty.png)
 
 The player drops down onto the top platform, and that's it. Of course, it'd be nice to actually move around, and we'll deal with that in the next part. We'll come back to the physics of it all once we've got a way of making things happen.
 
@@ -812,7 +830,7 @@ Now we've got our method for reading in the controls, we'll just call it at the 
 
 To bring in the Qw/ST Pad, we're just going to be adding to this structure. First of all we need to import that library. We're going to be using a modified version of the Qw/ST Pad driver, which we'll include in the game folder. Put the following into a new text file, and save it as `qwstpad.py` in the same folder as `__init__.py`. Don't worry about how it works, it's simply the existing Qw/ST Pad driver with a couple of extra bits added so that we can treat the gamepad buttons the same way we treat the badge buttons.
 
-```python
+```python-raw
 import struct
 from collections import OrderedDict
 
@@ -1016,13 +1034,13 @@ This code uses the `qwstpad` library to check for the presence of Qw/ST Pads, an
 Now it's easy to use this to check for connected pads and assign the first one to the `game.gamepad` variable we made. Then when we're parsing controls we can just check if `game.gamepad` has a value that's not None to see if we need to check its controls. If we check regularly, each update, the system can even handle plugging and unplugging pads mid-game. Let's do that - first of all, we'll change the beginning of `parse_controls()` to read:
 
 ```python-raw
-if game.gamepad:
-    try:
-        game.gamepad.update_buttons()
-    except OSError:
+    if game.gamepad:
+        try:
+            game.gamepad.update_buttons()
+        except OSError:
+            init_gamepad()
+    else:
         init_gamepad()
-else:
-    init_gamepad()
 ```
 
 So if `gamepad` is showing something other than `None` (and therefore a pad is connected), we're telling it to read the status of all of its buttons. We're also enclosing that in a `try` statement so that if it throws an error (as it would if the pad was disconnected unexpectedly) it ignores reading the gamepad for this update and instead just tries to initialise it again for the next update. If there isn't a pad connected it'll try and connect to one, because you never know, someone might have just plugged one in.
@@ -1261,7 +1279,7 @@ while True:
 
 ```
 
-![Run your code!](/tut4_res/tufty.gif)
+![Run your code!](/tut4_res/tufty.png)
 
 ## Running
 
@@ -1275,11 +1293,15 @@ Running is easy, we just add a bit of acceleration to the player in the appropri
                 self.vx -= 1.5
 ```
 
+![Run your code!](/tut4_res/tufty.png)
+
 Test that now and you'll find two things - first, you just accelerate and don't stop, and second, you disappear off the edge of the screen. We can remedy the second one easy enough. Right after changing the player's position and before drawing them, we can clamp your position using the following line:
 
 ```python-raw
         self.x = clamp(self.x, 0, screen.width - self.w)
 ```
+
+![Run your code!](/tut4_res/tufty.png)
 
 Now you'll see you'll at least not fly off the screen, but that speed is still wild. You're a squirrel, not a rocket. We want it to be pretty nippy, part of the gameplay is that you're controlling something very fast moving, but we clearly need some kind of damping. That's easy enough to implement - right after our movement controls, within that same `else` statement, let's say:
 
@@ -1290,7 +1312,9 @@ Now you'll see you'll at least not fly off the screen, but that speed is still w
                 self.vx += 0.5
 ```
 
-So now your speed is reduced by 0.5 every frame you're touching the ground. Tufty still clearly has the zoomies, but you can see that there is now a deceleration after a light tap on the buttons.
+![Run your code!](/tut4_res/tufty.png)
+
+So now your speed is reduced by 0.5 every frame you're touching the ground. Tufty still clearly has the zoomies and we'll address the speed issue soon, but you can see that there is now a deceleration after a light tap on the buttons.
 
 ## Dropping
 
@@ -1348,7 +1372,7 @@ For the `JUMP_LEFT` and `JUMP_RIGHT` commands, we've already got the vertical mo
 
 ## Final player movement bits
 
-And that's it! That's pretty much everything for player movement. There's one more thing, and while it won't come up until a bit later we can set the groundwork for it now. When you die, we want you to pass through all of the platforms and not land on them. So, we can just add `self.dead = False` to our `__init__()` method, and then check for it when checking for whether we fall:
+And that's it! That's pretty much everything for player movement. There's one more thing, and while it won't come up until a bit later we can set the groundwork for it now. When you die, we want you to pass through all of the platforms and not land on them. So, we can just add `self.dead = False` to our `__init__()` method, and then check for it in `update()` when checking for whether we fall:
 
 ```python-raw
     def __init__(self, x, y):
@@ -1575,6 +1599,8 @@ while True:
 
 ```
 
+![Run your code!](/tut4_res/tufty.png)
+
 We're not quite done with the `player_base` class overall, but we're at least done for now. Now, we'll work on getting some scrolling platforms.
 
 # Making the platforms move
@@ -1615,6 +1641,8 @@ To do this, we can easily just check to see if the right hand side of the platfo
 
         self.draw()
 ```
+
+![Run your code!](/tut4_res/tufty.png)
 
 And all of a sudden, there's gameplay! It's very fast-paced and pretty difficult, but it is technically playable.
 
@@ -1663,6 +1691,8 @@ while True:
         game.last_frame = ticks
 ```
 
+![Run your code!](/tut4_res/tufty.png)
+
 The first two lines work out how many milliseconds it's been since `game.last_frame`. Then everything that was in the loop before is now behind the new `if` statement, checking if it's been more than 33ms. Finally, we've added a very important line at the end, to set `game.last_frame` to the new ticks value for the next frame. Note that it's inside the `if` statement, as we only want that to happen on those times through the loop where we calculate a new frame.
 
 ## Renewing platforms
@@ -1683,6 +1713,8 @@ Right now, the platforms are staying at their original size and their original h
         self.y = random.randint(24, 110)
         self.w = random.randint(int(screen.width / 2), screen.width)
 ```
+
+![Run your code!](/tut4_res/tufty.png)
 
 Now they're randomised alright, but we've got a problem - they keep overlapping one another. We need to check whether a platform is going to respawn in the same space as another, and make it choose somewhere else if it does so. For this we can take advantage of a property that Badgeware's `rect` object has, which is a very quick check to see if it intersects with another `rect`. Useful!
 
@@ -1726,6 +1758,8 @@ We call this method right after resetting the platform, and loop it using `while
         self.draw()
 ```
 
+![Run your code!](/tut4_res/tufty.png)
+
 Run this now, and you'll see that you've got rid of the overlapping platforms. But they're still spawning _really_ close to each other. Well, we can sort this easily by just changing the size of the bounding box. Let's put a value called `keepout` into the platform's `__init__()`, and set it to 5 - this will be the number of pixels beyond the platform's borders the bounding box wants to extend.
 
 ```python_raw
@@ -1745,6 +1779,8 @@ Then we can alter the method we use to generate the bounding box, using `keepout
     def bounding_box(self):
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
 ```
+
+![Run your code!](/tut4_res/tufty.png)
 
 And now we've got nicely spawning, nicely spaced platforms.
 
@@ -2077,6 +2113,8 @@ def game_over_loop():
     screen.text("Game Over screen", 0, 0)
 ```
 
+![Run your code!](/tut4_res/tufty.png)
+
 Well, this seems like a step backwards. Try running it now, and you'll just get a black screen with "Title screen" written on it that you can't get out of. And of course that's because we started with the state set to `TITLE` and we've got nothing in place to change it. You can see the stuff that used to be in the `while` loop right there in `gameplay_loop()`, we just can't get to it yet. That's easily fixed, we just check for a button press each frame and when it's pressed, we move it onto the next one:
 
 ```python-raw
@@ -2100,6 +2138,8 @@ def game_over_loop():
     if game.controls["ANY_KEY"]:
         game.current_game_state = game_state.TITLE
 ```
+
+![Run your code!](/tut4_res/tufty.png)
 
 ## Losing the game
 
@@ -2129,6 +2169,8 @@ def game_over_loop():
     if game.controls["ANY_KEY"]:
         game.current_game_state = game_state.TITLE
 ```
+
+![Run your code!](/tut4_res/tufty.png)
 
 Hmmm, well now there's another problem. That loop seems to work okay once - title screen, gameplay till you die, game over screen, title screen - but then the second time round it flashes up gameplay for a single frame and goes straight to game over. What's happening?
 
@@ -2161,6 +2203,8 @@ def game_over_loop():
 
 That'll just reset the player back to the starting position and zero out their speed. You might notice we've still not used that `dead` property of the player, but that'll come in later still. The suspense must be killing you. And now we've got a full gameplay loop.
 
+![Run your code!](/tut4_res/tufty.png)
+
 It's still not quite right though. Do you notice that after you finish your first playthrough, after that you sometimes just fall and die instantly because there's no platform beneath you? That's as a result of the same thing - the platforms aren't resetting, they're exactly where you left them. Easily fixed though - we'll call `init_platforms()` that we made ages ago to reset their positions, and we'll do it right after we reset the player:
 
 ```python-raw
@@ -2172,7 +2216,7 @@ It's still not quite right though. Do you notice that after you finish your firs
 
 # Scoring
 
-What's next, then? How about a score? Say, one point for every platform you pass? Sounds good. Let's add in a variable, once again in `game`, named `score`. It can go right after we initially set the game state, and of course it wants to start off set to zero. We can easily increase the score by adding it as a global into the `update()` method of `platform_base`, and then adding in `game.score += 1` just after the `while` loop to find a new position for the platform:
+What's next, then? How about a score? Say, one point for every platform you pass? Sounds good. Let's add in a variable, once again in `game`, named `score`. It can go right after we initially set the game state, and of course it wants to start off set to zero. We can easily increase the score by adding `game.score += 1` to `platform_base`'s `update()` method just after the `while` loop to find a new position for the platform:
 
 ```python-raw
 def update(self):
@@ -2526,6 +2570,8 @@ while True:
 
 ```
 
+![Run your code!](/tut4_res/tufty.png)
+
 # Losing, but properly
 
 We'll get into the fancy graphics soon. But first, does that dying seem abrupt to you? Hit the bottom of the screen and then boom, straight to game over? In fact, if you're mashing the buttons it's easy to accidentally hit it an extra time and skip the game over and even the title screen.
@@ -2538,15 +2584,15 @@ First of all, let's create that missing game state, by adding in `DEATH_ANIM = 2
 
 ```python-raw
 def death_anim_loop():
-    global current_game_state
-
-    for platform in platforms:
-        platform.draw()
-
     player.update()
 
+    for platform in game.platforms:
+        platform.draw()
+
+    draw_score()
+
     if player.b >= screen.height:
-        current_game_state = game_state.GAME_OVER
+        game.current_game_state = game_state.GAME_OVER
 ```
 
 Can you spot the difference? In this state, we're calling `platform.draw()` instead of `platform.update()`. That means the platforms will still get drawn, but they won't move, reset or anything else. The scrolling stops when you die.
@@ -2612,6 +2658,8 @@ def gameplay_loop():
 ```
 
 Now you might be able to see what's going to happen. When you hit the bottom of the screen the first time, it goes into the `DEATH_ANIM` mode. This stops the platforms from scrolling, moves the player up a tiny bit so they won't immediately trigger the game over screen, and gives them a boost upward while disabling controls and collisions with platforms. Since they're still being affected by gravity, they're going to bounce up, fall down and then trigger the game over screen when they hit the bottom of the screen again.
+
+![Run your code!](/tut4_res/tufty.png)
 
 And by jingo, it works. Here's the full code so far:
 
