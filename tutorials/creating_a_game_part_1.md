@@ -11,6 +11,10 @@ It's time to put everything together to make a simple but fun game, with lots of
 
 The game you'll be making it called Acorn Highway, and it's a simple infinite runner / platformer. You control Tufty the squirrel, hopping from branch to branch to grab as many acorns as you can without falling out of the tree. Tufty can run very fast but has a lot of momentum, so part of the challenge is to know when _not_ to run or jump. Tufty earns one point for each platform passed, and another three points for each acorn collected.
 
+> Note: Whenever it's time to run your program to test something, you'll see an animated Tufty running like the one below.
+
+![Run your code!](/tut4_res/tufty.gif)
+
 # Setting up
 
 First of all, let's set up basic classes for three very important things we'll be using. The basics of creating a MicroPython class are outside the scope of this tutorial, but we will talk a little about properties and how they work.
@@ -19,14 +23,14 @@ Create a new app with an icon, assets folder and `__init__.py`. Here's a good im
 
 ![Icon image for Acorn Highway](/tut4_res/icon.png)
 
-Inside `__init__.py` we'll make the classes. We will still need to create a loop, we'll just be creating our own custom one instead of using the built in `update()`. We'll start by creating a class right at the top of the file for all of the things that we need to keep track of and access from other parts of the program. For now, we'll just 
+Inside `__init__.py` we'll make the classes. We will still need to create a loop, we'll just be creating our own custom one instead of using the built in `update()`. We'll start by creating a class right at the top of the file for all of the things that we need to keep track of and access from other parts of the program. For now, we'll just add the following at the very top of the file:
 
 ```python-raw
 class game:
     pass
 ```
 
-We've not put anything inside it yet, but as we go we'll add things to this. You'll notice as we do that these will not use `self.` - We're not going to be making any instances of this class, just using it as a convenient store for things to access, so they'll go directly inside the class.
+We've not put anything inside it yet, but as we go we'll add things to this. You'll notice as we do that these will not use `self.` to make these into variables that can change per instance - we're not going to be making any instances of this class, just using it as a convenient store for things to access, so they'll go directly inside the class as static variables.
 
 Then, directly after that, we'll make a class for the player:
 
@@ -76,28 +80,30 @@ while True:
     display.update()
 ```
 
+![Run your code!](/tut4_res/tufty.gif)
+
 This should give you a red square at the top of the screen, 20 pixels from the left. Of course, positioning things is nice and easy if you only ever want to check on the top left corner, but what about other positions on the player? We could store the position of the right and bottom as variables, and update them every time the x and y change, but there's a way that makes life simpler throughout the rest of the program. In the `player_base` class, add the following, after `__init__` and before `draw()`:
 
 ```python-raw
-    @property
-    def r(self):
-        return self.x + self.w
+@property
+def r(self):
+    return self.x + self.w
 
-    @property
-    def b(self):
-        return self.y + self.h
+@property
+def b(self):
+    return self.y + self.h
 ```
 
 The `@property` on these makes them very useful. They're defined like methods, but they act like variables. They're like variables that aren't stored as a fixed value in the instance of the class, but calculated fresh every time the program asks for them, and it's that calculation that is in the methods you just added. So another part of the program could use, say, `player.r` in a calculation, and it would be whatever value is equal to the player's x position plus their width - or in other words, the player's right hand side. We can go further with this. Add the following after the above:
 
 ```python-raw
-    @r.setter
-    def r(self, a):
-        self.x = a - self.w
+@r.setter
+def r(self, a):
+    self.x = a - self.w
 
-    @b.setter
-    def b(self, a):
-        self.y = a - self.h
+@b.setter
+def b(self, a):
+    self.y = a - self.h
 ```
 
 This essentially works the same, but in reverse. It allows people to assign values to `player.r` or `player.b`, and this will be taken in as the parameter `a` and used to calculate how to change the x and y coordinates. Let's try this out - alter `update()` so that the whole program looks like this:
@@ -151,6 +157,8 @@ while True:
     display.update()
 ```
 
+![Run your code!](/tut4_res/tufty.gif)
+
 As you can see, you're getting two squares. First, you're setting the top left corner of the box to be at `80, 60` - the centre of the screen, and you're drawing it. Then you're setting the bottom right corner to be at the same coordinates, and drawing it again. When you're setting `r` and `b` there, it's calculating what `x` and `y` need to be to put it in the right place.
 
 We'll be making lots of other methods in `player_base`, but for now let's move on. This program is structured so that the things that effect each type of entity in the game are handled and processed by that entity, so the player class will be doing all of the calculations for moving the player, the platform class will do all the calculations for placing platforms, and so on. We'll make two new classes called `platform_base` and `acorn_base` and set them up with very simiilar properties to `player_base`. For the sake of completeness you could give them setters for `r` and `b` as you did for `player_base`, but it's not necessary, they won't be used.
@@ -178,7 +186,7 @@ class platform_base:
         screen.shape(player_box)
 ```
 
-You'll notice `platform_base` has an extra parameter when you create it, which is just a unique name for that particular platform. It's not important now, but will be useful later. The length of the platform is also randomly generated for each one, somewhere between half the screen width and the full screen width. Remember to insert `import random` at the very beginning of the file to import the random number functions.
+You'll notice `platform_base` has an extra parameter that gets passed in when it's initialised, which is just a unique name for that particular platform that we're storing as `self.id`. It's not important now, but will be useful later. The length of the platform is also randomly generated for each one, somewhere between half the screen width and the full screen width. Remember to insert `import random` at the very beginning of the file to import the random number functions.
 
 ```python-raw
 class acorn_base:
@@ -297,6 +305,8 @@ while True:
     display.update()
 ```
 
+![Run your code!](/tut4_res/tufty.gif)
+
 # Basic physics
 
 Now, let's apply some physics. We'll make an `update()` method in our `player_base` class, which we'll call to update the player's physics, and eventually process the controls. For now we just need two new lines in it, but we'll also move the call to `draw()` the player in here rather than in the main loop. That way we'll only need to call `player.update()` - make sure you change the call in the loop to reflect that.
@@ -347,15 +357,15 @@ So with those new lines, we're adding 1 to `vy`, the player's y speed, every upd
 However, a game where the player disappears off the edge of the screen within the first second isn't going to be winning any Game Of The Year awards, except maybe really artsy ones. Let's see if we can get it to land on the platform. For that, we need it to stop when it hits the platform, and to do that we'll add the following method into the `player_base` class:
 
 ```python-raw
-    def is_standing(self, platform):
-        if self.r < platform.x or self.x > platform.r:
-            return False
-        if self.b == platform.y:
-            return True
+def is_standing(self, platform):
+    if self.r < platform.x or self.x > platform.r:
         return False
+    if self.b == platform.y:
+        return True
+    return False
 ```
 
-This will return True if the player overlaps the platform horizontally, and the bottom of the player is at the top of the platform. But if you think about how the player's position is calculated using vx and vy, you'll notice it's sometimes moving several pixels in a frame. So we also need to check whether it passes through the top of the platform _between_ frames, as it were. That's not too hard, and just needs the following method adding to `player_base`:
+This will return True if the player overlaps the platform horizontally, and the bottom of the player is at the top of the platform. But if you think about how the player's position is calculated using vx and vy, you'll notice it's sometimes moving several pixels in a frame. So we also need to check whether it will pass through the top of the platform between this frame and the next one. That's not too hard, and just needs the following method adding to `player_base`:
 
 ```python-raw
     def is_landing(self, platform):
@@ -371,19 +381,19 @@ You can see that this is very similar to `is_standing()` - it's just that there'
 What we're going to do is first check if we're in the air to see whether we want to accelerate downward this frame. For this we'll use `is_standing()`. But then, before we move, we want to check if we're going to land next frame. If we are, we'll set our position to the top of the platform and our y speed to 0 so that next frame, `is_standing()` will catch it and not accelerate the player downward. Let's change the player's `update()` to look like this:
 
 ```python-raw
-    def update(self):
+def update(self):
 
-        if not self.is_standing(platform):
-            self.vy += 1
+    if not self.is_standing(platform):
+        self.vy += 1
 
-        if self.is_landing(platform):
-            self.b = platform.y
-            self.vy = 0
+    if self.is_landing(platform):
+        self.b = platform.y
+        self.vy = 0
 
-        self.x += self.vx
-        self.y += self.vy
+    self.x += self.vx
+    self.y += self.vy
 
-        self.draw()
+    self.draw()
 ```
 
 The whole program should look like this:
@@ -514,6 +524,8 @@ while True:
 
 ```
 
+![Run your code!](/tut4_res/tufty.gif)
+
 You'll see that when you run it, no matter where you put the platform, as long as it's below the player they'll fall down and land on the platform.
 
 # Multiple platforms
@@ -538,8 +550,8 @@ You can see that because it's in that class we made, we're able to just access t
 So we're now setting up three different platforms. Let's make sure we draw them all by looping through the list in the `while` loop:
 
 ```python-raw
-    for platform in game.platforms:
-        platform.draw()
+for platform in game.platforms:
+    platform.draw()
 ```
 
 And before we can run this again, we'll also need to change up the player's `update()` method to check through every platform. To do this we'll make one more method in `player_base`, `is_airborne()`, which we'll use to check if we're in the air and just set a variable on the player, as it's something we need to check several times in a frame and we might as well just calculate it once. Here's our new `player_base`.
@@ -758,6 +770,8 @@ while True:
 
 ```
 
+![Run your code!](/tut4_res/tufty.gif)
+
 The player drops down onto the top platform, and that's it. Of course, it'd be nice to actually move around, and we'll deal with that in the next part. We'll come back to the physics of it all once we've got a way of making things happen.
 
 # Controls
@@ -798,7 +812,7 @@ Now we've got our method for reading in the controls, we'll just call it at the 
 
 To bring in the Qw/ST Pad, we're just going to be adding to this structure. First of all we need to import that library. We're going to be using a modified version of the Qw/ST Pad driver, which we'll include in the game folder. Put the following into a new text file, and save it as `qwstpad.py` in the same folder as `__init__.py`. Don't worry about how it works, it's simply the existing Qw/ST Pad driver with a couple of extra bits added so that we can treat the gamepad buttons the same way we treat the badge buttons.
 
-```python-raw
+```python
 import struct
 from collections import OrderedDict
 
@@ -1002,18 +1016,18 @@ This code uses the `qwstpad` library to check for the presence of Qw/ST Pads, an
 Now it's easy to use this to check for connected pads and assign the first one to the `game.gamepad` variable we made. Then when we're parsing controls we can just check if `game.gamepad` has a value that's not None to see if we need to check its controls. If we check regularly, each update, the system can even handle plugging and unplugging pads mid-game. Let's do that - first of all, we'll change the beginning of `parse_controls()` to read:
 
 ```python-raw
-    if game.gamepad:
-        try:
-            game.gamepad.update_buttons()
-        except OSError:
-            init_gamepad()
-    else:
+if game.gamepad:
+    try:
+        game.gamepad.update_buttons()
+    except OSError:
         init_gamepad()
+else:
+    init_gamepad()
 ```
 
 So if `gamepad` is showing something other than `None` (and therefore a pad is connected), we're telling it to read the status of all of its buttons. We're also enclosing that in a `try` statement so that if it throws an error (as it would if the pad was disconnected unexpectedly) it ignores reading the gamepad for this update and instead just tries to initialise it again for the next update. If there isn't a pad connected it'll try and connect to one, because you never know, someone might have just plugged one in.
 
-Now that we've got access to the gamepad's buttons, we can integrate them into the controls. This is very simple, just an `if` statement checking on the gamepad's status, and then a set of new definitions for if it's connected. The `qwstpad` library for Badgeware provides the same methods you can call on the Badgeware buttons, just using strings to identify the buttons - your options are `U, D, L, R, A, B, X, Y, +, -`.
+Now that we've got access to the gamepad's buttons, we can integrate them into the controls. This is very simple, just an `if` statement checking on the gamepad's status, and then a set of new definitions for if it's connected. The modified `qwstpad` library provides the same methods you can call on the Badgeware buttons, just using strings to identify the buttons - your options are `U, D, L, R, A, B, X, Y, +, -`.
 
 Let's see the `parse_controls()` method with that added in.
 
@@ -1246,6 +1260,8 @@ while True:
     display.update()
 
 ```
+
+![Run your code!](/tut4_res/tufty.gif)
 
 ## Running
 
@@ -2004,9 +2020,9 @@ class game_state:
 
 That's it, that's the whole class. Don't worry about the numbers going "0, 1, 3" - that certainly isn't foreshadowing about a secret extra state we're going to add later or anything, nooo, not at all.
 
-You can see that these are static variables, just lioke the ones in `game` - we're not making an instance of this class anywhere and in fact we'll never change these, it's just going to sit there as a shorthand to make the code readable. We could just have a variable in `game` called `game_state` and set it to different numbers to indicate different states, but this way stops us having to remember "Was it 1 that was gameplay, or was that 2?". Plus, having a name in the code means that anyone else looking at it will immediately understand what's going on in a way that they wouldn't with just a number.
+You can see that these are static variables, just like the ones in `game` - we're not making an instance of this class anywhere and in fact we'll never change these, it's just going to sit there as a shorthand to make the code readable. We could just have a variable in `game` called `game_state` and set it to different numbers to indicate different states, but this way stops us having to remember "Was it 1 that was gameplay, or was that 2?". Plus, having a name in the code means that anyone else looking at it will immediately understand what's going on in a way that they wouldn't with just a number.
 
-Now, we are going to mak that variable in `game` that keeps track of which state we're in, but we can now use a name instead of a number. We'll put it just after setting up our player, platforms, and acorns:
+Now, we are going to make that variable in `game` that keeps track of which state we're in, but we can now use a name instead of a number. We'll put it just after setting up our other variables:
 
 ```python-raw
 class game:
@@ -2156,19 +2172,19 @@ It's still not quite right though. Do you notice that after you finish your firs
 
 # Scoring
 
-What's next, then? How about a score? Say, one point for every platform you pass? Sounds good. Let's add in a variable, once again in `game`, named `score`. It can go right after we initially set the game state, and of course it wants to start off set to zero. We can easily increase the score by adding it as a global into the `update()` method of `platform_base`, and then adding in `score += 1` just after the `while` loop to find a new position for the platform:
+What's next, then? How about a score? Say, one point for every platform you pass? Sounds good. Let's add in a variable, once again in `game`, named `score`. It can go right after we initially set the game state, and of course it wants to start off set to zero. We can easily increase the score by adding it as a global into the `update()` method of `platform_base`, and then adding in `game.score += 1` just after the `while` loop to find a new position for the platform:
 
 ```python-raw
-    def update(self):
-        self.x -= game.foreground_scroll_speed
+def update(self):
+    self.x -= game.foreground_scroll_speed
 
-        if self.r <= 0:
+    if self.r <= 0:
+        self.reset()
+        while self.check_collisions():
             self.reset()
-            while self.check_collisions():
-                self.reset()
-            game.score += 1
+        game.score += 1
 
-        self.draw()
+    self.draw()
 ```
 
 That way, the score goes up by one every time a platform passes off the left side of the screen. We should probably display the score, too. Now, we'll just do a line of text for now, but we're going to be displaying the score in a fancier way later on so it makes sense to set up a separate method for it ahead of time. We'll make a method just before `init_gamepad()` (or `parse_controls()` if you didn't set up the gamepad), as follows:
