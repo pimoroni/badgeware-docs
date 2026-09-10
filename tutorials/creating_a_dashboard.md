@@ -24,12 +24,12 @@ run(update)
 
 ```
 
-And just like the first time - yay, a blank screen!
+And just like the first tutorial - yay, a blank screen!
 
 Just like in the first tutorial, you don't have to use the same colours that are mentioned here - use whatever works on your badge and to your tastes. One thing that we'll do here though is make all of our dimensions relative to the screen dimensions, rather than fixed numbers of pixels - that way, it should display the same whether you're on Tufty or Badger. Blinky is tricky, of course, because of its resolution but many of the same techniques I'm doing here will still work. You might just have to leave out some text.
 
 ## Getting some dimensions
-The main part of this dashboard will be two big arc shapes which we'll use as pie charts. We'll be writing a method which lets us draw one of these, but we'll need to pass it some dimensions. Here are the dimensions we want to calculate:
+The main part of this dashboard will be two big arc shapes which we'll use as pie charts. We'll be writing a function which lets us draw one of these, but we'll need to pass it some dimensions. Here are the dimensions we want to calculate:
 
 - The centre line of the screen vertically, which we'll call `centre_y`.
 - The centre points of each pie chart horizontally, which we'll call `left_centre_x` and `right_centre_x`.
@@ -92,8 +92,8 @@ class dash:
 
 
 def update():
-    left_pie_background = shape.circle(left_centre_x, centre_y, radius_outer)
-    right_pie_background = shape.circle(right_centre_x, centre_y, radius_outer)
+    left_pie_background = shape.circle(dash.left_centre_x, dash.centre_y, dash.radius_outer)
+    right_pie_background = shape.circle(dash.right_centre_x, dash.centre_y, dash.radius_outer)
 
 
 run(update)
@@ -153,7 +153,7 @@ If we're wanting to display fascinating stats about our badge, then we need to a
     year, month, day, hour, minute, second, _ = rtc.datetime()
 ```
 
-You'll notice that for some of these we've got more than one variable before the `=` sign, and some of those are just an underscore `_`. If you've not run across this before, don't worry. Some of these functions return more than one value, or return a tuple containing several values. We don't necessarily need all of the values they return, but we still have to receive them or it'll throw an error. So, for the ones we don't need we can just assign them to `_`, which discards them.
+You'll notice that for some of these we've got more than one variable before the `=` sign, and some of those are just an underscore `_`. If you've not run across this before, don't worry. Some of these functions return a collection containing more than one value. We don't necessarily need all of the values they return, but we still have to receive them or it'll throw an error. So, for the ones we don't need we can just assign them to `_`, which discards them.
 
 Now we've got those values though, we need to represent them on screen.
 
@@ -167,13 +167,14 @@ my_arc = shape.arc(x, y, inner, outer, from, to)
 ```
 
 Let's look at the arguments that takes.
+
 - `x, y`: Position of the centre point
 - `inner`: Inner radius
 - `outer`: Outer radius
 - `from`: Start angle (degrees)
 - `to`: End angle (degrees)
 
-Well, we've already worked out `x`, `y`, `inner` and `outer`, but that `from` and `to` still need calculating, and we'll need to do it for both charts. We could just do the calculations twice and in this case it's probably easiest to do so, but for the sake of the tutorial let's create a method we can call to convert a percentage into two pie sections. We'll add the following into our code right before our `update()` method:
+Well, we've already worked out `x`, `y`, `inner` and `outer`, but that `from` and `to` still need calculating, and we'll need to do it for both charts. We could just do the calculations twice and in this case it's probably easiest to do so, but for the sake of the tutorial let's create a function we can call to convert a percentage into two pie sections. We'll add the following into our code right before our `update()` function:
 
 ```python-raw
 def make_chart():
@@ -195,7 +196,7 @@ def make_chart(x, y, inner, outer, percentage):
     seg_1_end = (percentage / 100) * 360
 ```
 
-Easy peasy. You'll see it says `seg_1` there - that's because we're going to return two `arc` shapes - one for the filled section of the chart and one for the unfilled part. We can fill in the rest easily though, as it just starts where the last one finished and goes all the way round to 360 degrees:
+Easy peasy. You'll see it says `seg_1` there. That's because we're going to return two `arc` shapes - one for the filled section of the chart and one for the unfilled part. We can fill in the rest easily though, as it just starts where the last one finished and goes all the way round to 360 degrees:
 
 ```python-raw
 def make_chart(x, y, inner, outer, percentage):
@@ -207,7 +208,7 @@ def make_chart(x, y, inner, outer, percentage):
 
 Of course, eagle eyed viewers might notice we don't actually need them to match up exactly - we could just always make the unfilled section a full ring and draw the filled section over the top of it. But we're making them fit together like jigsaw pieces here for the sake of the tutorial, and because it lets you do potentially interesting things with the shapes once you've done the tutorial and want to tweak it a bit.
 
-Anyway, now we've got all the information to make the shapes and return them. The new lines take the values we worked out or passed in, and feed them into an `arc()` method to generate the shapes.
+Anyway, now we've got all the information to make the shapes and return them. The new lines take the values we worked out or passed in, and feed them into an `arc()` function to generate the shapes.
 
 ```python-raw
 def make_chart(x, y, inner, outer, percentage):
@@ -222,7 +223,7 @@ def make_chart(x, y, inner, outer, percentage):
     return filled_section, unfilled_section
 ```
 
-Now we've made that - and you'll see that it's one of those methods we just saw with more than one return value - then we can call it inside our `update()` loop. Battery level will be on the left, and flash usage on the right.
+Now we've made that - and you'll see that it's one of those functions we just saw with more than one return value - then we can call it inside our `update()` loop. Battery level will be on the left, and flash usage on the right.
 
 ```python
 screen.antialias = image.X4
@@ -325,9 +326,9 @@ Instead, we're going to do some more drawing after we've worked out the shapes o
 shadow_matrix = mat3().translate(shadow_distance, shadow_distance)
 ```
 
-The `mat3()` here creates a blank matrix. Then running the `translate()` method on it gives it a translation by the amounts we've provided for x and y.
+The `mat3()` here creates a blank matrix. Then running its `translate()` method gives it a translation by the amounts we've provided for x and y.
 
-In our `update()` method, we want to apply this matrix to the shapes we generate with our `make_chart()` method, draw them in a shadow colour, and then remove the matrix again so we can draw the charts themselves in the right place. Let's make a method that'll easily do that. You can put this below `make_chart()`.
+In our `update()` function, we want to apply this matrix to the shapes we generate with our `make_chart()` function, draw them in a shadow colour, and then remove the matrix again so we can draw the charts themselves in the right place. Let's make a function that'll easily do that. You can put this below `make_chart()`.
 
 ```python-raw
 def draw_drop_shadow(shape, colour, matrix):
@@ -339,11 +340,11 @@ def draw_drop_shadow(shape, colour, matrix):
     screen.pen = old_pen
 ```
 
-Let's go through this line by line. First, we're remembering whatever colour the pen was set to, so the method can clean up after itself. Next we're applying the matrix to the shape - both of these, as well as the colour, get passed in using the method's parameters. Then we're setting the pen to the shadow colour, drawing the shape to the screen, and then we're cleaning up after ourselves by setting the pen back to what it was and setting the shape's transformation back to a blank matrix.
+Let's go through this line by line. First, we're remembering whatever colour the pen was set to, so the function can clean up after itself. Next we're applying the matrix to the shape - both of these, as well as the colour, get passed in using the function's parameters. Then we're setting the pen to the shadow colour, drawing the shape to the screen, and then we're cleaning up after ourselves by setting the pen back to what it was and setting the shape's transformation back to a blank matrix.
 
-This is a pretty simple method, and there are a couple of things which you could customise to improve it. For example, this would currently only work on something that didn't already have a transformation applied to it. It also always draws to `screen` - both of these things are fixable, but they're not necessary for what we're doing here so let's move on.
+This is a pretty simple function, and there are a couple of things which you could customise to improve it. For example, this would currently only work on something that didn't already have a transformation applied to it - if it did, the transformatrix we apply here would oveeride it. It also always draws to `screen` - both of these things are fixable, but they're not necessary for what we're doing here so let's move on.
 
-Now we've made our method, we just need to call it. We have to call it after making the shapes, because we need to use them, but also before drawing the charts, because if we didn't then the shadow would appear over the top of the charts. That leaves one place we can do it:
+Now we've made our function, we just need to call it. We have to call it after making the shapes, because we need to use them, but also before drawing the charts, because if we didn't then the shadow would appear over the top of the charts. That leaves one place we can do it:
 
 ```python
 badge.mode(HIRES)
@@ -429,7 +430,7 @@ run(update)
 There we go, looking good.
 
 ## Writing on the wall
-It's time to get some text onto the screen. We're going to be using vector fonts for this as they'll scale nicely. There are three vector fonts in .af format here, but you can find more at [the Alright Fonts GitHub repository](https://github.com/lowfatcode/alright-fonts). We're using one called Mona Sans.
+It's time to get some text onto the screen. We're going to be using vector fonts for this as they'll scale nicely. There are three vector fonts in .af format built into Badgeware, but you can find more at [the Alright Fonts GitHub repository](https://github.com/lowfatcode/alright-fonts). We're using one of the built in ones called Mona Sans.
 
 First, we'll load the font in at the very top of `dash` with the following line:
 
@@ -451,7 +452,7 @@ These have given good results for us on Tufty, but you can play about with them 
 
 Finally, let's get some text on the screen. Almost all of the text we'll want to display will be centred on a point, so we'll want to write something that'll let us centre text. We're not using the more advanced text functions in the `text` class here, but instead drawing straight onto the image as it's faster and allows us to position the text more easily.
 
-Let's make another new method just above `update()`:
+Let's make another new function just above `update()`:
 
 ```python-raw
 def centred_text(text, x, y, size):
@@ -461,9 +462,9 @@ def centred_text(text, x, y, size):
     screen.text(text, new_x, new_y, size)
 ```
 
-Going through this line by line, we can see that `screen.measure_text()` gives us the dimensions of the specified text at the specified font size. Then we're taking the centre point we passed into the method, and we're subtracting half of the width from x, and all of the height from y, so that the baseline of the text will be at the point we specified vertically, with the text centred horizontally. Finally we're drawing the text to the screen at the specified size, using these new x and y coordinates.
+Going through this line by line, we can see that `screen.measure_text()` gives us the dimensions of the specified text at the specified font size. Then we're taking the centre point we passed into the function, and we're subtracting half of the width from x, and all of the height from y, so that the baseline of the text will be at the point we specified vertically, with the text centred horizontally. Finally we're drawing the text to the screen at the specified size, using these new x and y coordinates.
 
-Let's try using this to write the battery percentage as a number in the middle of its chart. We'll convert it into a string and add a percent sign, then pass it into our new method, specifying the centre point of that left pie chart:
+Let's try using this to write the battery percentage as a number in the middle of its chart. We'll convert it into a string and add a percent sign, then pass it into our new function, specifying the centre point of that left pie chart:
 
 ```python
 badge.mode(HIRES)
@@ -713,9 +714,9 @@ run(update)
 ```
 
 ## A backing for the clock
-That clock looks a bit sparse, down there at the bottom of the screen. What if we put it inside a box, and reused the drop shadow method we made earlier to give it a shadow of its own?
+That clock looks a bit sparse, down there at the bottom of the screen. What if we put it inside a box, and reused the drop shadow function we made earlier to give it a shadow of its own?
 
-To make the box, we really need to know the dimensions of the text so we can fit around it. We can find that out just like we did in the `centred_text()` method, just using `screen.measure_text()`:
+To make the box, we really need to know the dimensions of the text so we can fit around it. We can find that out just like we did in the `centred_text()` function, just using `screen.measure_text()`:
 
 ```python-raw
 time_width, time_height = screen.measure_text(time_text, dash.text_size_l)
@@ -900,7 +901,7 @@ run(update)
 That looks great, but we're not done yet. Let's add some interactivity and give the user some control over the rear lighting.
 
 ## Lights on, lights off
-The case lighting is controlled with one command, `badge.caselights()`. You can use this without parameters to get the current values, or plug in parameters to set them. First of all, let's make another method to toggle the case lights. After `centred_text()`, let's create this:
+The case lighting is controlled with one command, `badge.caselights()`. You can use this without parameters to get the current values, or plug in parameters to set them. First of all, let's make another function to toggle the case lights. After `centred_text()`, let's create this:
 
 ```python-raw
 def toggle_caselights():
@@ -920,7 +921,7 @@ All we need to get this working is to hook it up to a button. That's very easy o
         toggle_caselights()
 ```
 
-`BUTTON_A` is a constant representing, you guessed it, the A button. `pressed()` is one of several methods in `badge` for checking the button status - if you pass them a button constant, they'll return True or False depending on the status of that button. If you call them without giving them a button, they'll return a tuple containing all of the buttons which would return True. Using `pressed()`, the LEDs will toggle on or off on the frame the button is pressed down. If you wanted to do it every time the button was released instead, you could use `released()` instead of pressed.
+`BUTTON_A` is a constant representing, you guessed it, the A button. `pressed()` is one of several functions in `badge` for checking the button status - if you pass them a button constant, they'll return True or False depending on the status of that button. If you call them without giving them a button, they'll return a tuple containing all of the buttons which would return True. Using `pressed()`, the LEDs will toggle on or off on the frame the button is pressed down. If you wanted to do it every time the button was released instead, you could use `released()` instead of pressed.
 
 To have the LED come on only while the button was held down, you might think you'd use `held()`. But that detects whether the button is held, and with the code as it is that would mean that it would detect that the button was held down every frame, and so would toggle the light every frame. The LEDs would flash as fast as `update()` was looping, and we'd need to put an epilepsy warning on this tutorial.
 
@@ -937,26 +938,102 @@ To do this, we'll first need to make the battery level a global variable, so tha
 We're going to copy these lines:
 
 ```python-raw
-battery_percent = badge.battery_level()
-battery_voltage = badge.battery_voltage()
-total_flash, used_flash, _ = badge.disk_free("/system")
+    battery_percent = badge.battery_level()
+    battery_voltage = badge.battery_voltage()
+    total_flash, used_flash, _ = badge.disk_free("/system")
 ```
 
-They'll be going outside `update()`, after our colours and before our `make_chart()` method. Since we're defining these variables up there now and reusing them for each cycle of `update()`, we'll need to tell `update()` not to make variables of its own, but to use the ones created when the program started. Add the following line at the very top of `update()`:
+They'll be going into `dash`, at the nottom of the list, and let's leave a blank line before them so it's more readable. Since we're defining these variables up there now and reusing them for each cycle of `update()`, we'll need to tell `update()` to update those variables each time. Let's modify the original lines in `update()` to add `dash.`:
 
 ```python-raw
-    global battery_percent, battery_voltage, total_flash, used_flash
+def update():
+    dash.battery_percent = badge.battery_level()
+    dash.battery_voltage = badge.battery_voltage()
+    dash.total_flash, dash.used_flash, _ = badge.disk_free("/system")
+    year, month, day, hour, minute, second, _ = rtc.datetime()
+
+    screen.pen = palette.light_grey
+    screen.clear()
+
+    left_pie_filled, left_pie_unfilled = make_chart(dash.left_centre_x, dash.centre_y, dash.radius_inner, dash.radius_outer, dash.battery_percent)
+
+    memory_percent = (dash.used_flash / dash.total_flash) * 100
+    right_pie_filled, right_pie_unfilled = make_chart(dash.right_centre_x, dash.centre_y, dash.radius_inner, dash.radius_outer, memory_percent)
+
+    draw_drop_shadow(left_pie_filled, palette.med_grey, dash.shadow_matrix)
+    draw_drop_shadow(left_pie_unfilled, palette.med_grey, dash.shadow_matrix)
+    draw_drop_shadow(right_pie_filled, palette.med_grey, dash.shadow_matrix)
+    draw_drop_shadow(right_pie_unfilled, palette.med_grey, dash.shadow_matrix)
+
+    screen.pen = palette.dark_red
+    screen.shape(left_pie_filled)
+    screen.pen = palette.light_red
+    screen.shape(left_pie_unfilled)
+
+    screen.pen = palette.dark_blue
+    screen.shape(right_pie_filled)
+    screen.pen = palette.light_blue
+    screen.shape(right_pie_unfilled)
+
+    screen.pen = color.black
+    screen.font = dash.monasans
+
+    centred_text("Battery", dash.left_centre_x, dash.centre_y - (2 * du), dash.text_size_s)
+
+    battery_text = str(dash.battery_percent) + "%"
+    centred_text(battery_text, dash.left_centre_x, dash.centre_y + (5.5 * du), dash.text_size_l)
+
+    voltage_text = "{:.2f}".format(dash.battery_voltage) + "V"
+    centred_text(voltage_text, dash.left_centre_x, dash.centre_y + (27 * du), dash.text_size_s)
+
+    centred_text("Flash", dash.right_centre_x, dash.centre_y - (2 * du), dash.text_size_s)
+
+    memory_text = str(round(memory_percent)) + "%"
+    centred_text(memory_text, dash.right_centre_x, dash.centre_y + (5.5 * du), dash.text_size_l)
+
+    total_flash_mb = dash.total_flash / 1048576
+    used_flash_mb = dash.used_flash / 1048576
+    flash_text = "{:.2f}".format(used_flash_mb) + "MB /" + "{:.2f}".format(total_flash_mb) + "MB"
+    centred_text(flash_text, dash.right_centre_x, dash.centre_y + (27 * du), dash.text_size_s)
+
+    day_text = "{:02.0f}".format(day)
+    month_text = "{:02.0f}".format(month)
+    year_text = "{:04.0f}".format(year)
+    hour_text = "{:02.0f}".format(hour)
+    minute_text = "{:02.0f}".format(minute)
+    second_text = "{:02.0f}".format(second)
+    time_text = f"{day_text}/{month_text}/{year_text} {hour_text}:{minute_text}:{second_text}"
+
+    time_y = screen.height - (5 * du)
+
+    time_width, time_height = screen.measure_text(time_text, dash.text_size_l)
+    time_box_x = dash.centre_x - (time_width / 2) - (3 * du)
+    time_box_w = time_width + (6 * du)
+    time_box_y = time_y - time_height + (2 * du)
+    time_box_h = time_height + (0 * du)
+
+    time_box = shape.rounded_rectangle(time_box_x, time_box_y, time_box_w, time_box_h, (3 * du))
+    draw_drop_shadow(time_box, palette.med_grey, dash.shadow_matrix)
+    screen.pen = color.black
+    screen.shape(time_box)
+
+    screen.pen = color.white
+    centred_text(time_text, dash.centre_x, time_y, dash.text_size_l)
+
+    screen.pen = color.black
+    centred_text("BADGEWARE DASHBOARD", dash.centre_x, (7 * du), dash.text_size_m)
+
+    if badge.pressed(BUTTON_A):
+        toggle_caselights()
 ```
 
-This will allow `update()` to write to those variables instead of creating new ones each time round.
+It's harder to see because the entries are scattered all through the function, but every reference to `battery_percent`, `battery_voltage`, `total_flash` and `used_flash` has had `dash.` added before it. Note that we haven't done anything with the date/time - they're still pulled in fresh every update, as we want that to update constantly.
 
-Now we have to modify `update()` so that it's only refreshing those values every couple of seconds. To start we need to make another global variable, in the same place we copied the other variables to:
+Now we have to modify `update()` so that it's only refreshing those values every couple of seconds. To start we need to make another variable in `dash`:
 
 ```python-raw
-last_refresh = badge.ticks
+    last_refresh = 0
 ```
-
-And add `last_refresh` to the line we just wrote, where we defined the battery and flash variables as `global`.
 
 `last_refresh` is for our timing. It's set up using `badge.ticks`, which is the number of milliseconds between the badge being powered on and the beginning of the current `update()` loop. We're going to check `badge.ticks` every time we go round `update()` and see if it's greater than `last_refresh` by 2000 or more - if it is, then that means at least two seconds have passed since the time we stored in `last_refresh`. In that case we'll refresh the battery and memory values, and set `last_refresh` to the current `badge.ticks`. That way, the whole cycle will repeat again every two seconds.
 
@@ -964,13 +1041,11 @@ In practice, that means modifying the beginning of our `update()` to look like t
 
 ```python-raw
 def update():
-    global battery_percent, battery_voltage, total_flash, used_flash, last_update
-
-    if badge.ticks - last_update > 2000:
-        battery_percent = badge.battery_level()
-        battery_voltage = badge.battery_voltage()
-        total_flash, used_flash, _ = badge.disk_free("/system")
-        last_update = badge.ticks
+    if badge.ticks - dash.last_refresh > 2000:
+        dash.battery_percent = badge.battery_level()
+        dash.battery_voltage = badge.battery_voltage()
+        dash.total_flash, dash.used_flash, _ = badge.disk_free("/system")
+        dash.last_refresh = badge.ticks
 
     year, month, day, hour, minute, second, _ = rtc.datetime()
 ```
@@ -981,49 +1056,54 @@ This should now update the graphs every two seconds and get rid of that annoying
 Now we'll tackle what the battery indicator does when you're plugged in. The easiest thing would probably be to just display a plug icon instead when it's plugged in, so let's do that. First, let's rearrange things so that all of the lines regarding the left hand graph and its text are together. That gives us this:
 
 ```python
+badge.mode(HIRES)
 screen.antialias = image.X4
 
-monasans = font.load("/system/assets/fonts/MonaSans-Medium.af")
-
-# Getting all our dimensions together
-centre_x = screen.width * 0.5
-centre_y = screen.height * 0.42
-left_centre_x = screen.width * 0.25
-right_centre_x = screen.width * 0.75
-radius_outer = screen.width * 0.2
-radius_inner = radius_outer * 0.6
 du = screen.width / 100
-shadow_distance = 2 * du
-text_size_l = 10 * du
-text_size_m = 8 * du
-text_size_s = 6 * du
 
-shadow_matrix = mat3().translate(shadow_distance, shadow_distance)
 
-# Defining some colours too
-light_grey = color.rgb(240, 240, 240)
-med_grey = color.rgb(192, 192, 192)
-dark_red = color.rgb(125, 0, 0)
-light_red = color.rgb(255, 42, 42)
-dark_blue = color.rgb(12, 60, 212)
-light_blue = color.rgb(87, 147, 240)
+class dash:
+    monasans = font.load("/system/assets/fonts/MonaSans-Medium.af")
 
-battery_percent = badge.battery_level()
-battery_voltage = badge.battery_voltage()
-total_flash, used_flash, _ = badge.disk_free("/system")
-last_update = badge.ticks
+    centre_x = screen.width * 0.5
+    centre_y = screen.height * 0.42
+    left_centre_x = screen.width * 0.25
+    right_centre_x = screen.width * 0.75
+    radius_outer = screen.width * 0.2
+    radius_inner = radius_outer * 0.6
+    shadow_distance = 2 * du
+    shadow_matrix = mat3().translate(shadow_distance, shadow_distance)
+    text_size_l = 10 * du
+    text_size_m = 8 * du
+    text_size_s = 6 * du
 
-# Takes in a percentage and dimensions to make two pie chart segments
+    battery_percent = badge.battery_level()
+    battery_voltage = badge.battery_voltage()
+    total_flash, used_flash, _ = badge.disk_free("/system")
+
+    last_refresh = 0
+
+
+class palette:
+    light_grey = color.rgb(240, 240, 240)
+    med_grey = color.rgb(192, 192, 192)
+    dark_red = color.rgb(125, 0, 0)
+    light_red = color.rgb(255, 42, 42)
+    dark_blue = color.rgb(12, 60, 212)
+    light_blue = color.rgb(87, 147, 240)
+
+
 def make_chart(x, y, inner, outer, percentage):
     seg_1_start = 0
-    seg_1_end = (percentage / 100) * 359.999
+    seg_1_end = (percentage / 100) * 360
     seg_2_start = seg_1_end
-    seg_2_end = 359.999
+    seg_2_end = 360
 
     filled_section = shape.arc(x, y, inner, outer, seg_1_start, seg_1_end)
     unfilled_section = shape.arc(x, y, inner, outer, seg_2_start, seg_2_end)
 
     return filled_section, unfilled_section
+
 
 def draw_drop_shadow(shape, colour, matrix):
     old_pen = screen.pen
@@ -1033,11 +1113,13 @@ def draw_drop_shadow(shape, colour, matrix):
     shape.transform = mat3()
     screen.pen = old_pen
 
+
 def centred_text(text, x, y, size):
     width, height = screen.measure_text(text, size)
     new_x = x - (width / 2)
     new_y = y - height
     screen.text(text, new_x, new_y, size)
+
 
 def toggle_caselights():
     caselight, _, _, _ = badge.caselights()
@@ -1046,78 +1128,68 @@ def toggle_caselights():
     else:
         badge.caselights(1)
 
-def update():
-    global battery_percent, battery_voltage, total_flash, used_flash, last_update, i
 
-    if badge.ticks - last_update > 2000:
-        battery_percent = badge.battery_level()
-        battery_voltage = badge.battery_voltage()
-        total_flash, used_flash, _ = badge.disk_free("/system")
-        last_update = badge.ticks
+def update():
+    if badge.ticks - dash.last_refresh > 2000:
+        dash.battery_percent = badge.battery_level()
+        dash.battery_voltage = badge.battery_voltage()
+        dash.total_flash, dash.used_flash, _ = badge.disk_free("/system")
+        dash.last_refresh = badge.ticks
 
     year, month, day, hour, minute, second, _ = rtc.datetime()
 
-    screen.pen = light_grey
+    screen.pen = palette.light_grey
     screen.clear()
 
-    # BATTERY READOUT STARTS HERE
+    # Battery related stuff starts here...
 
-    left_pie_filled, left_pie_unfilled = make_chart(left_centre_x, centre_y, radius_inner, radius_outer, battery_percent)
+    left_pie_filled, left_pie_unfilled = make_chart(dash.left_centre_x, dash.centre_y, dash.radius_inner, dash.radius_outer, dash.battery_percent)
 
-    draw_drop_shadow(left_pie_filled, med_grey, shadow_matrix)
-    draw_drop_shadow(left_pie_unfilled, med_grey, shadow_matrix)
+    draw_drop_shadow(left_pie_filled, palette.med_grey, dash.shadow_matrix)
+    draw_drop_shadow(left_pie_unfilled, palette.med_grey, dash.shadow_matrix)
 
-    screen.pen = light_red
+    screen.pen = palette.dark_red
     screen.shape(left_pie_filled)
-    screen.pen = dark_red
+    screen.pen = palette.light_red
     screen.shape(left_pie_unfilled)
 
     screen.pen = color.black
-    screen.font = monasans
+    screen.font = dash.monasans
 
-    # Caption for the battery.
-    centred_text("Battery", left_centre_x, centre_y - (2 * du), text_size_s)
+    centred_text("Battery", dash.left_centre_x, dash.centre_y - (2 * du), dash.text_size_s)
 
-    # Adding the percent sign to the battery level before drawing it.
-    battery_text = str(battery_percent) + "%"
-    centred_text(battery_text, left_centre_x, centre_y + (5.5 * du), text_size_l)
+    battery_text = str(dash.battery_percent) + "%"
+    centred_text(battery_text, dash.left_centre_x, dash.centre_y + (5.5 * du), dash.text_size_l)
 
-    # This just makes sure that once we round the voltage to two decimal places,
-    # there's still a trailing zero where necessary.
-    voltage_text = "{:.2f}".format(battery_voltage) + "V"
-    centred_text(voltage_text, left_centre_x, centre_y + (27 * du), text_size_s)
+    voltage_text = "{:.2f}".format(dash.battery_voltage) + "V"
+    centred_text(voltage_text, dash.left_centre_x, dash.centre_y + (27 * du), dash.text_size_s)
 
-    # MEMORY READOUT STARTS HERE
+    # ...and finishes here.
 
-    memory_percent = (used_flash / total_flash) * 100
-    right_pie_filled, right_pie_unfilled = make_chart(right_centre_x, centre_y, radius_inner, radius_outer, memory_percent)
+    memory_percent = (dash.used_flash / dash.total_flash) * 100
+    right_pie_filled, right_pie_unfilled = make_chart(dash.right_centre_x, dash.centre_y, dash.radius_inner, dash.radius_outer, memory_percent)
 
-    draw_drop_shadow(right_pie_filled, med_grey, shadow_matrix)
-    draw_drop_shadow(right_pie_unfilled, med_grey, shadow_matrix)
+    draw_drop_shadow(right_pie_filled, palette.med_grey, dash.shadow_matrix)
+    draw_drop_shadow(right_pie_unfilled, palette.med_grey, dash.shadow_matrix)
 
-    screen.pen = light_blue
+    screen.pen = palette.dark_blue
     screen.shape(right_pie_filled)
-    screen.pen = dark_blue
+    screen.pen = palette.light_blue
     screen.shape(right_pie_unfilled)
 
     screen.pen = color.black
-    screen.font = monasans
+    screen.font = dash.monasans
 
-    # Caption for the flash capacity.
-    centred_text("Flash", right_centre_x, centre_y - (2 * du), text_size_s)
+    centred_text("Flash", dash.right_centre_x, dash.centre_y - (2 * du), dash.text_size_s)
 
-    # Adding the percent sign to the memory level before drawing it.
     memory_text = str(round(memory_percent)) + "%"
-    centred_text(memory_text, right_centre_x, centre_y + (5.5 * du), text_size_l)
+    centred_text(memory_text, dash.right_centre_x, dash.centre_y + (5.5 * du), dash.text_size_l)
 
-    # Converting the memory usage from bytes into MB, then drawing it.
-    total_flash_mb = total_flash / 1048576
-    used_flash_mb = used_flash / 1048576
+    total_flash_mb = dash.total_flash / 1048576
+    used_flash_mb = dash.used_flash / 1048576
     flash_text = "{:.2f}".format(used_flash_mb) + "MB /" + "{:.2f}".format(total_flash_mb) + "MB"
-    centred_text(flash_text, right_centre_x, centre_y + (27 * du), text_size_s)
+    centred_text(flash_text, dash.right_centre_x, dash.centre_y + (27 * du), dash.text_size_s)
 
-    # Here we just format each part of the time with the right number
-    # of digits and no decimal places, then write it too.
     day_text = "{:02.0f}".format(day)
     month_text = "{:02.0f}".format(month)
     year_text = "{:04.0f}".format(year)
@@ -1126,32 +1198,31 @@ def update():
     second_text = "{:02.0f}".format(second)
     time_text = f"{day_text}/{month_text}/{year_text} {hour_text}:{minute_text}:{second_text}"
 
-    # The y position of the time, we're defining it here
-    # because we want to use it again later
     time_y = screen.height - (5 * du)
 
-    time_width, time_height = screen.measure_text(time_text, text_size_l)
-    time_box_x = centre_x - (time_width / 2) - (3 * du)
+    time_width, time_height = screen.measure_text(time_text, dash.text_size_l)
+    time_box_x = dash.centre_x - (time_width / 2) - (3 * du)
     time_box_w = time_width + (6 * du)
     time_box_y = time_y - time_height + (2 * du)
     time_box_h = time_height + (0 * du)
 
     time_box = shape.rounded_rectangle(time_box_x, time_box_y, time_box_w, time_box_h, (3 * du))
-    draw_drop_shadow(time_box, med_grey, shadow_matrix)
-
+    draw_drop_shadow(time_box, palette.med_grey, dash.shadow_matrix)
     screen.pen = color.black
     screen.shape(time_box)
 
     screen.pen = color.white
-    centred_text(time_text, centre_x, time_y, text_size_l)
+    centred_text(time_text, dash.centre_x, time_y, dash.text_size_l)
 
     screen.pen = color.black
-    centred_text("BADGEWARE DASHBOARD", centre_x, (7 * du), text_size_m)
+    centred_text("BADGEWARE DASHBOARD", dash.centre_x, (7 * du), dash.text_size_m)
 
     if badge.pressed(BUTTON_A):
         toggle_caselights()
 
+
 run(update)
+
 ```
 
 This should work exactly the same, but now all of the battery stuff is separated out into one place. You'll notice we've also duplicated the line where we're setting the font and text colour.
@@ -1159,49 +1230,54 @@ This should work exactly the same, but now all of the battery stuff is separated
 Now, we can just toggle whether or not we draw any of the battery info based on an `if` statement. But what condition is the `if` statement checking? Well, Badgeware has a built in function called `badge.usb_connected()` which is perfect for our needs - it simply returns True if the USB is connected, and False if not. Let's apply that to the code:
 
 ```python
+badge.mode(HIRES)
 screen.antialias = image.X4
 
-monasans = font.load("/system/assets/fonts/MonaSans-Medium.af")
-
-# Getting all our dimensions together
-centre_x = screen.width * 0.5
-centre_y = screen.height * 0.42
-left_centre_x = screen.width * 0.25
-right_centre_x = screen.width * 0.75
-radius_outer = screen.width * 0.2
-radius_inner = radius_outer * 0.6
 du = screen.width / 100
-shadow_distance = 2 * du
-text_size_l = 10 * du
-text_size_m = 8 * du
-text_size_s = 6 * du
 
-shadow_matrix = mat3().translate(shadow_distance, shadow_distance)
 
-# Defining some colours too
-light_grey = color.rgb(240, 240, 240)
-med_grey = color.rgb(192, 192, 192)
-dark_red = color.rgb(125, 0, 0)
-light_red = color.rgb(255, 42, 42)
-dark_blue = color.rgb(12, 60, 212)
-light_blue = color.rgb(87, 147, 240)
+class dash:
+    monasans = font.load("/system/assets/fonts/MonaSans-Medium.af")
 
-battery_percent = badge.battery_level()
-battery_voltage = badge.battery_voltage()
-total_flash, used_flash, _ = badge.disk_free("/system")
-last_update = badge.ticks
+    centre_x = screen.width * 0.5
+    centre_y = screen.height * 0.42
+    left_centre_x = screen.width * 0.25
+    right_centre_x = screen.width * 0.75
+    radius_outer = screen.width * 0.2
+    radius_inner = radius_outer * 0.6
+    shadow_distance = 2 * du
+    shadow_matrix = mat3().translate(shadow_distance, shadow_distance)
+    text_size_l = 10 * du
+    text_size_m = 8 * du
+    text_size_s = 6 * du
 
-# Takes in a percentage and dimensions to make two pie chart segments
+    battery_percent = badge.battery_level()
+    battery_voltage = badge.battery_voltage()
+    total_flash, used_flash, _ = badge.disk_free("/system")
+
+    last_refresh = 0
+
+
+class palette:
+    light_grey = color.rgb(240, 240, 240)
+    med_grey = color.rgb(192, 192, 192)
+    dark_red = color.rgb(125, 0, 0)
+    light_red = color.rgb(255, 42, 42)
+    dark_blue = color.rgb(12, 60, 212)
+    light_blue = color.rgb(87, 147, 240)
+
+
 def make_chart(x, y, inner, outer, percentage):
     seg_1_start = 0
-    seg_1_end = (percentage / 100) * 359.999
+    seg_1_end = (percentage / 100) * 360
     seg_2_start = seg_1_end
-    seg_2_end = 359.999
+    seg_2_end = 360
 
     filled_section = shape.arc(x, y, inner, outer, seg_1_start, seg_1_end)
     unfilled_section = shape.arc(x, y, inner, outer, seg_2_start, seg_2_end)
 
     return filled_section, unfilled_section
+
 
 def draw_drop_shadow(shape, colour, matrix):
     old_pen = screen.pen
@@ -1211,11 +1287,13 @@ def draw_drop_shadow(shape, colour, matrix):
     shape.transform = mat3()
     screen.pen = old_pen
 
+
 def centred_text(text, x, y, size):
     width, height = screen.measure_text(text, size)
     new_x = x - (width / 2)
     new_y = y - height
     screen.text(text, new_x, new_y, size)
+
 
 def toggle_caselights():
     caselight, _, _, _ = badge.caselights()
@@ -1224,79 +1302,65 @@ def toggle_caselights():
     else:
         badge.caselights(1)
 
-def update():
-    global battery_percent, battery_voltage, total_flash, used_flash, last_update, i
 
-    if badge.ticks - last_update > 2000:
-        battery_percent = badge.battery_level()
-        battery_voltage = badge.battery_voltage()
-        total_flash, used_flash, _ = badge.disk_free("/system")
-        last_update = badge.ticks
+def update():
+    if badge.ticks - dash.last_refresh > 2000:
+        dash.battery_percent = badge.battery_level()
+        dash.battery_voltage = badge.battery_voltage()
+        dash.total_flash, dash.used_flash, _ = badge.disk_free("/system")
+        dash.last_refresh = badge.ticks
 
     year, month, day, hour, minute, second, _ = rtc.datetime()
 
-    screen.pen = light_grey
+    screen.pen = palette.light_grey
     screen.clear()
 
-    # BATTERY READOUT STARTS HERE
-
     if badge.usb_connected():
-        left_pie_filled, left_pie_unfilled = make_chart(left_centre_x, centre_y, radius_inner, radius_outer, battery_percent)
+        left_pie_filled, left_pie_unfilled = make_chart(dash.left_centre_x, dash.centre_y, dash.radius_inner, dash.radius_outer, dash.battery_percent)
 
-        draw_drop_shadow(left_pie_filled, med_grey, shadow_matrix)
-        draw_drop_shadow(left_pie_unfilled, med_grey, shadow_matrix)
+        draw_drop_shadow(left_pie_filled, palette.med_grey, dash.shadow_matrix)
+        draw_drop_shadow(left_pie_unfilled, palette.med_grey, dash.shadow_matrix)
 
-        screen.pen = light_red
+        screen.pen = palette.dark_red
         screen.shape(left_pie_filled)
-        screen.pen = dark_red
+        screen.pen = palette.light_red
         screen.shape(left_pie_unfilled)
 
         screen.pen = color.black
-        screen.font = monasans
+        screen.font = dash.monasans
 
-        # Caption for the battery.
-        centred_text("Battery", left_centre_x, centre_y - (2 * du), text_size_s)
+        centred_text("Battery", dash.left_centre_x, dash.centre_y - (2 * du), dash.text_size_s)
 
-        # Adding the percent sign to the battery level before drawing it.
-        battery_text = str(battery_percent) + "%"
-        centred_text(battery_text, left_centre_x, centre_y + (5.5 * du), text_size_l)
+        battery_text = str(dash.battery_percent) + "%"
+        centred_text(battery_text, dash.left_centre_x, dash.centre_y + (5.5 * du), dash.text_size_l)
 
-        # This just makes sure that once we round the voltage to two decimal places,
-        # there's still a trailing zero where necessary.
-        voltage_text = "{:.2f}".format(battery_voltage) + "V"
-        centred_text(voltage_text, left_centre_x, centre_y + (27 * du), text_size_s)
+        voltage_text = "{:.2f}".format(dash.battery_voltage) + "V"
+        centred_text(voltage_text, dash.left_centre_x, dash.centre_y + (27 * du), dash.text_size_s)
 
-    # MEMORY READOUT STARTS HERE
+    memory_percent = (dash.used_flash / dash.total_flash) * 100
+    right_pie_filled, right_pie_unfilled = make_chart(dash.right_centre_x, dash.centre_y, dash.radius_inner, dash.radius_outer, memory_percent)
 
-    memory_percent = (used_flash / total_flash) * 100
-    right_pie_filled, right_pie_unfilled = make_chart(right_centre_x, centre_y, radius_inner, radius_outer, memory_percent)
+    draw_drop_shadow(right_pie_filled, palette.med_grey, dash.shadow_matrix)
+    draw_drop_shadow(right_pie_unfilled, palette.med_grey, dash.shadow_matrix)
 
-    draw_drop_shadow(right_pie_filled, med_grey, shadow_matrix)
-    draw_drop_shadow(right_pie_unfilled, med_grey, shadow_matrix)
-
-    screen.pen = light_blue
+    screen.pen = palette.dark_blue
     screen.shape(right_pie_filled)
-    screen.pen = dark_blue
+    screen.pen = palette.light_blue
     screen.shape(right_pie_unfilled)
 
     screen.pen = color.black
-    screen.font = monasans
+    screen.font = dash.monasans
 
-    # Caption for the flash capacity.
-    centred_text("Flash", right_centre_x, centre_y - (2 * du), text_size_s)
+    centred_text("Flash", dash.right_centre_x, dash.centre_y - (2 * du), dash.text_size_s)
 
-    # Adding the percent sign to the memory level before drawing it.
     memory_text = str(round(memory_percent)) + "%"
-    centred_text(memory_text, right_centre_x, centre_y + (5.5 * du), text_size_l)
+    centred_text(memory_text, dash.right_centre_x, dash.centre_y + (5.5 * du), dash.text_size_l)
 
-    # Converting the memory usage from bytes into MB, then drawing it.
-    total_flash_mb = total_flash / 1048576
-    used_flash_mb = used_flash / 1048576
+    total_flash_mb = dash.total_flash / 1048576
+    used_flash_mb = dash.used_flash / 1048576
     flash_text = "{:.2f}".format(used_flash_mb) + "MB /" + "{:.2f}".format(total_flash_mb) + "MB"
-    centred_text(flash_text, right_centre_x, centre_y + (27 * du), text_size_s)
+    centred_text(flash_text, dash.right_centre_x, dash.centre_y + (27 * du), dash.text_size_s)
 
-    # Here we just format each part of the time with the right number
-    # of digits and no decimal places, then write it too.
     day_text = "{:02.0f}".format(day)
     month_text = "{:02.0f}".format(month)
     year_text = "{:04.0f}".format(year)
@@ -1305,32 +1369,31 @@ def update():
     second_text = "{:02.0f}".format(second)
     time_text = f"{day_text}/{month_text}/{year_text} {hour_text}:{minute_text}:{second_text}"
 
-    # The y position of the time, we're defining it here
-    # because we want to use it again later
     time_y = screen.height - (5 * du)
 
-    time_width, time_height = screen.measure_text(time_text, text_size_l)
-    time_box_x = centre_x - (time_width / 2) - (3 * du)
+    time_width, time_height = screen.measure_text(time_text, dash.text_size_l)
+    time_box_x = dash.centre_x - (time_width / 2) - (3 * du)
     time_box_w = time_width + (6 * du)
     time_box_y = time_y - time_height + (2 * du)
     time_box_h = time_height + (0 * du)
 
     time_box = shape.rounded_rectangle(time_box_x, time_box_y, time_box_w, time_box_h, (3 * du))
-    draw_drop_shadow(time_box, med_grey, shadow_matrix)
-
+    draw_drop_shadow(time_box, palette.med_grey, dash.shadow_matrix)
     screen.pen = color.black
     screen.shape(time_box)
 
     screen.pen = color.white
-    centred_text(time_text, centre_x, time_y, text_size_l)
+    centred_text(time_text, dash.centre_x, time_y, dash.text_size_l)
 
     screen.pen = color.black
-    centred_text("BADGEWARE DASHBOARD", centre_x, (7 * du), text_size_m)
+    centred_text("BADGEWARE DASHBOARD", dash.centre_x, (7 * du), dash.text_size_m)
 
     if badge.pressed(BUTTON_A):
         toggle_caselights()
 
+
 run(update)
+
 ```
 
 Well, that's certainly done something, but it's the wrong way round - the graph is displaying when the cable is connected, and that's when we want it to disappear. We could of course just change it to `if not badge.usb_connected()`, but we want to display something else when it is connected so instead let's make this `if` into an `if...else` and put our graph drawing code into the `else` bit:
@@ -1342,20 +1405,20 @@ Well, that's certainly done something, but it's the wrong way round - the graph 
         # graph-drawing code
 ```
 
-What are we going to do with that `else` section? We could blit an image in the graph's place, but we're trying to keep everything as vectors right now, so let's draw one using the different `shape` primitives - we've worked this one out, but you can experiment and create your own:
+What are we going to do with that `if` section? We could blit an image in the graph's place, but we're trying to keep everything as vectors right now, so let's draw one using the different `shape` primitives - we've worked this one out, but you can experiment and create your own:
 
 ```python-raw
     if badge.usb_connected():
-        plug1, _ = make_chart(left_centre_x, centre_y, radius_inner, radius_outer, 100)
-        plug2 = shape.circle(left_centre_x, centre_y, (4 * du))
-        plug3 = shape.rectangle(left_centre_x - (4 * du), centre_y - (4 * du), 8 * du, 4 * du)
-        plug4 = shape.line(left_centre_x - (2 * du), centre_y, left_centre_x - (2 * du), centre_y - (8 * du), (2 * du))
-        plug5 = shape.line(left_centre_x + (2 * du), centre_y, left_centre_x + (2 * du), centre_y - (8 * du), (2 * du))
-        plug6 = shape.line(left_centre_x, centre_y, left_centre_x, centre_y + (8 * du), (2 * du))
+        plug1, _ = make_chart(dash.left_centre_x, dash.centre_y, dash.radius_inner, dash.radius_outer, 100)
+        plug2 = shape.circle(dash.left_centre_x, dash.centre_y, (4 * du))
+        plug3 = shape.rectangle(dash.left_centre_x - (4 * du), dash.centre_y - (4 * du), 8 * du, 4 * du)
+        plug4 = shape.line(dash.left_centre_x - (2 * du), dash.centre_y, dash.left_centre_x - (2 * du), dash.centre_y - (8 * du), (2 * du))
+        plug5 = shape.line(dash.left_centre_x + (2 * du), dash.centre_y, dash.left_centre_x + (2 * du), dash.centre_y - (8 * du), (2 * du))
+        plug6 = shape.line(dash.left_centre_x, dash.centre_y, dash.left_centre_x, dash.centre_y + (8 * du), (2 * du))
 
-        draw_drop_shadow(plug1, med_grey, shadow_matrix)
+        draw_drop_shadow(plug1, palette.med_grey, dash.shadow_matrix)
 
-        screen.pen = light_green
+        screen.pen = palette.light_green
         screen.shape(plug1)
 
         screen.pen = color.black
@@ -1366,37 +1429,38 @@ What are we going to do with that `else` section? We could blit an image in the 
         screen.shape(plug6)
 ```
 
-We're also adding a couple of new colours:
+We're also adding a couple of new colours to `palette`:
 
 ```python-raw
-dark_green = color.rgb(0, 125, 0)
-light_green = color.rgb(42, 255, 42)
+    dark_green = color.rgb(0, 125, 0)
+    light_green = color.rgb(42, 255, 42)
 ```
 
 There's just one finishing touch. Badgeware also offers a function, `badge.is_charging()` which returns whether or not the unit is currently charging. Let's add a text line, in the same place as the voltage readout is when unplugged, to say "Charging" or "Fully Charged" and change the colour accordingly:
 
 ```python-raw
     if badge.usb_connected():
-        plug1, _ = make_chart(left_centre_x, centre_y, radius_inner, radius_outer, 100)
-        plug2 = shape.circle(left_centre_x, centre_y, (4 * du))
-        plug3 = shape.rectangle(left_centre_x - (4 * du), centre_y - (4 * du), 8 * du, 4 * du)
-        plug4 = shape.line(left_centre_x - (2 * du), centre_y, left_centre_x - (2 * du), centre_y - (8 * du), (2 * du))
-        plug5 = shape.line(left_centre_x + (2 * du), centre_y, left_centre_x + (2 * du), centre_y - (8 * du), (2 * du))
-        plug6 = shape.line(left_centre_x, centre_y, left_centre_x, centre_y + (8 * du), (2 * du))
+        plug1, _ = make_chart(dash.left_centre_x, dash.centre_y, dash.radius_inner, dash.radius_outer, 100)
+        plug2 = shape.circle(dash.left_centre_x, dash.centre_y, (4 * du))
+        plug3 = shape.rectangle(dash.left_centre_x - (4 * du), dash.centre_y - (4 * du), 8 * du, 4 * du)
+        plug4 = shape.line(dash.left_centre_x - (2 * du), dash.centre_y, dash.left_centre_x - (2 * du), dash.centre_y - (8 * du), (2 * du))
+        plug5 = shape.line(dash.left_centre_x + (2 * du), dash.centre_y, dash.left_centre_x + (2 * du), dash.centre_y - (8 * du), (2 * du))
+        plug6 = shape.line(dash.left_centre_x, dash.centre_y, dash.left_centre_x, dash.centre_y + (8 * du), (2 * du))
 
-        draw_drop_shadow(plug1, med_grey, shadow_matrix)
+        draw_drop_shadow(plug1, palette.med_grey, dash.shadow_matrix)
 
         if badge.is_charging():
-            screen.pen = dark_green
+            screen.pen = palette.dark_green
             charge_status_text = "Charging..."
         else:
-            screen.pen = light_green
+            screen.pen = palette.light_green
             charge_status_text = "Fully charged"
 
         screen.shape(plug1)
 
         screen.pen = color.black
-        centred_text(charge_status_text, left_centre_x, centre_y + (27 * du), text_size_s)
+
+        centred_text(charge_status_text, dash.left_centre_x, dash.centre_y + (27 * du), dash.text_size_s)
 
         screen.shape(plug2)
         screen.shape(plug3)
@@ -1408,51 +1472,56 @@ There's just one finishing touch. Badgeware also offers a function, `badge.is_ch
 Phew! That's it, we're done. Here's the full code for your `__init__.py` - every single thing you draw to the screen is in this file.
 
 ```python
+badge.mode(HIRES)
 screen.antialias = image.X4
 
-monasans = font.load("/system/assets/fonts/MonaSans-Medium.af")
-
-# Getting all our dimensions together
-centre_x = screen.width * 0.5
-centre_y = screen.height * 0.42
-left_centre_x = screen.width * 0.25
-right_centre_x = screen.width * 0.75
-radius_outer = screen.width * 0.2
-radius_inner = radius_outer * 0.6
 du = screen.width / 100
-shadow_distance = 2 * du
-text_size_l = 10 * du
-text_size_m = 8 * du
-text_size_s = 6 * du
 
-shadow_matrix = mat3().translate(shadow_distance, shadow_distance)
 
-# Defining some colours too
-light_grey = color.rgb(240, 240, 240)
-med_grey = color.rgb(192, 192, 192)
-dark_red = color.rgb(125, 0, 0)
-light_red = color.rgb(255, 42, 42)
-dark_blue = color.rgb(12, 60, 212)
-light_blue = color.rgb(87, 147, 240)
-dark_green = color.rgb(0, 125, 0)
-light_green = color.rgb(42, 255, 42)
+class dash:
+    monasans = font.load("/system/assets/fonts/MonaSans-Medium.af")
 
-battery_percent = badge.battery_level()
-battery_voltage = badge.battery_voltage()
-total_flash, used_flash, _ = badge.disk_free("/system")
-last_update = badge.ticks
+    centre_x = screen.width * 0.5
+    centre_y = screen.height * 0.42
+    left_centre_x = screen.width * 0.25
+    right_centre_x = screen.width * 0.75
+    radius_outer = screen.width * 0.2
+    radius_inner = radius_outer * 0.6
+    shadow_distance = 2 * du
+    shadow_matrix = mat3().translate(shadow_distance, shadow_distance)
+    text_size_l = 10 * du
+    text_size_m = 8 * du
+    text_size_s = 6 * du
 
-# Takes in a percentage and dimensions to make two pie chart segments
+    battery_percent = badge.battery_level()
+    battery_voltage = badge.battery_voltage()
+    total_flash, used_flash, _ = badge.disk_free("/system")
+
+    last_refresh = 0
+
+
+class palette:
+    light_grey = color.rgb(240, 240, 240)
+    med_grey = color.rgb(192, 192, 192)
+    dark_red = color.rgb(125, 0, 0)
+    light_red = color.rgb(255, 42, 42)
+    dark_blue = color.rgb(12, 60, 212)
+    light_blue = color.rgb(87, 147, 240)
+    dark_green = color.rgb(0, 125, 0)
+    light_green = color.rgb(42, 255, 42)
+
+
 def make_chart(x, y, inner, outer, percentage):
     seg_1_start = 0
-    seg_1_end = (percentage / 100) * 359.999
+    seg_1_end = (percentage / 100) * 360
     seg_2_start = seg_1_end
-    seg_2_end = 359.999
+    seg_2_end = 360
 
     filled_section = shape.arc(x, y, inner, outer, seg_1_start, seg_1_end)
     unfilled_section = shape.arc(x, y, inner, outer, seg_2_start, seg_2_end)
 
     return filled_section, unfilled_section
+
 
 def draw_drop_shadow(shape, colour, matrix):
     old_pen = screen.pen
@@ -1462,11 +1531,13 @@ def draw_drop_shadow(shape, colour, matrix):
     shape.transform = mat3()
     screen.pen = old_pen
 
+
 def centred_text(text, x, y, size):
     width, height = screen.measure_text(text, size)
     new_x = x - (width / 2)
     new_y = y - height
     screen.text(text, new_x, new_y, size)
+
 
 def toggle_caselights():
     caselight, _, _, _ = badge.caselights()
@@ -1475,43 +1546,41 @@ def toggle_caselights():
     else:
         badge.caselights(1)
 
-def update():
-    global battery_percent, battery_voltage, total_flash, used_flash, last_update, i
 
-    if badge.ticks - last_update > 2000:
-        battery_percent = badge.battery_level()
-        battery_voltage = badge.battery_voltage()
-        total_flash, used_flash, _ = badge.disk_free("/system")
-        last_update = badge.ticks
+def update():
+    if badge.ticks - dash.last_refresh > 2000:
+        dash.battery_percent = badge.battery_level()
+        dash.battery_voltage = badge.battery_voltage()
+        dash.total_flash, dash.used_flash, _ = badge.disk_free("/system")
+        dash.last_refresh = badge.ticks
 
     year, month, day, hour, minute, second, _ = rtc.datetime()
 
-    screen.pen = light_grey
+    screen.pen = palette.light_grey
     screen.clear()
 
-    # BATTERY READOUT STARTS HERE
-
     if badge.usb_connected():
-        plug1, _ = make_chart(left_centre_x, centre_y, radius_inner, radius_outer, 100)
-        plug2 = shape.circle(left_centre_x, centre_y, (4 * du))
-        plug3 = shape.rectangle(left_centre_x - (4 * du), centre_y - (4 * du), 8 * du, 4 * du)
-        plug4 = shape.line(left_centre_x - (2 * du), centre_y, left_centre_x - (2 * du), centre_y - (8 * du), (2 * du))
-        plug5 = shape.line(left_centre_x + (2 * du), centre_y, left_centre_x + (2 * du), centre_y - (8 * du), (2 * du))
-        plug6 = shape.line(left_centre_x, centre_y, left_centre_x, centre_y + (8 * du), (2 * du))
+        plug1, _ = make_chart(dash.left_centre_x, dash.centre_y, dash.radius_inner, dash.radius_outer, 100)
+        plug2 = shape.circle(dash.left_centre_x, dash.centre_y, (4 * du))
+        plug3 = shape.rectangle(dash.left_centre_x - (4 * du), dash.centre_y - (4 * du), 8 * du, 4 * du)
+        plug4 = shape.line(dash.left_centre_x - (2 * du), dash.centre_y, dash.left_centre_x - (2 * du), dash.centre_y - (8 * du), (2 * du))
+        plug5 = shape.line(dash.left_centre_x + (2 * du), dash.centre_y, dash.left_centre_x + (2 * du), dash.centre_y - (8 * du), (2 * du))
+        plug6 = shape.line(dash.left_centre_x, dash.centre_y, dash.left_centre_x, dash.centre_y + (8 * du), (2 * du))
 
-        draw_drop_shadow(plug1, med_grey, shadow_matrix)
+        draw_drop_shadow(plug1, palette.med_grey, dash.shadow_matrix)
 
         if badge.is_charging():
-            screen.pen = dark_green
+            screen.pen = palette.dark_green
             charge_status_text = "Charging..."
         else:
-            screen.pen = light_green
+            screen.pen = palette.light_green
             charge_status_text = "Fully charged"
 
         screen.shape(plug1)
 
         screen.pen = color.black
-        centred_text(charge_status_text, left_centre_x, centre_y + (27 * du), text_size_s)
+
+        centred_text(charge_status_text, dash.left_centre_x, dash.centre_y + (27 * du), dash.text_size_s)
 
         screen.shape(plug2)
         screen.shape(plug3)
@@ -1519,62 +1588,51 @@ def update():
         screen.shape(plug5)
         screen.shape(plug6)
     else:
-        left_pie_filled, left_pie_unfilled = make_chart(left_centre_x, centre_y, radius_inner, radius_outer, battery_percent)
+        left_pie_filled, left_pie_unfilled = make_chart(dash.left_centre_x, dash.centre_y, dash.radius_inner, dash.radius_outer, dash.battery_percent)
 
-        draw_drop_shadow(left_pie_filled, med_grey, shadow_matrix)
-        draw_drop_shadow(left_pie_unfilled, med_grey, shadow_matrix)
+        draw_drop_shadow(left_pie_filled, palette.med_grey, dash.shadow_matrix)
+        draw_drop_shadow(left_pie_unfilled, palette.med_grey, dash.shadow_matrix)
 
-        screen.pen = light_red
+        screen.pen = palette.dark_red
         screen.shape(left_pie_filled)
-        screen.pen = dark_red
+        screen.pen = palette.light_red
         screen.shape(left_pie_unfilled)
 
         screen.pen = color.black
-        screen.font = monasans
+        screen.font = dash.monasans
 
-        # Caption for the battery.
-        centred_text("Battery", left_centre_x, centre_y - (2 * du), text_size_s)
+        centred_text("Battery", dash.left_centre_x, dash.centre_y - (2 * du), dash.text_size_s)
 
-        # Adding the percent sign to the battery level before drawing it.
-        battery_text = str(battery_percent) + "%"
-        centred_text(battery_text, left_centre_x, centre_y + (5.5 * du), text_size_l)
+        battery_text = str(dash.battery_percent) + "%"
+        centred_text(battery_text, dash.left_centre_x, dash.centre_y + (5.5 * du), dash.text_size_l)
 
-        # This just makes sure that once we round the voltage to two decimal places,
-        # there's still a trailing zero where necessary.
-        voltage_text = "{:.2f}".format(battery_voltage) + "V"
-        centred_text(voltage_text, left_centre_x, centre_y + (27 * du), text_size_s)
+        voltage_text = "{:.2f}".format(dash.battery_voltage) + "V"
+        centred_text(voltage_text, dash.left_centre_x, dash.centre_y + (27 * du), dash.text_size_s)
 
-    # MEMORY READOUT STARTS HERE
+    memory_percent = (dash.used_flash / dash.total_flash) * 100
+    right_pie_filled, right_pie_unfilled = make_chart(dash.right_centre_x, dash.centre_y, dash.radius_inner, dash.radius_outer, memory_percent)
 
-    memory_percent = (used_flash / total_flash) * 100
-    right_pie_filled, right_pie_unfilled = make_chart(right_centre_x, centre_y, radius_inner, radius_outer, memory_percent)
+    draw_drop_shadow(right_pie_filled, palette.med_grey, dash.shadow_matrix)
+    draw_drop_shadow(right_pie_unfilled, palette.med_grey, dash.shadow_matrix)
 
-    draw_drop_shadow(right_pie_filled, med_grey, shadow_matrix)
-    draw_drop_shadow(right_pie_unfilled, med_grey, shadow_matrix)
-
-    screen.pen = light_blue
+    screen.pen = palette.dark_blue
     screen.shape(right_pie_filled)
-    screen.pen = dark_blue
+    screen.pen = palette.light_blue
     screen.shape(right_pie_unfilled)
 
     screen.pen = color.black
-    screen.font = monasans
+    screen.font = dash.monasans
 
-    # Caption for the flash capacity.
-    centred_text("Flash", right_centre_x, centre_y - (2 * du), text_size_s)
+    centred_text("Flash", dash.right_centre_x, dash.centre_y - (2 * du), dash.text_size_s)
 
-    # Adding the percent sign to the memory level before drawing it.
     memory_text = str(round(memory_percent)) + "%"
-    centred_text(memory_text, right_centre_x, centre_y + (5.5 * du), text_size_l)
+    centred_text(memory_text, dash.right_centre_x, dash.centre_y + (5.5 * du), dash.text_size_l)
 
-    # Converting the memory usage from bytes into MB, then drawing it.
-    total_flash_mb = total_flash / 1048576
-    used_flash_mb = used_flash / 1048576
+    total_flash_mb = dash.total_flash / 1048576
+    used_flash_mb = dash.used_flash / 1048576
     flash_text = "{:.2f}".format(used_flash_mb) + "MB /" + "{:.2f}".format(total_flash_mb) + "MB"
-    centred_text(flash_text, right_centre_x, centre_y + (27 * du), text_size_s)
+    centred_text(flash_text, dash.right_centre_x, dash.centre_y + (27 * du), dash.text_size_s)
 
-    # Here we just format each part of the time with the right number
-    # of digits and no decimal places, then write it too.
     day_text = "{:02.0f}".format(day)
     month_text = "{:02.0f}".format(month)
     year_text = "{:04.0f}".format(year)
@@ -1583,32 +1641,31 @@ def update():
     second_text = "{:02.0f}".format(second)
     time_text = f"{day_text}/{month_text}/{year_text} {hour_text}:{minute_text}:{second_text}"
 
-    # The y position of the time, we're defining it here
-    # because we want to use it again later
     time_y = screen.height - (5 * du)
 
-    time_width, time_height = screen.measure_text(time_text, text_size_l)
-    time_box_x = centre_x - (time_width / 2) - (3 * du)
+    time_width, time_height = screen.measure_text(time_text, dash.text_size_l)
+    time_box_x = dash.centre_x - (time_width / 2) - (3 * du)
     time_box_w = time_width + (6 * du)
     time_box_y = time_y - time_height + (2 * du)
     time_box_h = time_height + (0 * du)
 
     time_box = shape.rounded_rectangle(time_box_x, time_box_y, time_box_w, time_box_h, (3 * du))
-    draw_drop_shadow(time_box, med_grey, shadow_matrix)
-
+    draw_drop_shadow(time_box, palette.med_grey, dash.shadow_matrix)
     screen.pen = color.black
     screen.shape(time_box)
 
     screen.pen = color.white
-    centred_text(time_text, centre_x, time_y, text_size_l)
+    centred_text(time_text, dash.centre_x, time_y, dash.text_size_l)
 
     screen.pen = color.black
-    centred_text("BADGEWARE DASHBOARD", centre_x, (7 * du), text_size_m)
+    centred_text("BADGEWARE DASHBOARD", dash.centre_x, (7 * du), dash.text_size_m)
 
     if badge.pressed(BUTTON_A):
         toggle_caselights()
 
+
 run(update)
+
 ```
 
-Finally we're at the end of this tutorial. In the next one, we'll look at making things MOVE.
+Finally we're at the end of this tutorial. In the next one, we'll look at making things move, as we make a game.

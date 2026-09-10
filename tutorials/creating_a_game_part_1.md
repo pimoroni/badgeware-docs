@@ -5,7 +5,7 @@ icon: sports_esports
 publish: true
 sort: 3
 ---
-# A simple game: Acorn Highway (Part 1)
+# Tutorial 3: Acorn Highway (Part 1)
 
 It's time to put everything together to make a simple but fun game, with lots of scope for expansion. In this part and the next part we'll cover using sprites and animations, as well as structuring the game, working with properties to easily align objects, saving and loading data through states, and working with brushes to produce animation effects. You'll make the main gameplay loop, as well as an animation when you die, and animated title and game over screens.
 
@@ -13,9 +13,9 @@ The game you'll be making it called Acorn Highway, and it's a simple infinite ru
 
 > Note: Whenever it's time to run your program to test something, you'll see an icon of Tufty running like the one below.
 
-![Run your code!](/tut4_res/tufty.png)
+![Run your code!](/tut4_res/tufty.gif)
 
-# Setting up
+## Setting up
 
 First of all, let's set up basic classes for three very important things we'll be using. The basics of creating a MicroPython class are outside the scope of this tutorial, but we will talk a little about properties and how they work.
 
@@ -80,12 +80,11 @@ while True:
     display.update()
 ```
 
-![Run your code!](/tut4_res/tufty.png)
+![Run your code!](/tut4_res/tufty.gif)
 
 This should give you a red square at the top of the screen, 20 pixels from the left. Of course, positioning things is nice and easy if you only ever want to check on the top left corner, but what about other positions on the player? We could store the position of the right and bottom as variables, and update them every time the x and y change, but there's a way that makes life simpler throughout the rest of the program. In the `player_base` class, add the following, after `__init__` and before `draw()`:
 
 ```python-raw
-
     @property
     def r(self):
         return self.x + self.w
@@ -158,7 +157,7 @@ while True:
     display.update()
 ```
 
-![Run your code!](/tut4_res/tufty.png)
+![Run your code!](/tut4_res/tufty.gif)
 
 As you can see, you're getting two squares. First, you're setting the top left corner of the box to be at `80, 60` - the centre of the screen, and you're drawing it. Then you're setting the bottom right corner to be at the same coordinates, and drawing it again. When you're setting `r` and `b` there, it's calculating what `x` and `y` need to be to put it in the right place.
 
@@ -324,9 +323,9 @@ while True:
     display.update()
 ```
 
-![Run your code!](/tut4_res/tufty.png)
+![Run your code!](/tut4_res/tufty.gif)
 
-# Basic physics
+## Basic physics
 
 Now, let's apply some physics. We'll make an `update()` method in our `player_base` class, which we'll call to update the player's physics, and eventually process the controls. For now we just need two new lines in it, but we'll also move the call to `draw()` the player into here rather than in the main loop. That way we'll only need to call `player.update()` - make sure you change the call in the loop to reflect that.
 
@@ -542,11 +541,11 @@ while True:
 
 ```
 
-![Run your code!](/tut4_res/tufty.png)
+![Run your code!](/tut4_res/tufty.gif)
 
 You'll see that when you run it, no matter where you put the platform, as long as it's below the player they'll fall down and land on the platform.
 
-# Multiple platforms
+## Multiple platforms
 
 It would be a pretty boring platformer with only one platform, though. Let's switch it up a bit to make a list of platforms which we initialise to start with. We'll define this list as the first thing in our `game` class and in fact while we're at it, let's do the same for the acorns as we know we'll want multiple of those. Remember to delete our old lines where we set up `platform` and `acorn`, as well as the line to draw the acorn in the main loop. Your `game` class should look like this:
 
@@ -556,7 +555,7 @@ class game:
     acorns = []
 ```
 
-Those lists are empty right now, but we're about to make a little method that fills the platform list with three platforms in default starting positions. Although this is short, we're making it a separate method after the classes so that we can call on it later from elsewhere in the program. Dont forget to call `init_platforms()` in your main program, right before the loop.
+Those lists are empty right now, but we're about to make a little function that fills the platform list with three platforms in default starting positions. Although this is short, we're making it a separate function after the classes so that we can call on it later from elsewhere in the program. Dont forget to call `init_platforms()` in your main program, right before the loop.
 
 ```python-raw
 def init_platforms():
@@ -788,19 +787,19 @@ while True:
 
 ```
 
-![Run your code!](/tut4_res/tufty.png)
+![Run your code!](/tut4_res/tufty.gif)
 
 The player drops down onto the top platform, and that's it. Of course, it'd be nice to actually move around, and we'll deal with that in the next part. We'll come back to the physics of it all once we've got a way of making things happen.
 
-# Controls
+## Controls
 
 There's two ways of implementing controls, and it depends on whether or not you want to include support for the Qw/ST Pad gamepad that comes as part of Badgeware's STEM kit. We'll end up at the same place either way, but if you're wanting to create something to share, it might be a good idea to learn here how to implement Qw/ST Pad for others to use.
 
-## Control basics
+### Control basics
 
 Of course, the buttons on Badgeware are built in to the software API, but we're going to be creating a structure on top of that which lets you define in-game actions and refer to them by name. The benefit of this is that those in-game actions could be a combination of two or more buttons, so once they're defined it's easy to just check on them quickly elsewhere in the program - and that it'll read both the onboard buttons and any other input you care to mention.
 
-We're going to need several things in place. First let's set up a dictionary in the `game` class for our controls. It doesn't need to have anything in it, as we'll populate it using a method we'll create. `game` should look like this:
+We're going to need several things in place. First let's set up a dictionary in the `game` class for our controls. It doesn't need to have anything in it, as we'll populate it using a function we'll create. `game` should look like this:
 
 ```python-raw
 class game:
@@ -809,7 +808,7 @@ class game:
     controls = {}
 ```
 
-And right before `init_platforms()` is defined, we'll create a method called `parse_controls()` which will fill that dictionary each turn with the appropriate values:
+And right before `init_platforms()` is defined, we'll create a function called `parse_controls()` which will fill that dictionary each turn with the appropriate values:
 
 ```python-raw
 def parse_controls():
@@ -824,9 +823,9 @@ As you can see, we've now got a dictionary of controls which we can access by na
 
 You can see that we've created five controls - moving left and right depend on a button being held, jumping just happens once on a press, and dropping uses a combination of holding down and pressing B. In this case B is also used as the jump button, but it doesn't have to be, it could be anything you like.
 
-Now we've got our method for reading in the controls, we'll just call it at the start of the main `while` loop, right after `badge.poll()`, so these values update every frame.
+Now we've got our function for reading in the controls, we'll just call it at the start of the main `while` loop, right after `badge.poll()`, so these values update every frame.
 
-## Bringing in the gamepad
+### Bringing in the gamepad
 
 To bring in the Qw/ST Pad, we're just going to be adding to this structure. First of all we need to import that library. We're going to be using a modified version of the Qw/ST Pad driver, which we'll include in the game folder. Put the following into a new text file, and save it as `qwstpad.py` in the same folder as `__init__.py`. Don't worry about how it works, it's simply the existing Qw/ST Pad driver with a couple of extra bits added so that we can treat the gamepad buttons the same way we treat the badge buttons.
 
@@ -1016,7 +1015,7 @@ class Gamepadhelper:
 
 Finally, at the very top of the file add `import qwstpad`.
 
-Now, we need to connect to the pad and create an object we can read its buttons from. We'll make a method to initialise the gamepad, which we'll call `init_gamepad()` - this can go right before `parse_controls()` and after the classes. We also need to add `gamepad = None` in our `game` class.
+Now, we need to connect to the pad and create an object we can read its buttons from. We'll make a function to initialise the gamepad, which we'll call `init_gamepad()` - this can go right before `parse_controls()` and after the classes. We also need to add `gamepad = None` in our `game` class.
 
 ```python-raw
 def init_gamepad():
@@ -1045,9 +1044,9 @@ Now it's easy to use this to check for connected pads and assign the first one t
 
 So if `gamepad` is showing something other than `None` (and therefore a pad is connected), we're telling it to read the status of all of its buttons. We're also enclosing that in a `try` statement so that if it throws an error (as it would if the pad was disconnected unexpectedly) it ignores reading the gamepad for this update and instead just tries to initialise it again for the next update. If there isn't a pad connected it'll try and connect to one, because you never know, someone might have just plugged one in.
 
-Now that we've got access to the gamepad's buttons, we can integrate them into the controls. This is very simple, just an `if` statement checking on the gamepad's status, and then a set of new definitions for if it's connected. The modified `qwstpad` library provides the same methods you can call on the Badgeware buttons, just using strings to identify the buttons - your options are `U, D, L, R, A, B, X, Y, +, -`.
+Now that we've got access to the gamepad's buttons, we can integrate them into the controls. This is very simple, just an `if` statement checking on the gamepad's status, and then a set of new definitions for if it's connected. The modified `qwstpad` library provides the same functions you can call on the Badgeware buttons, just using strings to identify the buttons - your options are `U, D, L, R, A, B, X, Y, +, -`.
 
-Let's see the `parse_controls()` method with that added in.
+Let's see the `parse_controls()` function with that added in.
 
 ```python-raw
 def parse_controls():
@@ -1077,9 +1076,9 @@ You can see that currently, the badge buttons would essentially be disabled when
 
 So, we've got a set of controls we can query for our game mechanics. But currently you can't even tell if they're working or not, since they're not hooked up to anything. Next up, let's learn to move.
 
-# Player movement
+## Player movement
 
-## Jumping
+### Jumping
 
 We'll start with a simple jump. For this we're going back up to the `player_base` class - remember, all movement _of_ the player is handled _by_ the player, so we're going to put this in `player_base`'s `update()` method.
 
@@ -1279,9 +1278,9 @@ while True:
 
 ```
 
-![Run your code!](/tut4_res/tufty.png)
+![Run your code!](/tut4_res/tufty.gif)
 
-## Running
+### Running
 
 Running is easy, we just add a bit of acceleration to the player in the appropriate direction. Again, just like jumping, we only want to be able to run if we're standing on a platform, so we can add this in right after our jump, within that same `else` statement:
 
@@ -1293,7 +1292,7 @@ Running is easy, we just add a bit of acceleration to the player in the appropri
                 self.vx -= 1.5
 ```
 
-![Run your code!](/tut4_res/tufty.png)
+![Run your code!](/tut4_res/tufty.gif)
 
 Test that now and you'll find two things - first, you just accelerate and don't stop, and second, you disappear off the edge of the screen. We can remedy the second one easy enough. Right after changing the player's position and before drawing them, we can clamp your position using the following line:
 
@@ -1301,7 +1300,7 @@ Test that now and you'll find two things - first, you just accelerate and don't 
         self.x = clamp(self.x, 0, screen.width - self.w)
 ```
 
-![Run your code!](/tut4_res/tufty.png)
+![Run your code!](/tut4_res/tufty.gif)
 
 Now you'll see you'll at least not fly off the screen, but that speed is still wild. You're a squirrel, not a rocket. We want it to be pretty nippy, part of the gameplay is that you're controlling something very fast moving, but we clearly need some kind of damping. That's easy enough to implement - right after our movement controls, within that same `else` statement, let's say:
 
@@ -1312,11 +1311,11 @@ Now you'll see you'll at least not fly off the screen, but that speed is still w
                 self.vx += 0.5
 ```
 
-![Run your code!](/tut4_res/tufty.png)
+![Run your code!](/tut4_res/tufty.gif)
 
 So now your speed is reduced by 0.5 every frame you're touching the ground. Tufty still clearly has the zoomies and we'll address the speed issue soon, but you can see that there is now a deceleration after a light tap on the buttons.
 
-## Dropping
+### Dropping
 
 Let's also look at dropping through the platforms. This is easy, as we've already established a control for drop, and all we want to happen when it's activated is for the player to start falling under gravity. We have that condition anyway - it applies whenever the player is airborne - so we just need to add to that check to tell it to also fall if we've hit 'Drop':
 
@@ -1324,7 +1323,7 @@ Let's also look at dropping through the platforms. This is easy, as we've alread
         if self.airborne or game.controls["DROP"]:
 ```
 
-## Jumping sideways
+### Jumping sideways
 
 And finally, we can already jump sideways if we've got a running start, but given how much we're bouncing between platforms it might be good to actually have a sideways jump. For this, let's create new controls in `parse_controls()`:
 
@@ -1370,7 +1369,7 @@ You'll see we've altered the existing commands to include a couple of `elif`s th
 
 For the `JUMP_LEFT` and `JUMP_RIGHT` commands, we've already got the vertical movement from `JUMP`, so we can just concentrate on giving Tufty a horizontal boost. If you're jumping sideways, your speed will be set to 3 unless it's already more than 3. That way, if you are taking a running jump, you won't suddenly slow down when you jump.
 
-## Final player movement bits
+### Final player movement bits
 
 And that's it! That's pretty much everything for player movement. There's one more thing, and while it won't come up until a bit later we can set the groundwork for it now. When you die, we want you to pass through all of the platforms and not land on them. So, we can just add `self.dead = False` to our `__init__()` method, and then check for it in `update()` when checking for whether we fall:
 
@@ -1599,11 +1598,11 @@ while True:
 
 ```
 
-![Run your code!](/tut4_res/tufty.png)
+![Run your code!](/tut4_res/tufty.gif)
 
 We're not quite done with the `player_base` class overall, but we're at least done for now. Now, we'll work on getting some scrolling platforms.
 
-# Making the platforms move
+## Making the platforms move
 
 So you can move, but what about your environment? This infinite runner doesn't feel very infinite right now. We presumably need an infinite number of platforms to scroll past for Tufty to jump on, right? Well, not quite, because we're going to cheat. We could keep spawning new platforms off the right hand side of the screen, but we'd need to destroy them again once they had passed, otherwise they'd just take up more and more memory and processing power the longer you played.
 
@@ -1642,7 +1641,7 @@ To do this, we can easily just check to see if the right hand side of the platfo
         self.draw()
 ```
 
-![Run your code!](/tut4_res/tufty.png)
+![Run your code!](/tut4_res/tufty.gif)
 
 And all of a sudden, there's gameplay! It's very fast-paced and pretty difficult, but it is technically playable.
 
@@ -1691,7 +1690,7 @@ while True:
         game.last_frame = ticks
 ```
 
-![Run your code!](/tut4_res/tufty.png)
+![Run your code!](/tut4_res/tufty.gif)
 
 The first two lines work out how many milliseconds it's been since `game.last_frame`. Then everything that was in the loop before is now behind the new `if` statement, checking if it's been more than 33ms. Finally, we've added a very important line at the end, to set `game.last_frame` to the new ticks value for the next frame. Note that it's inside the `if` statement, as we only want that to happen on those times through the loop where we calculate a new frame.
 
@@ -1714,7 +1713,7 @@ Right now, the platforms are staying at their original size and their original h
         self.w = random.randint(int(screen.width / 2), screen.width)
 ```
 
-![Run your code!](/tut4_res/tufty.png)
+![Run your code!](/tut4_res/tufty.gif)
 
 Now they're randomised alright, but we've got a problem - they keep overlapping one another. We need to check whether a platform is going to respawn in the same space as another, and make it choose somewhere else if it does so. For this we can take advantage of a property that Badgeware's `rect` object has, which is a very quick check to see if it intersects with another `rect`. Useful!
 
@@ -1758,7 +1757,7 @@ We call this method right after resetting the platform, and loop it using `while
         self.draw()
 ```
 
-![Run your code!](/tut4_res/tufty.png)
+![Run your code!](/tut4_res/tufty.gif)
 
 Run this now, and you'll see that you've got rid of the overlapping platforms. But they're still spawning _really_ close to each other. Well, we can sort this easily by just changing the size of the bounding box. Let's put a value called `keepout` into the platform's `__init__()`, and set it to 5 - this will be the number of pixels beyond the platform's borders the bounding box wants to extend.
 
@@ -1780,7 +1779,7 @@ Then we can alter the method we use to generate the bounding box, using `keepout
         return rect(self.x - self.keepout, self.y - self.keepout, self.w + (2 * self.keepout), self.h + (2 * self.keepout))
 ```
 
-![Run your code!](/tut4_res/tufty.png)
+![Run your code!](/tut4_res/tufty.gif)
 
 And now we've got nicely spawning, nicely spaced platforms.
 
@@ -2041,7 +2040,7 @@ while True:
 
 Looking good. But what we've got right now is a gameplay snippet, nothing more. Let's turn it into something with a start and a finish.
 
-# Game states
+## Game states
 
 To start off with, we're going to introduce three basic states - the title screen, gameplay, and the game over screen. The loop will be that the game starts at the title screen, switches to the gameplay screen when any button is pressed, switches to the game over screen when you die, then switches back to the title screen when you press any button on the game over screen.
 
@@ -2095,7 +2094,7 @@ while True:
         game.last_frame = ticks
 ```
 
-It's a very simple loop, since all the fancy stuff is happening in those methods with `_loop` in the names. Of course, right now this would just throw up an error as we haven't written any of those methods yet, so let's write them. We'll put them directly after `init_platforms()` and keep them simple to start with - you can see that `gameplay_loop()` just contains the lines we removed from the main loop, and the other two just draw a line of text:
+It's a very simple loop, since all the fancy stuff is happening in those functions with `_loop` in the names. Of course, right now this would just throw up an error as we haven't written any of those functions yet, so let's write them. We'll put them directly after `init_platforms()` and keep them simple to start with - you can see that `gameplay_loop()` just contains the lines we removed from the main loop, and the other two just draw a line of text:
 
 ```python-raw
 def title_loop():
@@ -2113,7 +2112,7 @@ def game_over_loop():
     screen.text("Game Over screen", 0, 0)
 ```
 
-![Run your code!](/tut4_res/tufty.png)
+![Run your code!](/tut4_res/tufty.gif)
 
 Well, this seems like a step backwards. Try running it now, and you'll just get a black screen with "Title screen" written on it that you can't get out of. And of course that's because we started with the state set to `TITLE` and we've got nothing in place to change it. You can see the stuff that used to be in the `while` loop right there in `gameplay_loop()`, we just can't get to it yet. That's easily fixed, we just check for a button press each frame and when it's pressed, we move it onto the next one:
 
@@ -2139,7 +2138,7 @@ def game_over_loop():
         game.current_game_state = game_state.TITLE
 ```
 
-![Run your code!](/tut4_res/tufty.png)
+![Run your code!](/tut4_res/tufty.gif)
 
 ## Losing the game
 
@@ -2170,7 +2169,7 @@ def game_over_loop():
         game.current_game_state = game_state.TITLE
 ```
 
-![Run your code!](/tut4_res/tufty.png)
+![Run your code!](/tut4_res/tufty.gif)
 
 Hmmm, well now there's another problem. That loop seems to work okay once - title screen, gameplay till you die, game over screen, title screen - but then the second time round it flashes up gameplay for a single frame and goes straight to game over. What's happening?
 
@@ -2188,7 +2187,7 @@ Not too big of a problem though - let's just put a `reset()` method into `player
         self.vy = 0
 ```
 
-Then we call that so that the player is reset when we start a new game. You might think this happens in the title screen method, but if it did then it would be carried out every frame - not a problem for resetting the player's position, but for other things later on it would cause issues. So, anything we want to happen just once when you first enter a game state goes in the same block of code that switches to that game state.
+Then we call that so that the player is reset when we start a new game. You might think this happens in the title screen function, but if it did then it would be carried out every frame - not a problem for resetting the player's position, but for other things later on it would cause issues. So, anything we want to happen just once when you first enter a game state goes in the same block of code that switches to that game state.
 
 In this case that means we reset the player at the end of the game over screen, when we're switching the game state back to the title screen:
 
@@ -2203,7 +2202,7 @@ def game_over_loop():
 
 That'll just reset the player back to the starting position and zero out their speed. You might notice we've still not used that `dead` property of the player, but that'll come in later still. The suspense must be killing you. And now we've got a full gameplay loop.
 
-![Run your code!](/tut4_res/tufty.png)
+![Run your code!](/tut4_res/tufty.gif)
 
 It's still not quite right though. Do you notice that after you finish your first playthrough, after that you sometimes just fall and die instantly because there's no platform beneath you? That's as a result of the same thing - the platforms aren't resetting, they're exactly where you left them. Easily fixed though - we'll call `init_platforms()` that we made ages ago to reset their positions, and we'll do it right after we reset the player:
 
@@ -2214,7 +2213,7 @@ It's still not quite right though. Do you notice that after you finish your firs
         game.current_game_state = game_state.TITLE
 ```
 
-# Scoring
+## Scoring
 
 What's next, then? How about a score? Say, one point for every platform you pass? Sounds good. Let's add in a variable, once again in `game`, named `score`. It can go right after we initially set the game state, and of course it wants to start off set to zero. We can easily increase the score by adding `game.score += 1` to `platform_base`'s `update()` method just after the `while` loop to find a new position for the platform:
 
@@ -2231,7 +2230,7 @@ def update(self):
     self.draw()
 ```
 
-That way, the score goes up by one every time a platform passes off the left side of the screen. We should probably display the score, too. Now, we'll just do a line of text for now, but we're going to be displaying the score in a fancier way later on so it makes sense to set up a separate method for it ahead of time. We'll make a method just before `init_gamepad()` (or `parse_controls()` if you didn't set up the gamepad), as follows:
+That way, the score goes up by one every time a platform passes off the left side of the screen. We should probably display the score, too. Now, we'll just do a line of text for now, but we're going to be displaying the score in a fancier way later on so it makes sense to set up a separate function for it ahead of time. We'll make a function just before `init_gamepad()` (or `parse_controls()` if you didn't set up the gamepad), as follows:
 
 ```python-raw
 def draw_score():
@@ -2570,9 +2569,9 @@ while True:
 
 ```
 
-![Run your code!](/tut4_res/tufty.png)
+![Run your code!](/tut4_res/tufty.gif)
 
-# Losing, but properly
+## Losing, but properly
 
 We'll get into the fancy graphics soon. But first, does that dying seem abrupt to you? Hit the bottom of the screen and then boom, straight to game over? In fact, if you're mashing the buttons it's easy to accidentally hit it an extra time and skip the game over and even the title screen.
 
@@ -2580,7 +2579,7 @@ Well, we can remedy that with a.... secret fourth game state nobody knew about! 
 
 This is going to be a little death animation similar to those you see in classic Sonic or Mario games, where the player bounces up from the bottom of the screen, then falls back down and disappears. Once we've got our full graphics, we can use a different sprite animation to show the owies.
 
-First of all, let's create that missing game state, by adding in `DEATH_ANIM = 2` in the appropriate place in our `game_state` class. Then, we'll  create a `death_anim_loop()` method in between `gameplay_loop()` and `game_over_loop()`. What's going in this method, though? Well, for now, it's just going to almost be a copy of `gameplay_loop()`:
+First of all, let's create that missing game state, by adding in `DEATH_ANIM = 2` in the appropriate place in our `game_state` class. Then, we'll  create a `death_anim_loop()` function in between `gameplay_loop()` and `game_over_loop()`. What's going in this function, though? Well, for now, it's just going to almost be a copy of `gameplay_loop()`:
 
 ```python-raw
 def death_anim_loop():
@@ -2659,7 +2658,7 @@ def gameplay_loop():
 
 Now you might be able to see what's going to happen. When you hit the bottom of the screen the first time, it goes into the `DEATH_ANIM` mode. This stops the platforms from scrolling, moves the player up a tiny bit so they won't immediately trigger the game over screen, and gives them a boost upward while disabling controls and collisions with platforms. Since they're still being affected by gravity, they're going to bounce up, fall down and then trigger the game over screen when they hit the bottom of the screen again.
 
-![Run your code!](/tut4_res/tufty.png)
+![Run your code!](/tut4_res/tufty.gif)
 
 And by jingo, it works. Here's the full code so far:
 
