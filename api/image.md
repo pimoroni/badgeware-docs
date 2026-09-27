@@ -84,6 +84,24 @@ for path in frames:
   badge.update()
 ```
 
+## qr()
+Generates an `image` containing a QR code.
+
+### Usage
+`image.qr(data)` \
+`image.qr(data, error_correction)` \
+`image.qr(data, error_correction, border)`
+
+
+| Parameter | Type | Description |
+|---|---|---|
+| `data` | `string` | The data to encode within the QR code |
+| `error_correction` | `int` | The error correction level to use. Options are 0 ("low", allows for 7% loss), 1 ("medium", allows for 15% loss), 2 ("quartile", allows for 25% loss), and 3 ("high", allows for 30% loss). The default value is 1 / medium. |
+| `border` | `int` | The size of the border in pixels, defaults to 4 which matches the recommended "quiet zone" |
+
+### Returns
+An `image` containing the specified QR code.
+
 # Palettised images
 A PNG saved with a colour table loads as one byte a pixel with that table attached, which saves a good deal of memory. Rewriting one entry in the table changes every pixel using it, with no redraw and no per-pixel work.
 
