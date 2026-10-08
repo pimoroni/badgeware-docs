@@ -827,252 +827,57 @@ Now we've got our function for reading in the controls, we'll just call it at th
 
 ### Bringing in the gamepad
 
-To bring in the Qw/ST Pad, we're just going to be adding to this structure. First of all we need to import that library. We're going to be using a modified version of the Qw/ST Pad driver, which we'll include in the game folder. Put the following into a new text file, and save it as `qwstpad.py` in the same folder as `__init__.py`. Don't worry about how it works, it's simply the existing Qw/ST Pad driver with a couple of extra bits added so that we can treat the gamepad buttons the same way we treat the badge buttons.
+To bring in the Qw/ST Pad, we're just going to be adding to this structure. The badge detects when a Qw/ST pad is connected, and by default it maps some of the pad buttons to do the same as the badge's face buttons - Up, Down, A, B and C go to Up, Down, Left, B and Right on the pad.
+
+That's probably fine for a lot of apps, but we'll do something a little different here - we can separate out some of our controls if there's a pad connected, since we've got more buttons to play with. Let's say that instead of pressing down and jump to drop, on the pad you just press Down. Also, let's have Tufty jump when any of the buttons on the right side of the pad are pressed.
+
+To do this, first we'll need to disable the existing mappings. There's a function in `badge` to set the pad mappings - we provide it with a dictionary of which pad button maps to which badge button, like so:
 
 ```python-raw
-import struct
-from collections import OrderedDict
-
-from micropython import const
-from machine import I2C
-
-__version__ = "0.0.1"
-
-# Constants
-NUM_LEDS = const(4)
-NUM_BUTTONS = const(10)
-
-DEFAULT_ADDRESS = const(0x21)
-ALT_ADDRESS_1 = const(0x23)
-ALT_ADDRESS_2 = const(0x25)
-ALT_ADDRESS_3 = const(0x27)
-ADDRESSES = (DEFAULT_ADDRESS, ALT_ADDRESS_1, ALT_ADDRESS_2, ALT_ADDRESS_3)
-I2C_PINS = {"id": 0, "sda": 4, "scl": 5}    # The I2C pins the QwSTPad is connected to
-i2c = I2C(**I2C_PINS)                           # The I2C instance to pass to all QwSTPads
-
-
-class QwSTPad:
-    # Registers
-    INPUT_PORT0 = const(0x00)
-    INPUT_PORT1 = const(0x01)
-    OUTPUT_PORT0 = const(0x02)
-    OUTPUT_PORT1 = const(0x03)
-    POLARITY_PORT0 = const(0x04)
-    POLARITY_PORT1 = const(0x05)
-    CONFIGURATION_PORT0 = const(0x06)
-    CONFIGURATION_PORT1 = const(0x07)
-
-    # Mappings
-    BUTTON_MAPPING = OrderedDict({"A": 0xE, "B": 0xC, "X": 0xF, "Y": 0xD,
-                                  "U": 0x1, "D": 0x4, "L": 0x2, "R": 0x3,
-                                  "+": 0xB, "-": 0x5
-                                  })
-    LED_MAPPING = (0x6, 0x7, 0x9, 0xA)
-
-    def __init__(self, i2c, address=DEFAULT_ADDRESS, show_address=True):
-        if address not in ADDRESSES:
-            raise ValueError("address is not valid. Expected: 0x21, 0x23, 0x25, or 0x27")
-
-        self.__i2c = i2c
-        self.__address = address
-
-        # Set up the TCA9555 with the correct input and output pins
-        self.__reg_write_uint16(self.__i2c, self.__address, self.CONFIGURATION_PORT0, 0b11111001_00111111)
-        self.__reg_write_uint16(self.__i2c, self.__address, self.POLARITY_PORT0, 0b11111000_00111111)
-        self.__reg_write_uint16(self.__i2c, self.__address, self.OUTPUT_PORT0, 0b00000110_11000000)
-
-        self.__button_states = OrderedDict({})
-        for key, _ in self.BUTTON_MAPPING.items():
-            self.__button_states[key] = False
-
-        self.__led_states = 0b0000
-        if show_address:
-            self.set_leds(self.address_code())
-
-        self.buttons = self.read_buttons()
-        self.__pressed = {}
-        self.__released = {}
-        self.__changed = {}
-        self.__held = {}
-        self.update_buttons()
-
-    def address_code(self):
-        return self.__change_bit(0x0000, ADDRESSES.index(self.__address), True)
-
-    def read_buttons(self):
-        state = self.__reg_read_uint16(self.__i2c, self.__address, self.INPUT_PORT0)
-        for key, value in self.BUTTON_MAPPING.items():
-            self.__button_states[key] = self.__get_bit(state, value)
-        return self.__button_states
-
-    def set_leds(self, states):
-        self.__led_states = states & 0b1111
-        self.__update_leds()
-
-    def set_led(self, led, state):
-        if led < 1 or led > NUM_LEDS:
-            raise ValueError("'led' out of range. Expected 1 to 4")
-
-        self.__led_states = self.__change_bit(self.__led_states, led - 1, state)
-        self.__update_leds()
-
-    def clear_leds(self):
-        self.__led_states = 0b0000
-        self.__update_leds()
-
-    def __update_leds(self):
-        output = 0
-        for i in range(NUM_LEDS):
-            output = self.__change_bit(output, self.LED_MAPPING[i], not self.__get_bit(self.__led_states, i))
-        self.__reg_write_uint16(self.__i2c, self.__address, self.OUTPUT_PORT0, output)
-
-    def __get_bit(self, num, bit_pos):
-        return (num & (1 << bit_pos)) != 0
-
-    def __change_bit(self, num, bit_pos, state):
-        return num | (1 << bit_pos) if state else num & ~(1 << bit_pos)
-
-    def __reg_write_uint16(self, i2c, address, reg, value):
-        buffer = struct.pack("<H", value)
-        i2c.writeto_mem(address, reg, buffer)
-
-    def __reg_read_uint16(self, i2c, address, reg):
-        buffer = i2c.readfrom_mem(address, reg, 2)
-        return struct.unpack("<H", buffer)[0]
-
-    def update_buttons(self):
-        old_values = {}
-        for key, value in self.buttons.items():
-            old_values[key] = value
-
-        self.buttons = self.read_buttons()
-
-        for key, value in self.buttons.items():
-            if not old_values[key] and not value:
-                self.__pressed[key] = False
-                self.__released[key] = False
-                self.__changed[key] = False
-                self.__held[key] = False
-            if not old_values[key] and value:
-                self.__pressed[key] = True
-                self.__released[key] = False
-                self.__changed[key] = True
-                self.__held[key] = True
-            if old_values[key] and not value:
-                self.__pressed[key] = False
-                self.__released[key] = True
-                self.__changed[key] = True
-                self.__held[key] = False
-            if old_values[key] and value:
-                self.__pressed[key] = False
-                self.__released[key] = False
-                self.__changed[key] = False
-                self.__held[key] = True
-
-    def pressed(self, button=None):
-        if button is None:
-            return True in self.__pressed.values()
-        return self.__pressed[button]
-
-    def released(self, button=None):
-        if button is None:
-            return True in self.__released.values()
-        return self.__released[button]
-
-    def changed(self, button=None):
-        if button is None:
-            return True in self.__changed.values()
-        return self.__changed[button]
-
-    def held(self, button=None):
-        if button is None:
-            return True in self.__held.values()
-        return self.__held[button]
-
-
-class Gamepadhelper:
-    def __init__(self):
-        self.pads = []
-        self.pads_count = 0
-        self.get_gamepads()
-
-    def get_gamepads(self):
-        pads_count = 0
-
-        # Create a player for each connected QwSTPad
-        for i in range(len(ADDRESSES)):
-            try:
-                self.pads.append(QwSTPad(i2c, ADDRESSES[i]))
-                print(f"P{i + 1}: Connected")
-                pads_count += 1
-            except OSError:
-                self.pads.append(None)
-                print(f"P{i + 1}: Not Connected")
-
-        self.pads_count = pads_count
-
+badge.pad_map({
+    PAD_UP: BUTTON_UP,
+    PAD_DOWN: BUTTON_DOWN,
+    PAD_LEFT: BUTTON_A,
+    PAD_RIGHT: BUTTON_C,
+    PAD_B: BUTTON_B,
+})
 ```
 
-Finally, at the very top of the file add `import qwstpad`.
-
-Now, we need to connect to the pad and create an object we can read its buttons from. We'll make a function to initialise the gamepad, which we'll call `init_gamepad()` - this can go right before `parse_controls()` and after the classes. We also need to add `gamepad = None` in our `game` class.
+That's the default configuration. Now if we just wanted to change around what buttons do what, we could just provide it with a different dictionary. However, we're taking a different route. On the line before `init_platforms()` is called, add the following:
 
 ```python-raw
-def init_gamepad():
-    gamepads = qwstpad.Gamepadhelper()
-    for i in gamepads.pads:
-        if i is not None:
-            game.gamepad = i
-            return
-    game.gamepad = None
-    return
+badge.pad_map({})
 ```
 
-This code uses the `qwstpad` library to check for the presence of Qw/ST Pads, and adds any it finds to a temporary list called `gamepads`. Then it just runs through the list and returns the first one that's connected. If there aren't any, it just returns None. Let's make sure we call this at the start of everything, inserting `init_gamepad()` right before `init_platforms()`
-
-Now it's easy to use this to check for connected pads and assign the first one to the `game.gamepad` variable we made. Then when we're parsing controls we can just check if `game.gamepad` has a value that's not None to see if we need to check its controls. If we check regularly, each update, the system can even handle plugging and unplugging pads mid-game. Let's do that - first of all, we'll change the beginning of `parse_controls()` to read:
+That's setting the map to an empty dictionary, breaking the link between the pad controls and the badge controls. Now we'll set up our gamepad to read the buttons. Right after the above line, add the following:
 
 ```python-raw
-    if game.gamepad:
-        try:
-            game.gamepad.update_buttons()
-        except OSError:
-            init_gamepad()
-    else:
-        init_gamepad()
+game.gamepad = badge.pad[0]
 ```
 
-So if `gamepad` is showing something other than `None` (and therefore a pad is connected), we're telling it to read the status of all of its buttons. We're also enclosing that in a `try` statement so that if it throws an error (as it would if the pad was disconnected unexpectedly) it ignores reading the gamepad for this update and instead just tries to initialise it again for the next update. If there isn't a pad connected it'll try and connect to one, because you never know, someone might have just plugged one in.
+This sets up a variable inside `game` for the first gamepad that's connected. Now that we've got access to the gamepad's buttons, we can integrate them into the controls. This is very simple, we're just asking the badge to check for either the badge button or the gamepad button being pressed. The options for the badge buttons are:
 
-Now that we've got access to the gamepad's buttons, we can integrate them into the controls. This is very simple, just an `if` statement checking on the gamepad's status, and then a set of new definitions for if it's connected. The modified `qwstpad` library provides the same functions you can call on the Badgeware buttons, just using strings to identify the buttons - your options are `U, D, L, R, A, B, X, Y, +, -`.
+- PAD_UP
+- PAD_DOWN
+- PAD_LEFT
+- PAD_RIGHT
+- PAD_A
+- PAD_B
+- PAD_X
+- PAD_Y
+- PAD_PLUS
+- PAD_MINUS
 
 Let's see the `parse_controls()` function with that added in.
 
 ```python-raw
 def parse_controls():
-    if game.gamepad:
-        try:
-            game.gamepad.update_buttons()
-        except OSError:
-            init_gamepad()
-    else:
-        init_gamepad()
-
-    if game.gamepad:
-        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
-        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
-        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
-        game.controls["JUMP"] = game.gamepad.pressed("A")
-        game.controls["ANY_KEY"] = game.gamepad.pressed()
-    else:
-        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
-        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
-        game.controls["JUMP"] = badge.pressed(BUTTON_B)
-        game.controls["ANY_KEY"] = badge.pressed()
+    game.controls["MOVE_LEFT"] = badge.held(BUTTON_A) or game.gamepad.held(PAD_LEFT)
+    game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C) or game.gamepad.held(PAD_RIGHT)
+    game.controls["DROP"] = (badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)) or game.gamepad.pressed(PAD_DOWN)
+    game.controls["JUMP"] = badge.pressed(BUTTON_B) or game.gamepad.pressed(PAD_A) or game.gamepad.pressed(PAD_B) or game.gamepad.pressed(PAD_X) or game.gamepad.pressed(PAD_Y)
+    game.controls["ANY_KEY"] = badge.pressed() or game.gamepad.pressed()
 ```
-
-You can see that currently, the badge buttons would essentially be disabled when the gamepad was plugged in, but it doesn't have to be like that - you could get rid of the `if game.gamepad` check and instead use an `or` operator on each control, such as `game.controls["MOVE_LEFT"] = gamepad.held("L") or badge.held(BUTTON_A)`
 
 So, we've got a set of controls we can query for our game mechanics. But currently you can't even tell if they're working or not, since they're not hooked up to anything. Next up, let's learn to move.
 
@@ -1098,14 +903,12 @@ Here's the full code so far:
 
 ```python
 import random
-import qwstpad
 
 
 class game:
     platforms = []
     acorns = []
     controls = {}
-    gamepad = None
 
 
 class player_base:
@@ -1224,37 +1027,14 @@ class acorn_base:
         screen.shape(player_box)
 
 
-def init_gamepad():
-    gamepads = qwstpad.Gamepadhelper()
-    for i in gamepads.pads:
-        if i is not None:
-            game.gamepad = i
-            return
-    game.gamepad = None
-    return
-
-
 def parse_controls():
-    if game.gamepad:
-        try:
-            game.gamepad.update_buttons()
-        except OSError:
-            init_gamepad()
-    else:
-        init_gamepad()
-
-    if game.gamepad:
-        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
-        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
-        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
-        game.controls["JUMP"] = game.gamepad.pressed("A")
-        game.controls["ANY_KEY"] = game.gamepad.pressed()
-    else:
-        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
-        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
-        game.controls["JUMP"] = badge.pressed(BUTTON_B)
-        game.controls["ANY_KEY"] = badge.pressed()
+    game.controls["MOVE_LEFT"] = badge.held(BUTTON_A) or game.gamepad.held(PAD_LEFT)
+    game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C) or game.gamepad.held(PAD_RIGHT)
+    game.controls["DROP"] = (badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)) or game.gamepad.pressed(PAD_DOWN)
+    game.controls["JUMP"] = badge.pressed(BUTTON_B) or game.gamepad.pressed(PAD_A) or game.gamepad.pressed(PAD_B) or game.gamepad.pressed(PAD_X) or game.gamepad.pressed(PAD_Y)
+    game.controls["JUMP_LEFT"] = game.controls["MOVE_LEFT"] and game.controls["JUMP"]
+    game.controls["JUMP_RIGHT"] = game.controls["MOVE_RIGHT"] and game.controls["JUMP"]
+    game.controls["ANY_KEY"] = badge.pressed() or game.gamepad.pressed()
 
 
 def init_platforms():
@@ -1262,7 +1042,8 @@ def init_platforms():
 
 
 player = player_base(20, 0)
-init_gamepad()
+badge.pad_map({})
+game.gamepad = badge.pad[0]
 init_platforms()
 
 while True:
@@ -1328,25 +1109,16 @@ Let's also look at dropping through the platforms. This is easy, as we've alread
 And finally, we can already jump sideways if we've got a running start, but given how much we're bouncing between platforms it might be good to actually have a sideways jump. For this, let's create new controls in `parse_controls()`:
 
 ```python-raw
-    if game.gamepad:
-        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
-        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
-        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
-        game.controls["JUMP"] = game.gamepad.pressed("A")
-        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
-        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
-        game.controls["ANY_KEY"] = game.gamepad.pressed()
-    else:
-        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
-        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
-        game.controls["JUMP"] = badge.pressed(BUTTON_B)
-        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
-        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
-        game.controls["ANY_KEY"] = badge.pressed()
+    game.controls["MOVE_LEFT"] = badge.held(BUTTON_A) or game.gamepad.held(PAD_LEFT)
+    game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C) or game.gamepad.held(PAD_RIGHT)
+    game.controls["DROP"] = (badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)) or game.gamepad.pressed(PAD_DOWN)
+    game.controls["JUMP"] = badge.pressed(BUTTON_B) or game.gamepad.pressed(PAD_A) or game.gamepad.pressed(PAD_B) or game.gamepad.pressed(PAD_X) or game.gamepad.pressed(PAD_Y)
+    game.controls["JUMP_LEFT"] = game.controls["MOVE_LEFT"] and game.controls["JUMP"]
+    game.controls["JUMP_RIGHT"] = game.controls["MOVE_RIGHT"] and game.controls["JUMP"]
+    game.controls["ANY_KEY"] = badge.pressed() or game.gamepad.pressed()
 ```
 
-We're treating this just like the Drop command and checking for jump being pressed while a direction is held. We can just add these lines in too, after the jump command and before the movement:
+We're treating this a bit differently, looking for other commands further up the list instead of specific button inputs. We can just add lines in to refer to these too, after the jump command and before the movement:
 
 ```python-raw
             if game.controls["JUMP"]:
@@ -1394,7 +1166,6 @@ For the moment, `dead` will just stay permanently on `False`, but watch out for 
 
 ```python
 import random
-import qwstpad
 
 
 class game:
@@ -1540,41 +1311,14 @@ class acorn_base:
         screen.shape(player_box)
 
 
-def init_gamepad():
-    gamepads = qwstpad.Gamepadhelper()
-    for i in gamepads.pads:
-        if i is not None:
-            game.gamepad = i
-            return
-    game.gamepad = None
-    return
-
-
 def parse_controls():
-    if game.gamepad:
-        try:
-            game.gamepad.update_buttons()
-        except OSError:
-            init_gamepad()
-    else:
-        init_gamepad()
-
-    if game.gamepad:
-        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
-        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
-        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
-        game.controls["JUMP"] = game.gamepad.pressed("A")
-        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
-        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
-        game.controls["ANY_KEY"] = game.gamepad.pressed()
-    else:
-        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
-        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
-        game.controls["JUMP"] = badge.pressed(BUTTON_B)
-        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
-        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
-        game.controls["ANY_KEY"] = badge.pressed()
+    game.controls["MOVE_LEFT"] = badge.held(BUTTON_A) or game.gamepad.held(PAD_LEFT)
+    game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C) or game.gamepad.held(PAD_RIGHT)
+    game.controls["DROP"] = (badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)) or game.gamepad.pressed(PAD_DOWN)
+    game.controls["JUMP"] = badge.pressed(BUTTON_B) or game.gamepad.pressed(PAD_A) or game.gamepad.pressed(PAD_B) or game.gamepad.pressed(PAD_X) or game.gamepad.pressed(PAD_Y)
+    game.controls["JUMP_LEFT"] = game.controls["MOVE_LEFT"] and game.controls["JUMP"]
+    game.controls["JUMP_RIGHT"] = game.controls["MOVE_RIGHT"] and game.controls["JUMP"]
+    game.controls["ANY_KEY"] = badge.pressed() or game.gamepad.pressed()
 
 
 def init_platforms():
@@ -1582,7 +1326,8 @@ def init_platforms():
 
 
 player = player_base(20, 0)
-init_gamepad()
+badge.pad_map({})
+game.gamepad = badge.pad[0]
 init_platforms()
 
 while True:
@@ -1789,7 +1534,6 @@ Here's your code so far:
 
 ```python
 import random
-import qwstpad
 import time
 
 
@@ -1797,7 +1541,6 @@ class game:
     platforms = []
     acorns = []
     controls = {}
-    gamepad = None
     foreground_scroll_speed = 4
     last_frame = 0
 
@@ -1974,41 +1717,14 @@ class acorn_base:
         screen.shape(player_box)
 
 
-def init_gamepad():
-    gamepads = qwstpad.Gamepadhelper()
-    for i in gamepads.pads:
-        if i is not None:
-            game.gamepad = i
-            return
-    game.gamepad = None
-    return
-
-
 def parse_controls():
-    if game.gamepad:
-        try:
-            game.gamepad.update_buttons()
-        except OSError:
-            init_gamepad()
-    else:
-        init_gamepad()
-
-    if game.gamepad:
-        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
-        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
-        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
-        game.controls["JUMP"] = game.gamepad.pressed("A")
-        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
-        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
-        game.controls["ANY_KEY"] = game.gamepad.pressed()
-    else:
-        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
-        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
-        game.controls["JUMP"] = badge.pressed(BUTTON_B)
-        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
-        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
-        game.controls["ANY_KEY"] = badge.pressed()
+    game.controls["MOVE_LEFT"] = badge.held(BUTTON_A) or game.gamepad.held(PAD_LEFT)
+    game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C) or game.gamepad.held(PAD_RIGHT)
+    game.controls["DROP"] = (badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)) or game.gamepad.pressed(PAD_DOWN)
+    game.controls["JUMP"] = badge.pressed(BUTTON_B) or game.gamepad.pressed(PAD_A) or game.gamepad.pressed(PAD_B) or game.gamepad.pressed(PAD_X) or game.gamepad.pressed(PAD_Y)
+    game.controls["JUMP_LEFT"] = game.controls["MOVE_LEFT"] and game.controls["JUMP"]
+    game.controls["JUMP_RIGHT"] = game.controls["MOVE_RIGHT"] and game.controls["JUMP"]
+    game.controls["ANY_KEY"] = badge.pressed() or game.gamepad.pressed()
 
 
 def init_platforms():
@@ -2016,7 +1732,8 @@ def init_platforms():
 
 
 player = player_base(20, 0)
-init_gamepad()
+badge.pad_map({})
+game.gamepad = badge.pad[0]
 init_platforms()
 
 while True:
@@ -2269,7 +1986,6 @@ By this point you should be working with something a lot like this:
 
 ```python
 import random
-import qwstpad
 import time
 
 
@@ -2473,41 +2189,14 @@ def draw_score():
     screen.text(str(game.score), 0, 0)
 
 
-def init_gamepad():
-    gamepads = qwstpad.Gamepadhelper()
-    for i in gamepads.pads:
-        if i is not None:
-            game.gamepad = i
-            return
-    game.gamepad = None
-    return
-
-
 def parse_controls():
-    if game.gamepad:
-        try:
-            game.gamepad.update_buttons()
-        except OSError:
-            init_gamepad()
-    else:
-        init_gamepad()
-
-    if game.gamepad:
-        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
-        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
-        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
-        game.controls["JUMP"] = game.gamepad.pressed("A")
-        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
-        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
-        game.controls["ANY_KEY"] = game.gamepad.pressed()
-    else:
-        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
-        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
-        game.controls["JUMP"] = badge.pressed(BUTTON_B)
-        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
-        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
-        game.controls["ANY_KEY"] = badge.pressed()
+    game.controls["MOVE_LEFT"] = badge.held(BUTTON_A) or game.gamepad.held(PAD_LEFT)
+    game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C) or game.gamepad.held(PAD_RIGHT)
+    game.controls["DROP"] = (badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)) or game.gamepad.pressed(PAD_DOWN)
+    game.controls["JUMP"] = badge.pressed(BUTTON_B) or game.gamepad.pressed(PAD_A) or game.gamepad.pressed(PAD_B) or game.gamepad.pressed(PAD_X) or game.gamepad.pressed(PAD_Y)
+    game.controls["JUMP_LEFT"] = game.controls["MOVE_LEFT"] and game.controls["JUMP"]
+    game.controls["JUMP_RIGHT"] = game.controls["MOVE_RIGHT"] and game.controls["JUMP"]
+    game.controls["ANY_KEY"] = badge.pressed() or game.gamepad.pressed()
 
 
 def init_platforms():
@@ -2544,7 +2233,8 @@ def game_over_loop():
 
 
 player = player_base(20, 0)
-init_gamepad()
+badge.pad_map({})
+game.gamepad = badge.pad[0]
 init_platforms()
 
 while True:
@@ -2664,7 +2354,6 @@ And by jingo, it works. Here's the full code so far:
 
 ```python
 import random
-import qwstpad
 import time
 
 
@@ -2679,7 +2368,6 @@ class game:
     platforms = []
     acorns = []
     controls = {}
-    gamepad = None
     foreground_scroll_speed = 4
     last_frame = 0
     current_game_state = game_state.TITLE
@@ -2877,41 +2565,14 @@ def draw_score():
     screen.text(str(game.score), 0, 0)
 
 
-def init_gamepad():
-    gamepads = qwstpad.Gamepadhelper()
-    for i in gamepads.pads:
-        if i is not None:
-            game.gamepad = i
-            return
-    game.gamepad = None
-    return
-
-
 def parse_controls():
-    if game.gamepad:
-        try:
-            game.gamepad.update_buttons()
-        except OSError:
-            init_gamepad()
-    else:
-        init_gamepad()
-
-    if game.gamepad:
-        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
-        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
-        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
-        game.controls["JUMP"] = game.gamepad.pressed("A")
-        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
-        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
-        game.controls["ANY_KEY"] = game.gamepad.pressed()
-    else:
-        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
-        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
-        game.controls["JUMP"] = badge.pressed(BUTTON_B)
-        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
-        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
-        game.controls["ANY_KEY"] = badge.pressed()
+    game.controls["MOVE_LEFT"] = badge.held(BUTTON_A) or game.gamepad.held(PAD_LEFT)
+    game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C) or game.gamepad.held(PAD_RIGHT)
+    game.controls["DROP"] = (badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)) or game.gamepad.pressed(PAD_DOWN)
+    game.controls["JUMP"] = badge.pressed(BUTTON_B) or game.gamepad.pressed(PAD_A) or game.gamepad.pressed(PAD_B) or game.gamepad.pressed(PAD_X) or game.gamepad.pressed(PAD_Y)
+    game.controls["JUMP_LEFT"] = game.controls["MOVE_LEFT"] and game.controls["JUMP"]
+    game.controls["JUMP_RIGHT"] = game.controls["MOVE_RIGHT"] and game.controls["JUMP"]
+    game.controls["ANY_KEY"] = badge.pressed() or game.gamepad.pressed()
 
 
 def init_platforms():
@@ -2961,7 +2622,8 @@ def game_over_loop():
 
 
 player = player_base(20, 0)
-init_gamepad()
+badge.pad_map({})
+game.gamepad = badge.pad[0]
 init_platforms()
 
 while True:

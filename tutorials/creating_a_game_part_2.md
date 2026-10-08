@@ -11,7 +11,6 @@ So having followed the previous tutorial, you should have a working, if ugly and
 
 ```python
 import random
-import qwstpad
 import time
 
 
@@ -26,7 +25,6 @@ class game:
     platforms = []
     acorns = []
     controls = {}
-    gamepad = None
     foreground_scroll_speed = 4
     last_frame = 0
     current_game_state = game_state.TITLE
@@ -224,41 +222,14 @@ def draw_score():
     screen.text(str(game.score), 0, 0)
 
 
-def init_gamepad():
-    gamepads = qwstpad.Gamepadhelper()
-    for i in gamepads.pads:
-        if i is not None:
-            game.gamepad = i
-            return
-    game.gamepad = None
-    return
-
-
 def parse_controls():
-    if game.gamepad:
-        try:
-            game.gamepad.update_buttons()
-        except OSError:
-            init_gamepad()
-    else:
-        init_gamepad()
-
-    if game.gamepad:
-        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
-        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
-        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
-        game.controls["JUMP"] = game.gamepad.pressed("A")
-        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
-        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
-        game.controls["ANY_KEY"] = game.gamepad.pressed()
-    else:
-        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
-        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
-        game.controls["JUMP"] = badge.pressed(BUTTON_B)
-        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
-        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
-        game.controls["ANY_KEY"] = badge.pressed()
+    game.controls["MOVE_LEFT"] = badge.held(BUTTON_A) or game.gamepad.held(PAD_LEFT)
+    game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C) or game.gamepad.held(PAD_RIGHT)
+    game.controls["DROP"] = (badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)) or game.gamepad.pressed(PAD_DOWN)
+    game.controls["JUMP"] = badge.pressed(BUTTON_B) or game.gamepad.pressed(PAD_A) or game.gamepad.pressed(PAD_B) or game.gamepad.pressed(PAD_X) or game.gamepad.pressed(PAD_Y)
+    game.controls["JUMP_LEFT"] = game.controls["MOVE_LEFT"] and game.controls["JUMP"]
+    game.controls["JUMP_RIGHT"] = game.controls["MOVE_RIGHT"] and game.controls["JUMP"]
+    game.controls["ANY_KEY"] = badge.pressed() or game.gamepad.pressed()
 
 
 def init_platforms():
@@ -308,7 +279,8 @@ def game_over_loop():
 
 
 player = player_base(20, 0)
-init_gamepad()
+badge.pad_map({})
+game.gamepad = badge.pad[0]
 init_platforms()
 
 while True:
@@ -391,7 +363,6 @@ class game:
     platforms = []
     acorns = []
     controls = {}
-    gamepad = None
     foreground_scroll_speed = 4
     last_frame = 0
     current_game_state = game_state.TITLE
@@ -409,7 +380,6 @@ class game:
     platforms = []
     acorns = []
     controls = {}
-    gamepad = None
 
     foreground_scroll_speed = 4
     background_scroll_speed = 1
@@ -489,7 +459,6 @@ And we're done - the background stops scrolling when the platform does. Here's t
 
 ```python
 import random
-import qwstpad
 import time
 
 
@@ -505,7 +474,6 @@ class game:
     platforms = []
     acorns = []
     controls = {}
-    gamepad = None
 
     foreground_scroll_speed = 4
     background_scroll_speed = 1
@@ -720,41 +688,14 @@ def draw_score():
     screen.text(str(game.score), 0, 0)
 
 
-def init_gamepad():
-    gamepads = qwstpad.Gamepadhelper()
-    for i in gamepads.pads:
-        if i is not None:
-            game.gamepad = i
-            return
-    game.gamepad = None
-    return
-
-
 def parse_controls():
-    if game.gamepad:
-        try:
-            game.gamepad.update_buttons()
-        except OSError:
-            init_gamepad()
-    else:
-        init_gamepad()
-
-    if game.gamepad:
-        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
-        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
-        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
-        game.controls["JUMP"] = game.gamepad.pressed("A")
-        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
-        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
-        game.controls["ANY_KEY"] = game.gamepad.pressed()
-    else:
-        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
-        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
-        game.controls["JUMP"] = badge.pressed(BUTTON_B)
-        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
-        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
-        game.controls["ANY_KEY"] = badge.pressed()
+    game.controls["MOVE_LEFT"] = badge.held(BUTTON_A) or game.gamepad.held(PAD_LEFT)
+    game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C) or game.gamepad.held(PAD_RIGHT)
+    game.controls["DROP"] = (badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)) or game.gamepad.pressed(PAD_DOWN)
+    game.controls["JUMP"] = badge.pressed(BUTTON_B) or game.gamepad.pressed(PAD_A) or game.gamepad.pressed(PAD_B) or game.gamepad.pressed(PAD_X) or game.gamepad.pressed(PAD_Y)
+    game.controls["JUMP_LEFT"] = game.controls["MOVE_LEFT"] and game.controls["JUMP"]
+    game.controls["JUMP_RIGHT"] = game.controls["MOVE_RIGHT"] and game.controls["JUMP"]
+    game.controls["ANY_KEY"] = badge.pressed() or game.gamepad.pressed()
 
 
 def init_platforms():
@@ -806,7 +747,8 @@ def game_over_loop():
 
 
 player = player_base(20, 0)
-init_gamepad()
+badge.pad_map({})
+game.gamepad = badge.pad[0]
 init_platforms()
 
 while True:
@@ -958,7 +900,6 @@ class game:
     platforms = []
     acorns = []
     controls = {}
-    gamepad = None
 
     foreground_scroll_speed = 4
     background_scroll_speed = 1
@@ -1009,7 +950,6 @@ If everything's gone right so far, your code should look like this, and Tufty sh
 
 ```python
 import random
-import qwstpad
 import time
 
 
@@ -1028,7 +968,6 @@ class game:
     platforms = []
     acorns = []
     controls = {}
-    gamepad = None
 
     foreground_scroll_speed = 4
     background_scroll_speed = 1
@@ -1244,41 +1183,14 @@ def draw_score():
     screen.text(str(game.score), 0, 0)
 
 
-def init_gamepad():
-    gamepads = qwstpad.Gamepadhelper()
-    for i in gamepads.pads:
-        if i is not None:
-            game.gamepad = i
-            return
-    game.gamepad = None
-    return
-
-
 def parse_controls():
-    if game.gamepad:
-        try:
-            game.gamepad.update_buttons()
-        except OSError:
-            init_gamepad()
-    else:
-        init_gamepad()
-
-    if game.gamepad:
-        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
-        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
-        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
-        game.controls["JUMP"] = game.gamepad.pressed("A")
-        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
-        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
-        game.controls["ANY_KEY"] = game.gamepad.pressed()
-    else:
-        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
-        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
-        game.controls["JUMP"] = badge.pressed(BUTTON_B)
-        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
-        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
-        game.controls["ANY_KEY"] = badge.pressed()
+    game.controls["MOVE_LEFT"] = badge.held(BUTTON_A) or game.gamepad.held(PAD_LEFT)
+    game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C) or game.gamepad.held(PAD_RIGHT)
+    game.controls["DROP"] = (badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)) or game.gamepad.pressed(PAD_DOWN)
+    game.controls["JUMP"] = badge.pressed(BUTTON_B) or game.gamepad.pressed(PAD_A) or game.gamepad.pressed(PAD_B) or game.gamepad.pressed(PAD_X) or game.gamepad.pressed(PAD_Y)
+    game.controls["JUMP_LEFT"] = game.controls["MOVE_LEFT"] and game.controls["JUMP"]
+    game.controls["JUMP_RIGHT"] = game.controls["MOVE_RIGHT"] and game.controls["JUMP"]
+    game.controls["ANY_KEY"] = badge.pressed() or game.gamepad.pressed()
 
 
 def init_platforms():
@@ -1330,7 +1242,8 @@ def game_over_loop():
 
 
 player = player_base(20, 0)
-init_gamepad()
+badge.pad_map({})
+game.gamepad = badge.pad[0]
 init_platforms()
 
 while True:
@@ -1417,7 +1330,6 @@ And we're done with the animations! If you've been following along, your code sh
 
 ```python
 import random
-import qwstpad
 import time
 
 
@@ -1436,7 +1348,6 @@ class game:
     platforms = []
     acorns = []
     controls = {}
-    gamepad = None
 
     foreground_scroll_speed = 4
     background_scroll_speed = 1
@@ -1660,41 +1571,14 @@ def draw_score():
     screen.text(str(game.score), 0, 0)
 
 
-def init_gamepad():
-    gamepads = qwstpad.Gamepadhelper()
-    for i in gamepads.pads:
-        if i is not None:
-            game.gamepad = i
-            return
-    game.gamepad = None
-    return
-
-
 def parse_controls():
-    if game.gamepad:
-        try:
-            game.gamepad.update_buttons()
-        except OSError:
-            init_gamepad()
-    else:
-        init_gamepad()
-
-    if game.gamepad:
-        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
-        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
-        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
-        game.controls["JUMP"] = game.gamepad.pressed("A")
-        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
-        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
-        game.controls["ANY_KEY"] = game.gamepad.pressed()
-    else:
-        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
-        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
-        game.controls["JUMP"] = badge.pressed(BUTTON_B)
-        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
-        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
-        game.controls["ANY_KEY"] = badge.pressed()
+    game.controls["MOVE_LEFT"] = badge.held(BUTTON_A) or game.gamepad.held(PAD_LEFT)
+    game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C) or game.gamepad.held(PAD_RIGHT)
+    game.controls["DROP"] = (badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)) or game.gamepad.pressed(PAD_DOWN)
+    game.controls["JUMP"] = badge.pressed(BUTTON_B) or game.gamepad.pressed(PAD_A) or game.gamepad.pressed(PAD_B) or game.gamepad.pressed(PAD_X) or game.gamepad.pressed(PAD_Y)
+    game.controls["JUMP_LEFT"] = game.controls["MOVE_LEFT"] and game.controls["JUMP"]
+    game.controls["JUMP_RIGHT"] = game.controls["MOVE_RIGHT"] and game.controls["JUMP"]
+    game.controls["ANY_KEY"] = badge.pressed() or game.gamepad.pressed()
 
 
 def init_platforms():
@@ -1746,7 +1630,8 @@ def game_over_loop():
 
 
 player = player_base(20, 0)
-init_gamepad()
+badge.pad_map({})
+game.gamepad = badge.pad[0]
 init_platforms()
 
 while True:
@@ -1887,7 +1772,7 @@ The more we get through this, the more we find that the mechanisms we need are a
 
 ![Run your code!](/tut4_res/tufty.gif)
 
-There's just one last thing to do. You might notice that it's a bit easy to pick up the acorns - you don't really have to touch them to pick them up, and it's pretty easy to see why. Remember the red square we had for our player before adding the Tufty sprite? It's a lot bigger than the sprite itself, 32×32px, and as soon as any part of it hits an acorn, that acorn gets picked up.
+There's just one last thing to do. You might notice that it's a bit easy to pick up the acorns - you don't really have to touch them to pick them up, and it's pretty easy to see why. Remember the red square we had for our player before adding the Tufty sprite? It's a lot bigger than the sprite itself, 32x32px, and as soon as any part of it hits an acorn, that acorn gets picked up.
 
 Fixing this isn't too complicated. The player's `bounding_box` property is used in just one place in the program - checking for collision with the acorns. That means that we can fine tune the size and location of that bounding box to better fit Tufty's actual dimensions, without affecting anything else in the game. The property is currently calculated with:
 
@@ -1917,7 +1802,6 @@ And now gameplay is almost entirely complete. Let's move on to prettying up the 
 
 ```python
 import random
-import qwstpad
 import time
 
 
@@ -1938,7 +1822,6 @@ class game:
     platforms = []
     acorns = []
     controls = {}
-    gamepad = None
 
     foreground_scroll_speed = 4
     background_scroll_speed = 1
@@ -2178,41 +2061,14 @@ def draw_score():
     screen.text(str(game.score), 0, 0)
 
 
-def init_gamepad():
-    gamepads = qwstpad.Gamepadhelper()
-    for i in gamepads.pads:
-        if i is not None:
-            game.gamepad = i
-            return
-    game.gamepad = None
-    return
-
-
 def parse_controls():
-    if game.gamepad:
-        try:
-            game.gamepad.update_buttons()
-        except OSError:
-            init_gamepad()
-    else:
-        init_gamepad()
-
-    if game.gamepad:
-        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
-        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
-        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
-        game.controls["JUMP"] = game.gamepad.pressed("A")
-        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
-        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
-        game.controls["ANY_KEY"] = game.gamepad.pressed()
-    else:
-        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
-        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
-        game.controls["JUMP"] = badge.pressed(BUTTON_B)
-        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
-        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
-        game.controls["ANY_KEY"] = badge.pressed()
+    game.controls["MOVE_LEFT"] = badge.held(BUTTON_A) or game.gamepad.held(PAD_LEFT)
+    game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C) or game.gamepad.held(PAD_RIGHT)
+    game.controls["DROP"] = (badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)) or game.gamepad.pressed(PAD_DOWN)
+    game.controls["JUMP"] = badge.pressed(BUTTON_B) or game.gamepad.pressed(PAD_A) or game.gamepad.pressed(PAD_B) or game.gamepad.pressed(PAD_X) or game.gamepad.pressed(PAD_Y)
+    game.controls["JUMP_LEFT"] = game.controls["MOVE_LEFT"] and game.controls["JUMP"]
+    game.controls["JUMP_RIGHT"] = game.controls["MOVE_RIGHT"] and game.controls["JUMP"]
+    game.controls["ANY_KEY"] = badge.pressed() or game.gamepad.pressed()
 
 
 def init_platforms():
@@ -2271,7 +2127,8 @@ def game_over_loop():
 
 
 player = player_base(20, 0)
-init_gamepad()
+badge.pad_map({})
+game.gamepad = badge.pad[0]
 init_platforms()
 
 while True:
@@ -2444,7 +2301,6 @@ At this point, your program should look like this:
 
 ```python
 import random
-import qwstpad
 import time
 
 
@@ -2468,7 +2324,6 @@ class game:
     platforms = []
     acorns = []
     controls = {}
-    gamepad = None
 
     foreground_scroll_speed = 4
     background_scroll_speed = 1
@@ -2715,41 +2570,14 @@ def draw_score():
     screen.text(str(game.score), 0, 0)
 
 
-def init_gamepad():
-    gamepads = qwstpad.Gamepadhelper()
-    for i in gamepads.pads:
-        if i is not None:
-            game.gamepad = i
-            return
-    game.gamepad = None
-    return
-
-
 def parse_controls():
-    if game.gamepad:
-        try:
-            game.gamepad.update_buttons()
-        except OSError:
-            init_gamepad()
-    else:
-        init_gamepad()
-
-    if game.gamepad:
-        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
-        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
-        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
-        game.controls["JUMP"] = game.gamepad.pressed("A")
-        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
-        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
-        game.controls["ANY_KEY"] = game.gamepad.pressed()
-    else:
-        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
-        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
-        game.controls["JUMP"] = badge.pressed(BUTTON_B)
-        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
-        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
-        game.controls["ANY_KEY"] = badge.pressed()
+    game.controls["MOVE_LEFT"] = badge.held(BUTTON_A) or game.gamepad.held(PAD_LEFT)
+    game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C) or game.gamepad.held(PAD_RIGHT)
+    game.controls["DROP"] = (badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)) or game.gamepad.pressed(PAD_DOWN)
+    game.controls["JUMP"] = badge.pressed(BUTTON_B) or game.gamepad.pressed(PAD_A) or game.gamepad.pressed(PAD_B) or game.gamepad.pressed(PAD_X) or game.gamepad.pressed(PAD_Y)
+    game.controls["JUMP_LEFT"] = game.controls["MOVE_LEFT"] and game.controls["JUMP"]
+    game.controls["JUMP_RIGHT"] = game.controls["MOVE_RIGHT"] and game.controls["JUMP"]
+    game.controls["ANY_KEY"] = badge.pressed() or game.gamepad.pressed()
 
 
 def init_platforms():
@@ -2837,7 +2665,8 @@ def game_over_loop():
 
 
 player = player_base(20, 0)
-init_gamepad()
+badge.pad_map({})
+game.gamepad = badge.pad[0]
 init_platforms()
 
 while True:
@@ -3038,7 +2867,6 @@ And that's it! By'eck, it's been a little while, but we got there. You should ha
 
 ```python
 import random
-import qwstpad
 import time
 
 
@@ -3064,7 +2892,6 @@ class game:
     platforms = []
     acorns = []
     controls = {}
-    gamepad = None
 
     foreground_scroll_speed = 4
     background_scroll_speed = 1
@@ -3331,41 +3158,14 @@ def draw_score():
     screen.text(str(game.score), vec2(x, y))
 
 
-def init_gamepad():
-    gamepads = qwstpad.Gamepadhelper()
-    for i in gamepads.pads:
-        if i is not None:
-            game.gamepad = i
-            return
-    game.gamepad = None
-    return
-
-
 def parse_controls():
-    if game.gamepad:
-        try:
-            game.gamepad.update_buttons()
-        except OSError:
-            init_gamepad()
-    else:
-        init_gamepad()
-
-    if game.gamepad:
-        game.controls["MOVE_LEFT"] = game.gamepad.held("L")
-        game.controls["MOVE_RIGHT"] = game.gamepad.held("R")
-        game.controls["DROP"] = game.gamepad.held("D") and game.gamepad.pressed("A")
-        game.controls["JUMP"] = game.gamepad.pressed("A")
-        game.controls["JUMP_LEFT"] = game.gamepad.held("L") and game.gamepad.pressed("A")
-        game.controls["JUMP_RIGHT"] = game.gamepad.held("R") and game.gamepad.pressed("A")
-        game.controls["ANY_KEY"] = game.gamepad.pressed()
-    else:
-        game.controls["MOVE_LEFT"] = badge.held(BUTTON_A)
-        game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C)
-        game.controls["DROP"] = badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)
-        game.controls["JUMP"] = badge.pressed(BUTTON_B)
-        game.controls["JUMP_LEFT"] = badge.held(BUTTON_A) and badge.pressed(BUTTON_B)
-        game.controls["JUMP_RIGHT"] = badge.held(BUTTON_C) and badge.pressed(BUTTON_B)
-        game.controls["ANY_KEY"] = badge.pressed()
+    game.controls["MOVE_LEFT"] = badge.held(BUTTON_A) or game.gamepad.held(PAD_LEFT)
+    game.controls["MOVE_RIGHT"] = badge.held(BUTTON_C) or game.gamepad.held(PAD_RIGHT)
+    game.controls["DROP"] = (badge.held(BUTTON_DOWN) and badge.pressed(BUTTON_B)) or game.gamepad.pressed(PAD_DOWN)
+    game.controls["JUMP"] = badge.pressed(BUTTON_B) or game.gamepad.pressed(PAD_A) or game.gamepad.pressed(PAD_B) or game.gamepad.pressed(PAD_X) or game.gamepad.pressed(PAD_Y)
+    game.controls["JUMP_LEFT"] = game.controls["MOVE_LEFT"] and game.controls["JUMP"]
+    game.controls["JUMP_RIGHT"] = game.controls["MOVE_RIGHT"] and game.controls["JUMP"]
+    game.controls["ANY_KEY"] = badge.pressed() or game.gamepad.pressed()
 
 
 def init_platforms():
@@ -3468,7 +3268,8 @@ def game_over_loop():
 
 
 player = player_base(20, 0)
-init_gamepad()
+badge.pad_map({})
+game.gamepad = badge.pad[0]
 init_platforms()
 
 while True:
